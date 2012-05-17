@@ -1,0 +1,2 @@
+fix_qreal_vs_double.patch
+Added-missing-include-fix-FTBFS-on-gcc-4.7.patch

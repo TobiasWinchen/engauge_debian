@@ -1,0 +1,9 @@
+Document: engauge-digitizer-doc
+Title: Engauge Digitizer Manual
+Author: Mark Mitchell <mmdigitizer@earthlink.net>
+Abstract: User manual and tutorial for engauge-digitizer
+Section: Science/Data Analysis
+
+Format: HTML
+Index: /usr/share/doc/engauge-digitizer-doc/html/index.html
+Files: /usr/share/doc/engauge-digitizer-doc/html/*.html

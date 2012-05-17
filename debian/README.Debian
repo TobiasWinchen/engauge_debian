@@ -1,0 +1,26 @@
+engauge-digitizer for Debian
+----------------------------
+
+The package is called engauge-digitizer, but the program binary is just
+'engauge'. Up to version 3.0 it was named 'digitizer'.
+
+The full documentation including the tutorials has been split off to an
+optional separate engauge-digitizer-doc package. The package will be fully
+functional without engauge-digitizer-doc installed, except for the manual and
+tutorials in the Help menu.
+
+For the Debian distribution the program was patched to expect the these
+documents under /usr/share/engauge-digitizer-doc/usermanual the place where
+engauge-digitizer-doc installs it.
+In contrast to the original version neither the current directory nor its
+parents will be searched for the documentation location. So if you
+really want to use a different the documentation directory for whatever
+reason, set the ENGAUGE_USERMANUAL environment variable to that directory.
+
+The date/time converter in the help menu requires a javascript capable
+browser, which is started as a background job. If the environment
+variable ENGAUGE_BROWSER is unset, sensible-browser is used. Should your
+sensible-browser be text driven or not javascript capable the date/time
+converter will not work.
+
+ -- Tobias Richter <tsr-debian@achos.com>  Wed, 28 Mar 2007 14:34:44 +0200

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Engauge-digitizer
+Type=Application
+Comment=Extract data from graphs
+TryExec=engauge
+Exec=engauge %F
+MimeType=text/plain
+Categories=Education;Science;DataVisualization
+Icon=/usr/share/pixmaps/engauge-digitizer.xpm

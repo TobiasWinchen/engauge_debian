@@ -1,0 +1,78 @@
+engauge-digitizer (5.0-3) unstable; urgency=low
+
+  * Added patch including mising header. Closes: #672068 (FTBFS with gcc-4.7) 
+
+ -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Thu, 17 May 2012 11:46:21 +0200
+
+engauge-digitizer (5.0-2) unstable; urgency=low
+
+  * Added patch fixing passing double as qreal. Closes: #656943 (FTBFS on armel
+    and armhf)
+  * Remove deprecated encoding key in desktop file
+  * Updated to standards version 3.9.3
+
+ -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Mon, 19 Mar 2012 14:16:21 +0100
+
+engauge-digitizer (5.0-1) unstable; urgency=low
+
+  * New upstream release
+   - Moved to Qt4 (Closes: #604503)
+  * New maintainer
+  * Moved to standards version 3.9.2
+  * Updated debhelper compatibility level to 7
+  * Fixed wrong title in menu entry (Closes: #556025)
+  * Added .desktop file (Closes: #556028)
+  * Removed wrapper to start program with old name
+  * Moved copyright to DEP5
+
+ -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Mon, 26 Sep 2011 21:45:52 +0200
+
+engauge-digitizer (4.1-2) unstable; urgency=low
+
+  * Change build depedency fftw3-dev to libfftw3-dev (from ubuntu).
+  * remove dependency on libqt3-compat-headers by kind patch from Barry
+    deFreese (Closes: #464391)
+  * drop dpatch build dependency - currently not used
+  * minor changes to bump standards version to 3.7.3 
+
+ -- Tobias Stefan Richter <tsr-debian@achos.com>  Thu,  1 May 2008 00:02:04 +0100
+
+engauge-digitizer (4.1-1) unstable; urgency=low
+
+  * new upstream version with added arrow movement
+  * debian/rules: build doc-package in binary-indep
+  * prevent compression of javascript source in -doc to get the browser date
+    convertion working
+  * rename /usr/share/doc/engauge-digitizer-doc/usermanual to .../html
+  * remove watch file, seems broken for sf.net and too difficult to fix
+  * remove rafael@debian.org from Uploaders to clarify his status as
+    sponsor only
+
+ -- Tobias Stefan Richter <tsr-debian@achos.com>  Mon, 16 Apr 2007 14:02:04 +0200
+
+engauge-digitizer (4.0-1) unstable; urgency=low
+
+  * new upstream version with improved point match routine
+  * NOTE: upstream changed the binary name, it is called 'engauge' now!
+
+ -- Tobias Stefan Richter <tsr-debian@achos.com>  Wed,  3 Jan 2007 20:55:36 +0100
+
+engauge-digitizer (3.0+cvs20061120-1) unstable; urgency=low
+
+  * new packaging using upstream CVS
+  * minor upstream changes to the documentation
+
+ -- Tobias Stefan Richter <tsr-debian@achos.com>  Thu, 16 Nov 2006 14:39:54 +0100
+
+engauge-digitizer (3.0-2) unstable; urgency=low
+
+  * First official Debian release, sponsored by me
+  * debian/control: Added my name to the Uploaders field
+
+ -- Rafael Laboissiere <rafael@debian.org>  Mon, 23 Oct 2006 09:06:53 +0200
+
+engauge-digitizer (3.0-1) unstable; urgency=low
+
+  * Initial release (Closes: #374849)
+
+ -- Tobias Stefan Richter <tsr-debian@achos.com>  Wed,  4 Oct 2006 11:49:35 +0200

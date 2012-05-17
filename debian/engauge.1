@@ -1,0 +1,75 @@
+.TH ENGAUGE-DIGITIZER 1 "December 14, 2006"
+.SH NAME
+engauge-digitizer \- interactively convert a bitmap graph or map into numbers
+.SH SYNOPSIS
+.B engauge
+.RI [ options ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B engauge
+command from the engauge-digitizer package.
+.PP
+.SH Startup
+.TP
+.B -import FILE
+Automatically import the specified image file at startup. Image files may also be imported manually using the menu
+.TP
+.B -open FILE
+Automatically open the specified Engauge Digitizer document file at startup. Document files may also be opened manually using the menu
+.TP
+.B -help
+Display a list of command line options similar to this manpage in an X window and exit
+.TP
+.B -manual DIRECTORY
+Look for the HTML user guide in the specified directory. For Debian it is installed in /usr/share/doc/engauge-digitizer/usermanual and should need no configuration.
+.TP
+.B -axes XMIN XMAX YMIN YMAX
+Scan the imported file at startup, and locate the X and Y axes. Then digitize axis points assuming the X axis ranges from XMIN to XMAX, and the Y axis ranges from YMIN to YMAX. The X axis is assumed to be near the bottom of the image, and the Y axis is assumed to be on the left side of the image. For speed, no attempt to rotate the image if it is sideways, so the digitized points may require adjustment. This feature should be useful when using Perl or other scripts to digitize many images with known axes ranges. The axis points may also be digitized manually using the Digitize Axis Points mode
+.TP
+.B -lazysegments
+Postpone scanning for segments that is normally performed during startup, until either the Segments dialog is used, or the Segment Fill button is selected.
+.SH Shutdown
+.TP
+.B -export FILE
+Automatically export the active document at shutdown. Documents may also be exported manually using the menu.
+.SH Settings
+.TP
+.B -reset
+Reset all settings to the factory defaults. This option is a fast and easy way to restore all settings to a useful configuration, especially when there are problems with one or more settings.
+Settings are stored in a text file such as $HOME/.qt/engaugerc.
+.SH Debugging
+.TP
+.B -pixels
+Show cursor location in pixel coordinates rather than graph coordinates
+.TP
+.B -ctor
+Trace constructor calls
+.TP
+.B -dtor
+Trace destructor calls
+.TP
+.B -curvecmb
+Trace curve combobox operations
+.TP
+.B -measurecmb
+Trace measure combobox operations
+.TP
+.B -refresh
+Trace screen refreshes
+.TP
+.B -scanning
+Trace image scanning
+.SH Environment variables
+.TP
+.B ENGAUGE_BROWSER
+To start up the date/time converter from within Engauge Digitizer, this environment variable must be set to the shell command that runs a javascript-capable browser. Examples are 'firefox', 'konqueror', ...
+.TP
+.B ENGAUGE_USERMANUAL
+If set, this specifies the directory containing the user manual. This option, like the '\-manual' command line option, should not be needed on a Debian installation.
+.SH SEE ALSO
+The program is documented quite nicely in the HTML user guide and tutorial, available under /usr/share/doc/engauge-digitzer/usermanual or from Help within the running program.
+.SH AUTHOR
+engauge-digitizer was written by Mark Mitchell <mmdigitizer@earthlink.net>.
+.PP
+This manual page was written by Tobias Stefan Richter <tsr-debian@achos.com>
+for the Debian project (but may be used by others).

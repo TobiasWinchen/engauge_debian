@@ -1,0 +1,6 @@
+?package(engauge-digitizer):needs="X11"				\
+		section="Applications/Science/Data Analysis"	\
+		title="engauge-digitizer"				\
+		command="/usr/bin/engauge"		\
+		icon="/usr/share/pixmaps/engauge-digitizer.xpm"
+
