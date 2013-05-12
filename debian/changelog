@@ -1,3 +1,11 @@
+engauge-digitizer (5.1-1) UNRELEASED; urgency=low
+
+  * New upstream release
+   - Makes patch Added-missing-include-fix-FTBFS-on-gcc-4.7 obsolete
+   - Fixes segmentation fault in point match (Closes: #695858)
+
+ -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Sun, 12 May 2013 14:01:34 +0200
+
 engauge-digitizer (5.0-3) unstable; urgency=low
 
   * Added patch including mising header. Closes: #672068 (FTBFS with gcc-4.7) 
