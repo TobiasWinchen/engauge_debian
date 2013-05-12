@@ -92,7 +92,7 @@ QAction* createAction(QObject * parent, const char * name = 0)
 	QAction *f = new QAction(name, parent);
 	return f;
 }
-QAction* createAction(const QString & menuText, QKeySequence accel, QObject * parent, const char * name = 0 )
+QAction* createAction(const QString & menuText, QKeySequence accel, QObject * parent, const char * )
 {
 	QAction *f = createAction(parent, menuText);
 	f->setShortcut(accel);
@@ -220,7 +220,7 @@ void DigitMain::initActions()
   fileImport->setWhatsThis(tr("New File\n\nCreates a new document by importing an image"));
   connect(fileImport, SIGNAL(activated()), this, SLOT(slotFileImport()));
 
-  fileOpen = createAction(tr("&Open Document"), openIcon, tr("&Open..."), 0, this);
+  fileOpen = createAction(tr("&Open Document"), openIcon, tr("&Open..."), tr("Ctrl+O"), this);
   CHECK_PTR_ENGAUGE(fileOpen);
   fileOpen->setStatusTip(tr("Opens an existing document"));
   fileOpen->setWhatsThis(tr("Open Document\n\nOpens an existing document"));
@@ -438,13 +438,13 @@ void DigitMain::initActions()
     "information window. Lengths and areas of the active measure are displayed"));
   connect(viewMeasureGeometry, SIGNAL(toggled(bool)), this, SLOT(slotViewMeasureGeometry(bool)));
 
-  digitizeSelect = createAction(tr("&Select"), selectIcons, tr("&Select"), tr("Ctrl+S"), this, 0, true);
+  digitizeSelect = createAction(tr("Selec&t"), selectIcons, tr("Select"), tr("Ctrl+T"), this, 0, true);
   CHECK_PTR_ENGAUGE(digitizeSelect);
   digitizeSelect->setStatusTip(tr("Select one or more points on screen"));
   digitizeSelect->setWhatsThis(tr("Select\n\nSelect one or more points on screen"));
   connect(digitizeSelect, SIGNAL(toggled(bool)), this, SLOT(slotDigitizeSelect(bool)));
 
-  digitizeAxis = createAction(tr("&Axis Point"), axisIcons, tr("&Axis Point"), 0, this, 0, true);
+  digitizeAxis = createAction(tr("&Axis Point"), axisIcons, tr("Axis Point"), 0, this, 0, true);
   CHECK_PTR_ENGAUGE(digitizeAxis);
   digitizeAxis->setStatusTip(tr("Digitizes an axis point"));
   digitizeAxis->setWhatsThis(tr("Digitize Axis Point\n\nDigitizes an axis point by placing a new point "
@@ -452,7 +452,7 @@ void DigitMain::initActions()
     "required to define the coordinates"));
   connect(digitizeAxis, SIGNAL(toggled(bool)), this, SLOT(slotDigitizeAxis(bool)));
 
-  digitizeScale = createAction(tr("&Scale Bar"), scaleIcons, tr("&Scale Bar"), 0, this, 0, true);
+  digitizeScale = createAction(tr("Scale &Bar"), scaleIcons, tr("Scale Bar"), 0, this, 0, true);
   CHECK_PTR_ENGAUGE(digitizeScale);
   digitizeScale->setStatusTip(tr("Digitizes a scale bar"));
   digitizeScale->setWhatsThis(tr("Digitize Scale Bar\n\nDigitizes a scale bar by placing a new point "
@@ -461,14 +461,14 @@ void DigitMain::initActions()
     "will be unavailable if log and/or polar coordinates have been selected"));
   connect(digitizeScale, SIGNAL(toggled(bool)), this, SLOT(slotDigitizeScale(bool)));
 
-  digitizeCurve = createAction(tr("&Curve Point"), curveIcons, tr("&Curve Point"), 0, this, 0, true);
+  digitizeCurve = createAction(tr("Cu&rve Point"), curveIcons, tr("Curve Point"), tr("Ctrl+R"), this, 0, true);
   CHECK_PTR_ENGAUGE(digitizeCurve);
   digitizeCurve->setStatusTip(tr("Digitizes a curve point"));
   digitizeCurve->setWhatsThis(tr("Digitize Curve Point\n\nDigitizes a single curve point under the cursor\n\n"
     "New points will be assigned to the currently active curve"));
   connect(digitizeCurve, SIGNAL(toggled(bool)), this, SLOT(slotDigitizeCurve(bool)));
 
-  digitizeSegment = createAction(tr("&Segment Fill"), segmentIcons, tr("&Segment Fill"), 0, this, 0, true);
+  digitizeSegment = createAction(tr("Se&gment Fill"), segmentIcons, tr("Segment Fill"), tr("Ctrl+G"), this, 0, true);
   CHECK_PTR_ENGAUGE(digitizeSegment);
   digitizeSegment->setStatusTip(tr("Digitizes curve points along a curve segment"));
   digitizeSegment->setWhatsThis(tr("Digitize Segment Fill\n\nDigitizes a curve segment by placing curve points "
@@ -476,7 +476,7 @@ void DigitMain::initActions()
     "New points will be assigned to the currently active curve"));
   connect(digitizeSegment, SIGNAL(toggled(bool)), this, SLOT(slotDigitizeSegment(bool)));
 
-  digitizePointMatch = createAction(tr("&Point Match"), matchIcons, tr("&Point Match"), 0, this, 0, true);
+  digitizePointMatch = createAction(tr("Point Matc&h"), matchIcons, tr("Point Match"), tr("Ctrl+H"), this, 0, true);
   CHECK_PTR_ENGAUGE(digitizePointMatch);
   digitizePointMatch->setStatusTip(tr("Digitizes curve points in a point plot by matching a point"));
   digitizePointMatch->setWhatsThis(tr("Digitize Curve Points by Point Matching\n\nDigitizes curve points in a "
@@ -484,7 +484,7 @@ void DigitMain::initActions()
     "New points will be assigned to the currently active curve"));
   connect(digitizePointMatch, SIGNAL(toggled(bool)), this, SLOT(slotDigitizePointMatch(bool)));
 
-  digitizeMeasure = createAction(tr("&Measure Point"), measureIcons, tr("&Measure Point"), 0, this, 0, true);
+  digitizeMeasure = createAction(tr("&Measure Point"), measureIcons, tr("Measure Point"), tr("Ctrl+M"), this, 0, true);
   CHECK_PTR_ENGAUGE(digitizeMeasure);
   digitizeMeasure->setStatusTip(tr("Digitizes a measure point for measuring length and area"));
   digitizeMeasure->setWhatsThis(tr("Digitize Measure Point\n\nDigitizes a measure point by placing a new point "
@@ -1976,7 +1976,8 @@ bool DigitMain::documentSaveAs(DigitDoc* doc)
   if (doc)
   {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save"), 
-				doc->savePath(), DigitDoc::filterOpenSave());
+                                                    doc->savePath(), DigitDoc::filterOpenSave(),
+                                                    0, QFileDialog::DontConfirmOverwrite);
     if (!filename.isEmpty())
     {
       bool save = true;
@@ -2133,8 +2134,9 @@ void DigitMain::slotFileExportAs()
   DigitDoc* doc = activeDocument();
   if (doc)
   {
-    QString filename = QFileDialog::getSaveFileName(doc->exportPath(), 0, this, "export as",
-      QString(tr("Export")));
+    QString filename = QFileDialog::getSaveFileName (this, QString(tr("Export")), doc->exportPath (),
+                                                     tr("Excel (*.csv *.tsv *.txt);; All files (*.*)"),
+                                                     0, QFileDialog::DontConfirmOverwrite);
     if (!filename.isEmpty())
     {
       bool save = true;

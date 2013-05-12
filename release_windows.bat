@@ -5,7 +5,7 @@ rem usage: release_windows.bat version_number_prefix version_number_suffix [buil
 rem author: mark mitchell
 
 rem release directory %releaseDir% is one level below the %releaseRootDir% directory, to be
-rem consistent with the linux and osx environments where the release directory ends up in 
+rem consistent with the linux and osx environments where the release directory ends up in
 rem the user's current directory when he/she untars!
 set releaseRootDir=releaseRoot
 
@@ -18,13 +18,12 @@ if "%3" == "" goto noDirectory
 :noDirectory
 set releaseDir=%releaseRootDir%\engauge
 
-rem make sure executable and fftw dll both exist in bin directory
+rem make sure executable exists in bin directory
 if not exist bin\engauge.exe goto missingExe
-if not exist bin\libfftw3-3.dll goto missingDll
 
 set zipFile=..\digit-exe-windows-%version%.zip
 
-echo 
+echo
 echo Version number: %version%
 echo Building release in directory: %releaseDir%
 echo Writing to zip file: %zipFile%
@@ -42,21 +41,19 @@ rem copy files. note that all wildcard copies are performed with file suffixes
 rem so the CVS subdirectory is not copied
 echo Copying files...
 copy bin\engauge.exe %releaseDir%
-copy bin\engauge.exe.local %releaseDir%
-copy bin\libfftw3-3.dll %releaseDir%
 copy LICENSE %releaseDir%
-copy samples\*.bmp %releaseDir%\samples 
-copy samples\*.gif %releaseDir%\samples 
-copy samples\*.jpg %releaseDir%\samples 
-copy samples\*.png %releaseDir%\samples 
-copy usermanual\*.gif %releaseDir%\usermanual 
-copy usermanual\*.html %releaseDir%\usermanual 
-copy usermanual\*.jpg %releaseDir%\usermanual 
+copy samples\*.bmp %releaseDir%\samples
+copy samples\*.gif %releaseDir%\samples
+copy samples\*.jpg %releaseDir%\samples
+copy samples\*.png %releaseDir%\samples
+copy usermanual\*.gif %releaseDir%\usermanual
+copy usermanual\*.html %releaseDir%\usermanual
+copy usermanual\*.jpg %releaseDir%\usermanual
 copy usermanual\*.png %releaseDir%\usermanual
 
 rem we made it this far, so finish up by zipping up the release
 echo Writing zip file...
-"\program files\winzip\winzip32.exe" -a -r %zipFile% %releaseRootDir%
+"\program files\winzip\winzip64.exe" -a -r %zipFile% %releaseRootDir%
 
 goto end
 
@@ -66,10 +63,6 @@ goto end
 
 :missingExe
 echo executable has not been created. see RELEASE file
-goto end
-
-:missingDll
-echo fftw dll has not been copied to the bin directory. see INSTALL file
 goto end
 
 :end

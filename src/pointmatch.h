@@ -74,7 +74,7 @@ class PointMatch
     // recursively isolate the "on" pixels around (x,y). return true if pixel at (x,y) was on
     bool isolateSampleMatchPoint(QPolygon * samplePointPixels,
       const QImage &image, PointMatchSettings settings,
-      int xStart, int yStart, int x, int y);
+      int x, int y);
 
     // create document points that match the sample point under the cursor
     static void matchSamplePoint(const QImage &imageProcessed,

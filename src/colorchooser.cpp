@@ -301,7 +301,7 @@ void ColorChooser::loadHistogram(const QImage* imageOriginal,
       int binCount = bins [i];
       if (binCount < 1)
         binCount = 1;
-      yNew = (int) ((m_chooserHeight - 1.0) * (1.0 - log(binCount) / log(pixelCount)) + 0.5);
+      yNew = (int) ((m_chooserHeight - 1.0) * (1.0 - log((double) binCount) / log(pixelCount)) + 0.5);
 
       if (yNew < 0)
         yNew = 0;

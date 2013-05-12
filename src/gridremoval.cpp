@@ -217,7 +217,7 @@ void GridRemoval::initializeThinSearch(double thinThickness,
         if (distancetoline(x, y, 0.0, 0.0, xBasis, yBasis) <= 0.5)
         {
           // add new search point
-          SearchPoint *p = new SearchPoint(i, j, sqrt(i * i + j * j));
+          SearchPoint *p = new SearchPoint(i, j, sqrt((double) (i * i + j * j)));
           CHECK_PTR_ENGAUGE(p);
 
           searchPattern->append(p);
@@ -291,8 +291,8 @@ void GridRemoval::Neuron::connectSynapseToSynapsesDestination(char *pixels,
     Synapse *s = m_synapseDict [i];
     int xDestination = s->xCenterOfMass();
     int yDestination = s->yCenterOfMass();
-    double separation = sqrt((xDestination - xSource) * (xDestination - xSource) +
-      (yDestination - ySource) * (yDestination - ySource));
+    double separation = sqrt((double) ((xDestination - xSource) * (xDestination - xSource) +
+      (yDestination - ySource) * (yDestination - ySource)));
     if (separation <= gapSeparation)
     {
       // draw a line from the source to the destination. we sacrifice efficiency for

@@ -20,8 +20,8 @@ QMAKE_CXXFLAGS_RELEASE += -Wno-non-virtual-dtor
 }
 win32 {
 DEFINES  	+= WIN32
-INCLUDEPATH	= $$(FFTW_HOME)/api
-LIBS            = -Lbin -llibfftw3-3
+INCLUDEPATH	= $$(FFTW_HOME)/include
+LIBS            += -L$$(FFTW_HOME)/lib -lfftw3
 OBJECTS_DIR     = src/.objs
 }
 HEADERS		= src/axispointdlg.h \
@@ -127,5 +127,6 @@ TARGET		= bin/engauge
 # tr is turkish
 TRANSLATIONS	= engauge_pt_br.ts \
 		  engauge_tr.ts
+MOC_DIR = src/.moc
 #qt3support was inserted by qt3to4. qt3support in turn requires network
 QT +=  qt3support network

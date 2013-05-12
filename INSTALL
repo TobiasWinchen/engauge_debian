@@ -13,7 +13,7 @@ Table of Contents:
    6. USER INSTALL - Source Release
    7. DEVELOPER INSTALL - Linux Using Makefile
    8. DEVELOPER INSTALL - Mac OSX Using Makefile
-   9. DEVELOPER INSTALL - MS Windows With Visual C++ 6.0 Using Makefile
+   9. DEVELOPER INSTALL - MS Windows With QtSDK
   10. DEVELOPER INSTALL - MS Windows With Visual C++ 6.0 Using IDE
   11. DEVELOPER INSTALL - Linking problems
   12. INTERNATIONALIZATION
@@ -32,11 +32,11 @@ manager such as Ubuntu's Synaptic.
 If you are compiling Engauge Digitizer from source code, the following two packages
 must first be installed:
 
-  1. Version 3 of Qt from www.trolltech.com
+  1. Version 4 of Qt from qt.nokia.com
 
          *******************************************************************
          * Comments and warnings:                                          *
-         * 1. Do NOT install Version 4! You must install version 3         *
+         * 1. Do NOT install Version 3! You must install version 4         *
          * 2. You may download the open source version for free, although  *
          *    purchasing a commercial version entitles you to customer     *
          *    support from the wonderful staff at Trolltech, and to        *
@@ -44,7 +44,13 @@ must first be installed:
          * 3. The QTDIR environment variable must point to the Qt          *
          *    installation directory                                       *
          * 4. The PATH environment variable must point to the qmake tool   *
-         *    of Qt                                                        *
+         *    of Qt. Hint - if you have compilation problems on a computer *
+         *    with multiple versions of Qt, then try 'qmake -v' to see if  *
+         *    you are using the wrong version of Qt. If so, then adjust    *
+         *    your PATH variable to use Qt version 4                       *
+         * 5. In Microsoft Windows the preferred setup is using QtSDK from *
+         *    qt.nokia.com with the optional MinGW package installed       *
+         *    during the QtSDK installation. Details are given below.      *
          *******************************************************************
 
   2. Version 3.1.2 of FFTW from www.fftw.org 
@@ -53,11 +59,15 @@ must first be installed:
          * Comments and warnings:                                          *
          * 1. Version 3.1.2 is guaranteed to work, although other versions *
          *    will probably also work                                      *
-         * 2. You may download the open source version for free, although  *
-         *    purchasing a commercial version allows you to include        *
-         *    Qt in commercial products                                    *
-         * 3. The 'make install' installation step must be performed so    *
-         *    the FFTW include files and library are available to Engauge  *
+         * 2. Linux users may be able to install a package for their       *
+         *    distribution using their standard package installer. This is *
+         *    the preferred method.                                        *
+         * 3. The FFTW source may be downloaded from www.fftw.org and      *
+         *    installed manually. In this case, the standard instalation   *
+         *    steps are followed:                                          *
+         *    3a) ./configure                                              *
+         *    3b) make                                                     *
+         *    3c) make install                                             *
          *******************************************************************
 
 Note that open source versions of both Qt and FFTW are freely available.
@@ -87,7 +97,7 @@ document files.
 5. USER INSTALL - Sun Forte Compiler
 -----------------------------------------
 
-1. Install Qt (see http://www.trolltech.com/developer/platforms/index.html)
+1. Install Qt (see http://qt.nokia.com/developer/platforms/index.html)
 2. Get a copy of the source code using anonymous cvs access by running 
    'cvs -z3 -d:pserver:anonymous@digitizer.cvs.sourceforge.net:/cvsroot/digitizer
    checkout -P digitizer' 
@@ -114,7 +124,7 @@ executable releases. However, this is the only option for unsupported
 operating systems.
 
 Building your own executable is not too much of a problem if you have 
-already installed Qt from Trolltech (www.trolltech.com) installed, but
+already installed Qt from Trolltech (qt.nokia.com) installed, but
 if you have yet to install the Qt toolkit, you may have much work 
 ahead of you. 
 
@@ -128,7 +138,7 @@ a wide variety of other platforms.
 1. See if Qt is installed. Some tricks are to try running 'qmake -v' and to
    look in '/usr/lib' for a directory like 'qt-3.3.3'
 2. If Qt from Trolltech is not already installed, then
-   install Qt/X11 (see http://www.trolltech.com/developer/platforms/index.html)
+   install Qt/X11 (see http://qt.nokia.com/developer/platforms/index.html)
    with the following environment variables:
      QTDIR=$HOME/qt-3.X.X
    and the following command line options for "configure":
@@ -170,7 +180,7 @@ Comments for Linux:
 1. See if Qt is installed. Some tricks are to try running 'qmake -v' and to
    look in '/usr/lib' for a directory like 'qt-3.3.3'
 2. If Qt from Trolltech is not already installed, then
-   install Qt/Mac (see http://www.trolltech.com/developer/platforms/index.html)
+   install Qt/Mac (see http://qt.nokia.com/developer/platforms/index.html)
    with the following environment variables:
      QTDIR=$HOME/qt-mac-free-3.X.X
      QMAKESPEC=$QTDIR/mkspecs/macx-g++
@@ -207,60 +217,32 @@ Comments for OSX:
 -ssh keys for sourceforge compile farm use rsa1 keys rather than dsa keys
 -Use other command line options for "configure" at your own risk
 
-9. DEVELOPER INSTALL - MS Windows With Visual C++ 6.0 Using Makefile
+9. DEVELOPER INSTALL - MS Windows With QtSDK
 --------------------------------------------------------------------
 
-1. Install Qt/Windows 3 Enterprise since the open source Windows package
-   is incompatible because it is an ancient version, and the Professional
-   edition lacks Canvas support (see 
-   http://www.trolltech.com/developer/platforms/index.html)
-   with the following environment variables:
-     QMAKESPEC=win32-msvc
-   and the following build options selected:
-     thread
-     release
-     gif
-     jpeg
-     mng
-     png
-     zlib
-2. Set QTDIR environment variable to the qt directory (typically c:\qt)
-3. Extract, but do not build, the complete source code package of FFTW 3.X.X from 
-   http://www.fftw.org into its own directory. Only the header files from this
-   package will be used so no compilation is needed
-4. Set the FFTW_HOME environment variable in Control Panel / System /
-   Environment Variables to point to the main FFTW source code directory
-5. Get a copy of the source code using anonymous cvs access by running 
-   'cvs -z3 -d:pserver:anonymous@digitizer.cvs.sourceforge.net:/cvsroot/digitizer
-   checkout -P digitizer' 
-   -OR-
-   by downloading the source tarball from digitizer.sourceforge.net and running
-   'tar xvfz digit-src-X_Y.tar.gz'
-   -OR-
-   by downloading the source zip file from digitizer.sourceforge.net and running
-   'unzip digit-src-X_Y.zip'
-6. Extract the two files libfftw3-3.def and libfftw3-3.dll from the version 3.X.X
-   dll package at http://www.fftw.org/install/windows, into the digitizer/bin 
-   directory created in the previous step
-7. According to the directions at http://www.fftw.org/install/windows, create the 
-   library file libfftw3-3.lib by running the Visual Studio 6 'lib' utility in the 
-   digitizer/bin using
-   'lib /machine:i386 /def:libfftw3-3.def'
-8. Run the Qt makefile utility qmake as 
-   'qmake digitizer.pro'
-9. Run MS make utility as 'nmake'
-10. If you have linking problems, see "DEVELOPER INSTALL - Linking problems"
-11. You can now run the digitizer.exe executable
-
-Comments for Windows:
--The settings in digitizer.pro must agree with the Qt build settings
--Use other build options at your own risk
+1. Install QtSDK. When prompted, select 'Custom installation' so you
+   can pick the 'MinGW' development tools
+2. Download the FFTW 3.X.X source code from http://www.fftw.org
+3. In the QtSDK menu open a 'MADDE Terminal'
+4. Set the following environment variables:
+   4a) FFTW_HOME to where you will install the FFTW library
+   4b) QMAKESPEC=Win32-g++
+5. In the FFTW subdirectory:
+      ./configure --prefix=$FFTW_HOME
+      make
+      make install
+5. Download the Engauge source code from http://sourceforge.net
+6. In the Engauge subdirectory:
+      qmake digitizer.pro
+      make
 
 10. DEVELOPER INSTALL - MS Windows With Visual C++ 6.0 Using IDE
 ----------------------------------------------------------------
 
-1. Install noncommercial Qt 3 using the settings from the same step in the previous 
-   section. See http://www.trolltech.com/developer/platforms/index.html
+Warning, this section is out of date since around 2006!
+
+1. Install noncommercial Qt 4 using the settings from the same step in the previous 
+   section. See http://qt.nokia.com/developer/platforms/index.html
 2. Set QTDIR environment variable to the qt directory (typically c:\qt)
 3. Extract, but do not build, the complete source code package of FFTW 3.X.X from 
    http://www.fftw.org into its own directory. Only the header files from this

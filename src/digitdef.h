@@ -258,6 +258,8 @@ struct ExportSettings
   ExportLayout layout;
   ExportDelimiters delimiters;
   ExportHeader header;
+  QString xLabel;
+  QString thetaLabel;
 };
 
 // of the four grid mesh parameters (count, increment, start, stop), only 
