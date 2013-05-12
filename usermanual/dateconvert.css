@@ -1,0 +1,51 @@
+form { 
+background-color: tan;
+border-width: 1;
+border-style: solid;
+padding: 10px;
+}
+img {
+margin-left: auto;
+margin-right: auto;
+}
+sup {
+font-size: 80%;
+}
+td { 
+margin: 0;
+border-width: 1px;
+border-style: solid;
+border-color: black;
+border-collapse: collapse;
+}
+td.mainheader {
+margin: 0;
+text-align: center;
+}
+td.header {
+margin: 0;
+padding: 0 0 0 5px;
+}
+table { 
+margin-left: auto;
+margin-right: auto;
+border-collapse: collapse;
+}
+.inputs {
+width: 160px;
+}
+.inputswide {
+width: 440px;
+}
+td.settings {
+width: 240px;
+border-width: 0px;
+vertical-align: top;
+}
+td.settingsspacer {
+border-width: 0px;
+width: 100px;
+}
+td.invis {
+border-width: 0px;
+}
