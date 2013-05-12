@@ -431,7 +431,7 @@ void PointMatchThread::removePixelsNearExistingPoints(double* image,
       int radical = pointSeparation * pointSeparation - (y - yPoint) * (y - yPoint);
       if (0 < radical)
       {
-        int xMin = (int) (xPoint - sqrt(radical));
+        int xMin = (int) (xPoint - sqrt((double) radical));
         if (xMin < 0)
           xMin = 0;
         int xMax = xPoint + (xPoint - xMin);

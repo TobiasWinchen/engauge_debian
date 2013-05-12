@@ -20,6 +20,7 @@
 #define EXPORTDLG_H
 
 #include <qdialog.h>
+#include <qlineedit.h>
 #include <qstring.h>
 #include <q3groupbox.h>
 #include <qpushbutton.h>
@@ -61,6 +62,7 @@ class ExportDlg : public QDialog
     void slotNone(bool toggle);
     void slotSimple(bool toggle);
     void slotGnuplot(bool toggle);
+    void slotXThetaLabel(const QString& xThetaLabel);
     void slotWhat(void);
 
   private:
@@ -103,6 +105,9 @@ class ExportDlg : public QDialog
     QRadioButton* buttonNone;
     QRadioButton* buttonSimple;
     QRadioButton* buttonGnuplot;
+
+    QLabel* labelXThetaLabel;
+    QLineEdit* editXThetaLabel;
 
     // immediately update the preview screen after each setting change, so user can
     // see the effects. if it turns out the user is blocked for an unacceptably long

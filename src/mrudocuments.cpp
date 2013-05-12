@@ -77,8 +77,6 @@ void MruDocuments::attachPopupMenu(QMenu* pParentMenu, int parentActionId, QSize
 
 void MruDocuments::mergeDocument(QString doc)
 {
-  bool success = true;
-  
   // if this document is already the first in the list, then nothing needs to be done
   if (!m_mruDocuments.isEmpty())
     if (doc == m_mruDocuments.first()->text())
@@ -88,13 +86,13 @@ void MruDocuments::mergeDocument(QString doc)
   // first and there is no way to move entries around in the popup menu
   QAction* pAction;
   for (pAction = m_mruDocuments.first(); pAction; pAction = m_mruDocuments.next())
-    success = pAction->removeFrom(m_pPopup);
+    pAction->removeFrom(m_pPopup);
 
   // remove duplicate entry from list if it exists
   for (pAction = m_mruDocuments.first(); pAction; pAction = m_mruDocuments.next())
     if (doc == pAction->text())
     {
-      success = m_mruDocuments.remove(pAction); // autodelete is off
+      m_mruDocuments.remove(pAction); // autodelete is off
       delete pAction;
       break;
     }

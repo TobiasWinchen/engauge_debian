@@ -83,14 +83,22 @@ AxisPointDlg::~AxisPointDlg()
 double AxisPointDlg::x(void)
 {
   double value;
+#ifdef VISUALSTUDIO
+  sscanf_s(editX->text(), "%lg", &value);
+#else
   sscanf(editX->text(), "%lg", &value);
+#endif
   return value;
 }
 
 double AxisPointDlg::y(void)
 {
   double value;
+#ifdef VISUALSTUDIO
+  sscanf_s(editY->text(), "%lg", &value);
+#else
   sscanf(editY->text(), "%lg", &value);
+#endif
   return value;
 }
 

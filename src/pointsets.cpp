@@ -709,9 +709,9 @@ QString PointSets::exportHeaderPrefix(CoordSettings coord, ExportSettings xport)
     prefix += "#";
 
   if (coord.frame == Cartesian)
-    prefix += "x";
+    prefix += xport.xLabel;
   else
-    prefix += "theta";
+    prefix += xport.thetaLabel;
 
   return prefix;
 }

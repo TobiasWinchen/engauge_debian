@@ -62,12 +62,12 @@ void initGlobals()
   ASSERT_ENGAUGE(GridSetStrings.findIndex("Step") == AllButStep);
   ASSERT_ENGAUGE(GridSetStrings.findIndex("Stop") == AllButStop);
 
-  VersionNumber = QString("5.0");
+  VersionNumber = QString("5.1");
   VersionNumbersSupported <<
     "2.0" << "2.1" << "2.2" << "2.3" << "2.4" << "2.5" << "2.6" << "2.7" <<  "2.8" << 
     "2.9" << "2.10" << "2.11" << "2.12" << "2.13" << "2.14" << "2.15" << "3.0" << 
     "4.0" << "4.1" <<
-    "5.0";
+    "5.0" << "5.1";
 }
 
 mmUnits mmUnitize(CoordSettings coord)

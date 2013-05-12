@@ -26,7 +26,7 @@
 #include "main.h"
 
 // default zoom settings as percentages
-static int zoomDefaults [] = {500, 400, 300, 200, 100, 75, 50, 33, 25, 10};
+static int zoomDefaults [] = {2000, 1000, 500, 400, 300, 200, 100, 75, 50, 33, 25, 10};
 
 ZoomCmb::ZoomCmb(QWidget* parent) :
   QComboBox(true, parent, "zoom factor")

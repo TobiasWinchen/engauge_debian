@@ -152,8 +152,8 @@ int Discretize::discretizeValueForeground(const QImage* image, int x, int y, Dis
   int r, g, b;
   double distance;
   color.rgb(&r, &g, &b);
-  distance = sqrt ((r - rBg) * (r - rBg) + (g - gBg) * (g - gBg) + (b - bBg) * (b - bBg));
-  int value = (int) (distance * DiscretizeForegroundMax / sqrt(255 * 255 + 255 * 255 + 255 * 255) + 0.5);
+  distance = sqrt ((double) ((r - rBg) * (r - rBg) + (g - gBg) * (g - gBg) + (b - bBg) * (b - bBg)));
+  int value = (int) (distance * DiscretizeForegroundMax / sqrt((double) (255 * 255 + 255 * 255 + 255 * 255)) + 0.5);
 
   if (value < 0)
     value = 0;
@@ -182,8 +182,8 @@ int Discretize::discretizeValueNotForeground(const QImage* image, int x, int y, 
     break;
   case DiscretizeIntensity:
     color.rgb(&r, &g, &b);
-    intensity = sqrt (r * r + g * g + b * b);
-    value = (int) (intensity * DiscretizeIntensityMax / sqrt(255 * 255 + 255 * 255 + 255 * 255) + 0.5);
+    intensity = sqrt ((double) (r * r + g * g + b * b));
+    value = (int) (intensity * DiscretizeIntensityMax / sqrt((double) (255 * 255 + 255 * 255 + 255 * 255)) + 0.5);
     break;
   case DiscretizeForeground:
     break;

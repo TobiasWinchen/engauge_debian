@@ -57,6 +57,8 @@ const QString EXPORT_POINTSSELECTION(EXPORT_GROUP + "/pointsselection");
 const QString EXPORT_LAYOUT(EXPORT_GROUP + "/layout");
 const QString EXPORT_DELIMITERS(EXPORT_GROUP + "/delimiters");
 const QString EXPORT_HEADER(EXPORT_GROUP + "/header");
+const QString EXPORT_XLABEL(EXPORT_GROUP + "/xlabel");
+const QString EXPORT_THETALABEL(EXPORT_GROUP + "/thetalabel");
 
 const QString VIEW_GROUP(ENGAUGE_GROUP_PREFIX + "/view"); // group prefix for view selections
 const QString VIEW_TOOLBARS(VIEW_GROUP + "/toolbars"); // subgroup prefix for view toolbars selections
@@ -235,7 +237,8 @@ void DefaultSettings::archiveSettings()
   // windows any calls to insertSearchPath or setPath either cancel cmdSettingsText,
   // or they cause multiple files to be written out (one per group)
   //QSettings archiver(cmdSettingsText ? QSettings::Ini : QSettings::Native);
-  QSettings archiver;
+  QString organization ("engauge"); // in linux systems a .ini file with this prefix is put into home directory
+  QSettings archiver (organization);
 
   archiver.writeEntry(SESSIONS_SESSIONS, m_sessionsSettings.sessions);
   archiver.writeEntry(SESSIONS_COORDINATES, m_sessionsSettings.coordinates);
@@ -262,6 +265,8 @@ void DefaultSettings::archiveSettings()
   archiver.writeEntry(EXPORT_LAYOUT, m_exportSettings.layout);
   archiver.writeEntry(EXPORT_DELIMITERS, m_exportSettings.delimiters);
   archiver.writeEntry(EXPORT_HEADER, m_exportSettings.header);
+  archiver.writeEntry(EXPORT_XLABEL, m_exportSettings.xLabel);
+  archiver.writeEntry(EXPORT_THETALABEL, m_exportSettings.thetaLabel);
 
   archiver.writeEntry(VIEW_FILETOOLBAR, m_viewFileToolbar);
   archiver.writeEntry(VIEW_SELECTTOOLBAR, m_viewSelectToolbar);
@@ -741,6 +746,8 @@ void DefaultSettings::initializeSettingsToFactoryDefaults()
   m_exportSettings.layout = AllCurvesOnEachLine;
   m_exportSettings.delimiters = Commas;
   m_exportSettings.header = HeaderSimple;
+  m_exportSettings.xLabel = "x";
+  m_exportSettings.thetaLabel = "theta";
 
   m_viewFileToolbar = true;
   m_viewSelectToolbar = true;
@@ -939,6 +946,10 @@ void DefaultSettings::loadArchivedSettings()
       m_exportSettings.delimiters);
     m_exportSettings.header = (ExportHeader) archiver.readNumEntry(EXPORT_HEADER,
       m_exportSettings.header);
+    m_exportSettings.xLabel = archiver.readEntry(EXPORT_XLABEL,
+      m_exportSettings.xLabel);
+    m_exportSettings.thetaLabel = archiver.readEntry(EXPORT_THETALABEL,
+      m_exportSettings.thetaLabel);
   }
 
   if (m_sessionsSettings.sessions && m_sessionsSettings.viewSelections)
@@ -1316,6 +1327,8 @@ void DefaultSettings::setExportSettings(ExportSettings exportSettings)
   m_exportSettings.layout = exportSettings.layout;
   m_exportSettings.delimiters = exportSettings.delimiters;
   m_exportSettings.header = exportSettings.header;
+  m_exportSettings.xLabel = exportSettings.xLabel;
+  m_exportSettings.thetaLabel = exportSettings.thetaLabel;
 }
 
 void DefaultSettings::setGridRemovalSettings(GridRemovalSettings grid)

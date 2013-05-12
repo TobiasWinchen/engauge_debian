@@ -141,7 +141,7 @@ ExportDlg::ExportDlg(QString title, PointSets* pointSets, const CoordSettings* c
   // delimiters
   groupDelimiters = new Q3ButtonGroup(QString(tr("Delimiters")), this);
   CHECK_PTR_ENGAUGE(groupDelimiters);
-  groupDelimiters->setGeometry(10, 370, 175, 90);
+  groupDelimiters->setGeometry(10, 370, 113, 90);
 
   buttonCommas = new QRadioButton(QString(tr("Commas")), groupDelimiters);
   CHECK_PTR_ENGAUGE(buttonCommas);
@@ -164,7 +164,7 @@ ExportDlg::ExportDlg(QString title, PointSets* pointSets, const CoordSettings* c
   // header
   groupHeader = new Q3ButtonGroup(QString(tr("Header")), this);
   CHECK_PTR_ENGAUGE(groupHeader);
-  groupHeader->setGeometry(195, 370, 175, 90);
+  groupHeader->setGeometry(133, 370, 113, 90);
 
   buttonNone = new QRadioButton(QString(tr("None")), groupHeader);
   CHECK_PTR_ENGAUGE(buttonNone);
@@ -183,6 +183,23 @@ ExportDlg::ExportDlg(QString title, PointSets* pointSets, const CoordSettings* c
   buttonGnuplot->setGeometry(10, 60, 110, 20);
   QWhatsThis::add(buttonGnuplot, QString(tr("Exported file will have gnuplot header line")));
   connect(buttonGnuplot, SIGNAL(toggled(bool)), this, SLOT(slotGnuplot(bool)));
+
+  // x label for header
+  if (coord->frame == Cartesian)
+    labelXThetaLabel = new QLabel(QString(tr("Header X Label")), this);
+  else
+    labelXThetaLabel = new QLabel(QString(tr("Header Theta Label")), this);
+  CHECK_PTR_ENGAUGE(labelXThetaLabel);
+  labelXThetaLabel->setGeometry(256, 390, 114, 20);
+
+  editXThetaLabel = new QLineEdit(this);
+  CHECK_PTR_ENGAUGE(editXThetaLabel);
+  editXThetaLabel->setGeometry(256, 410, 110, 20);
+  if (coord->frame == Cartesian)
+    QWhatsThis::add(editXThetaLabel, QString(tr("Label in the header for x values")));
+  else
+    QWhatsThis::add(editXThetaLabel, QString(tr("Label in the header for theta values")));
+  connect(editXThetaLabel, SIGNAL(textEdited(const QString&)), this, SLOT(slotXThetaLabel(const QString&)));
 
   // preview
   labelPreview = new QLabel(QString(tr("Preview")), this);
@@ -297,14 +314,22 @@ void ExportDlg::toggleActions()
   {
     case HeaderNone:
       buttonNone->setChecked(true);
+      editXThetaLabel->setEnabled(false);
       break;
     case HeaderSimple:
       buttonSimple->setChecked(true);
+      editXThetaLabel->setEnabled(true);
       break;
     case HeaderGnuplot:
       buttonGnuplot->setChecked(true);
+      editXThetaLabel->setEnabled(true);
       break;
   }
+
+  if (coord->frame == Cartesian)
+    editXThetaLabel->setText(xport->xLabel);
+  else
+    editXThetaLabel->setText(xport->thetaLabel);
 }
 
 void ExportDlg::updatePreview()
@@ -506,4 +531,13 @@ void ExportDlg::slotGnuplot(bool toggle)
 void ExportDlg::slotWhat()
 {
   QWhatsThis::enterWhatsThisMode();
+}
+
+void ExportDlg::slotXThetaLabel (const QString &text)
+{
+  ASSERT_ENGAUGE(xport != 0);
+  if (coord->frame == Cartesian)
+    xport->xLabel = text;
+  else
+    xport->thetaLabel = text;
 }
