@@ -2,7 +2,7 @@ Source: engauge-digitizer
 Section: science
 Priority: optional
 Maintainer: Tobias Winchen <winchen@physik.rwth-aachen.de> 
-Build-Depends: debhelper (>= 7), libqt4-dev, libfftw3-dev
+Build-Depends: cdbs, dpkg-dev (>= 1.16.1~), debhelper (>= 7), libqt4-dev, libfftw3-dev
 Standards-Version: 3.9.3
 Homepage: http://digitizer.sourceforge.net/
 
