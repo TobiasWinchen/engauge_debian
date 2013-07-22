@@ -1,9 +1,11 @@
 engauge-digitizer (5.1-1) UNRELEASED; urgency=low
 
-  * New upstream release
+  * New upstream release (Closes: #716732)
    - Makes patch Added-missing-include-fix-FTBFS-on-gcc-4.7 obsolete
    - Fixes segmentation fault in point match (Closes: #695858)
-  * Moved to cdbs 
+  * Moved to cdbs
+  * Fixed lintian warnings in dep-5 copyright formatting
+  * Updated to standards version 3.9.4
 
  -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Sun, 12 May 2013 14:01:34 +0200
 

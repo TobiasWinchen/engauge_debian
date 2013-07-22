@@ -3,17 +3,18 @@ Upstream-Name: engauge-digitizer
 Upstream-Contact: Mark Mitchell <mmdigitizer@earthlink.net>
 Source: http://sf.net/digitizer/
 
+Files: *
 Copyright: 2002-2012, Mark Mitchell <mmdigitizer@earthlink.net>
 					 2011-2012, Tobias Richter <tsr-debian@achos.com>
 					 2011-2012, Tobias Winchen <tobias.winchen@physik.rwth-aachen.de>
 License: GPL-2+
-        On Debian systems, the complete text of the GNU General
-        Public License version 2 can be found in `/usr/share/common-licenses/GPL-2'.
+	[LICENSE TEXT]
 
 Files: debian/*
 Copyright: 2006-2011 Tobias Stefan Richter <tsr-debian@achos.com>
 					 2011-2012, Tobias Winchen <tobias.winchen@physik.rwth-aachen.de>
 License: GPL-2+
+	[LICENSE TEXT]
 
 Files: src/helpwindow.h src/helpwindow.cpp
 Copyright: 1992-2000 Trolltech AS
