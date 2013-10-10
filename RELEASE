@@ -6,10 +6,9 @@ This file documents how to generate release packages for distribution
 to Sourceforge. See file INSTALL for instructions on installing
 a release package.
 
-RELEASE - Linux
+RELEASE - Source / Linux 
 ---------------
-This assumes  Qt 3.x is already installed on the computer. For now,
-the 'release' build will actually be a debug release
+This assumes  Qt 4.x is already installed on the computer.
 
 1.  Change the version number in digitdef.cpp and rebuild the executable
 
@@ -22,120 +21,13 @@ the 'release' build will actually be a debug release
 2.  Run test cases using valgrind (http://valgrind.kde.org) to check 
     for uninitialized variables and memory leaks
 
-      valgrind --leak-check=yes digitizer
+      valgrind --leak-check=yes engauge 
 
-3.  Commit the current files into cvs
+3. Create source tarball
+	git archive master --prefix engauge-VERSION/ -o /tmp/engauge_VERSION.tgz
 
-      cd ~
-      cvs commit -m 'Official release...' digitizer
+4. Test compilation and installation from source
 
-4.  Remove any existing digitizer directories
+5. Tag git version
 
-      rm -rf ~/digitizer
-
-5.  Extract the sources, minus the CVS directories, using
-
-      cvs export -kv -d '<dateinfuture>' digitizer
- 
-    Hint - to see what tag should be selected here, run
-
-      cvs log digitizer/README
-
-6.  Tar up the development directory and its subdirectories into the 
-    platform-independent source release tarball package
-
-      tar cvfz digit-src-1_0.tar.gz digitizer
-
-7.  Perform the steps of the 'DEVELOPER INSTALL - Linux'
-
-8.  run the release_linux.pl script to create the tarball 
-    digit-exe-linux-X_Y.tar.gz
-
-9.  Upload the two tarballs according to
-    http://sourceforge.net/docman/display_doc.php?docid=6445&group_id=1.
-    be sure to send out a notification to users who have subscribed 
-    to this Engauge Digitizer
-
-RELEASE - Mac OSX 10.2
-----------------------
-1.  Copy the source tarball to the Mac OSX 10.2 SourceForge compile farm.
-
-2.  Perform the steps of the 'DEVELOPER INSTALL - Mac OSX'
-
-3.  Run the release_linux.pl script to create the tarball 
-    digit-exe-osx-X_Y.tar.gz
-
-4.  Upload the tarball according to
-    http://sourceforge.net/docman/display_doc.php?docid=6445&group_id=1.
-
-RELEASE - MS Windows With Visual C++ 6.0 Using Makefile
--------------------------------------------------------
-
-1.  Use Windows Explorer to remove c:\digitizer
-
-2.  Obtain the newest source code by downloading from Sourceforge. Alternately,
-    use
-
-      cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/digitizer export -kv digitizer
-
-3   Zip up the development directory and its subdirectories 
-    (c:\digitizer) into the platform-independent source release zip 
-    package. The development directory must be recursively copied into 
-    another directory that is otherwise empty, so the zip file will unzip
-    nicely into the "digitizer" subdirectory.
-
-      mkdir c:\tmp
-      (use Windows Explorer to copy c:\digitizer into c:\tmp)
-      (winzip c:\tmp into c:\digit-src-1_0.zip using 'add with wildcards'
-        and 'recursive')
-      (delete c:\tmp directory)
-
-4.  Perform the steps of the 'DEVELOPER INSTALL - MS Windows With Visual C++
-    6.0 Using IDE' install, being sure to specify a Release build.
-    The IDE build is required rather than the qmake build, since the linking
-    is done statically so the dll files need not be included in the release,
-    and also because the IDE build adds a nice icon into the executable.
-
-5.  Make sure all of the sample files in the samples directory 
-    can be imported or opened. if not, quit this build and go back
-    to the linux system and run 'cvs admin -kb <filename>' on all of
-    binary files so they can be correctly opened in windows
-
-6.  Go up to your home directory
-
-7.  Run the release_windows.bat command file to create the zip file
-    digit-exe-windows-X_Y.zip
-
-8.  Zip up the install subdirectories into the executable release
-    package, from the directory above the install directory. The executable 
-    directory must be recursively copied into another directory that is 
-    otherwise empty, so the zip file will unzip nicely into the "digitizer" 
-    subdirectory.
-
-      mkdir c:\tmp
-      (use Windows Explorer to copy c:\engauge into c:\tmp)
-      (winzip c:\tmp into c:\digit-exe-windows-X_Y.zip using 
-        'add with wildcards' and 'recursive')
-      (delete c:\tmp directory)
-
-9.  Upload the two zip files according to
-    http://sourceforge.net/docman/display_doc.php?docid=6445&group_id=1
-
-RELEASE - Finishing up
-----------------------
-1.  Download the new release and test.
-
-2.  Go to the project download page and get the release id of the
-    newest release. Log into digitizer.sourceforge.net and upload
-    newer versions of the following files:
-
-    1) /home/groups/d/di/digitizer/htdocs/index.php to replace the
-       previous release id by the new release id. This will point
-       web surfers to the newest release when they try to download.
-    2) /home/groups/d/di/digitizer/htdocs/content1.php should have
-       an entry in the status section added for the new release
- 
-3.  Send out a release notification to subscribers at the sourceforge website
-
-4.  If this is a big release, send a notification out at freshmeat.net
-
+6.  Upload the tarball to sourceforge

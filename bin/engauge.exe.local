@@ -1,8 +1,0 @@
-This file is a patch for Microsoft Windows 2000.
-
-As long as this file is in the same directory as
-Digitizer.exe, the operating system will use the
-local dll files rather than the dll files that
-belong to the operating system.
-
-The contents of this file are unimportant.

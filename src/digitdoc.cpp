@@ -403,7 +403,7 @@ bool DigitDoc::openDocument(const QString &filename)
   str >> (Q_INT32 &) m_exportSettings.layout;
   str >> (Q_INT32 &) m_exportSettings.pointsSelection;
   str >> (Q_INT32 &) m_exportSettings.header;
-  if (versionNumber > 5) {
+  if (versionNumber >= 5.2) {
     str >> m_exportSettings.xLabel;
     str >> m_exportSettings.thetaLabel;
   }
@@ -424,7 +424,18 @@ bool DigitDoc::openDocument(const QString &filename)
   str >> (double &) m_gridRemovalSettings.gridMesh.stopY;
   str >> (double &) m_gridRemovalSettings.gridDistance;
   str >> (Q_INT32 &) m_gridRemovalSettings.removeColor;
-  str >> m_gridRemovalSettings.color;
+
+  if (versionNumber >= 5) 
+  {
+     str >> m_gridRemovalSettings.color;
+  }
+  else
+  {
+     Q_UINT32 p;
+     str >> p;
+     m_gridRemovalSettings.color.setRgb( p );
+  }
+
   str >> (Q_INT32 &) m_gridRemovalSettings.foregroundThresholdLow;
   str >> (Q_INT32 &) m_gridRemovalSettings.foregroundThresholdHigh;
   str >> (double &) m_gridRemovalSettings.gapSeparation;
