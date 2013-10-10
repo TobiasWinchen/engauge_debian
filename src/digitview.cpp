@@ -299,7 +299,7 @@ QPoint DigitView::convertZoom(QPoint p, bool to)
 
 QRect DigitView::convertZoom(QRect r, bool to)
 {
-  double xTL, yTL, xBR, yBR;
+  qreal xTL, yTL, xBR, yBR;
   if (to)
   {
     worldMatrix().map((double) r.left(), (double) r.top(), &xTL, &yTL);
