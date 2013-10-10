@@ -1,16 +1,13 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 DPKG_EXPORT_BUILDFLAGS = 1
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/qmake.mk
-include /usr/share/dpkg/buildflags.mk
 
-install/engauge-digitizer::
-	dh_installdirs -a usr/share/pixmaps
+%:
+	dh $@ --parallel
+
+override_dh_install:
+	mkdir -p debian/engauge-digitizer/usr/share/pixmaps/
 	install -m644 src/img/bannerapp.xpm debian/engauge-digitizer/usr/share/pixmaps/engauge-digitizer.xpm
-
-install/engauge-digitizer-doc::
-	dh_installdirs -i usr/share/doc/engauge-digitizer-doc/html
-	install -m644 $$( find usermanual/* -prune -type f -print ) debian/engauge-digitizer-doc/usr/share/doc/engauge-digitizer-doc/html
+	dh_install
 
 
