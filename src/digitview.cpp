@@ -288,7 +288,7 @@ void DigitView::keyReleaseEvent(QKeyEvent* e)
 
 QPoint DigitView::convertZoom(QPoint p, bool to)
 {
-  double x, y;
+  qreal x, y;
   if (to)
     worldMatrix().map((double) p.x(), (double) p.y(), &x, &y);
   else

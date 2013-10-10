@@ -6,17 +6,11 @@ Table of Contents:
    1. REQUIREMENTS
    1.1 Before installing a binary release
    1.2 Before installing a source code release
-   2. USER INSTALL - Linux Executable Release
-   3. USER INSTALL - Mac OSX Executable Release
-   4. USER INSTALL - MS Windows Executable Release
-   5. USER INSTALL - Sun Forte Compiler
-   6. USER INSTALL - Source Release
-   7. DEVELOPER INSTALL - Linux Using Makefile
-   8. DEVELOPER INSTALL - Mac OSX Using Makefile
-   9. DEVELOPER INSTALL - MS Windows With QtSDK
-  10. DEVELOPER INSTALL - MS Windows With Visual C++ 6.0 Using IDE
-  11. DEVELOPER INSTALL - Linking problems
-  12. INTERNATIONALIZATION
+   2. USER INSTALL - Mac OSX Executable Release
+   3. USER INSTALL - MS Windows Executable Release
+   4. USER INSTALL - Source Release
+   5. DEVELOPER INSTALL - Using Makefile
+   6. INTERNATIONALIZATION
 
 1. REQUIREMENTS
 ---------------
@@ -72,13 +66,8 @@ must first be installed:
 
 Note that open source versions of both Qt and FFTW are freely available.
 
-2. USER INSTALL - Linux Executable Release
-------------------------------------------
 
-Untar the executable release package. The executable name is digitizer. 
-The samples directory contains some sample image and document files
-
-3. USER INSTALL - Mac OSX Executable Release
+2. USER INSTALL - Mac OSX Executable Release
 --------------------------------------------
 
 Untar the executable release package. The executable name is Engauge.app.
@@ -87,36 +76,16 @@ it must be copied from inside the bundle. To copy the samples directory,
 open the bundle using 'Show contents', then click on the Contents
 directory, and then copy the samples directory.
 
-4. USER INSTALL - MS Windows Executable Release
+
+3. USER INSTALL - MS Windows Executable Release
 -----------------------------------------------
 
 Unzip the executable release package. The executable name is 
 digitizer.exe. The samples directory contains some sample image and 
 document files.
 
-5. USER INSTALL - Sun Forte Compiler
------------------------------------------
 
-1. Install Qt (see http://qt.nokia.com/developer/platforms/index.html)
-2. Get a copy of the source code using anonymous cvs access by running 
-   'cvs -z3 -d:pserver:anonymous@digitizer.cvs.sourceforge.net:/cvsroot/digitizer
-   checkout -P digitizer' 
-   -OR-
-   by downloading the source tarball from digitizer.sourceforge.net and running
-   'tar xvfz digit-src-X_Y.tar.gz'
-   -OR-
-   by downloading the source zip file from digitizer.sourceforge.net and running
-   'unzip digit-src-X_Y.zip'
-3. 'cd digitizer/digitizer'
-4. 'qmake digitizer.pro'
-5. 'make'
-6. If you have linking problems, see "DEVELOPER INSTALL - Linking problems"
-7. You can now run the digitizer executable
-
-Comments for OSX:
--Compiler macro __SUNPRO_CC should be set to get around 'const' problems
-
-6. USER INSTALL - Source Release
+4. USER INSTALL - Source Release
 --------------------------------
 
 This installation method is much harder than installing one of the 
@@ -132,198 +101,27 @@ There are two source release packages - zip file and tarball. Both contain
 the same contents, and both work under MS Windows, Mac OSX, Linux, and
 a wide variety of other platforms.
 
-7. DEVELOPER INSTALL - Linux Using Makefile
+
+5. DEVELOPER INSTALL - Using Makefile
 -------------------------------------------
 
 1. See if Qt is installed. Some tricks are to try running 'qmake -v' and to
    look in '/usr/lib' for a directory like 'qt-3.3.3'
 2. If Qt from Trolltech is not already installed, then
    install Qt/X11 (see http://qt.nokia.com/developer/platforms/index.html)
-   with the following environment variables:
-     QTDIR=$HOME/qt-3.X.X
-   and the following command line options for "configure":
-     -no-xkb
-     -no-xshape
-     -no-sm
-     -no-xinerama
-     -no-xrandr
-     -no-xcursor
-     -qt-gif
-     -thread
-     -static
-     -xft
-     -xrender
-   where the last two are included so the best fonts are sharp, and
-   must agree with the options in digitizer.pro
-3. Get a copy of the source code using anonymous cvs access by running 
-   'cvs -z3 -d:pserver:anonymous@digitizer.cvs.sourceforge.net:/cvsroot/digitizer
-   checkout -P digitizer' 
+3. Get a copy of the source code using anonymous git
+		git clone http://git.code.sf.net/p/digitizer/code digitizer-code
    -OR-
    by downloading the source tarball from digitizer.sourceforge.net and running
    'tar xvfz digit-src-X_Y.tar.gz'
-   -OR-
-   by downloading the source zip file from digitizer.sourceforge.net and running
-   'unzip digit-src-X_Y.zip'
 4. 'cd digitizer'
 5. 'qmake -unix digitizer.pro'
 6. 'make'
 7. You can now run the digitizer executable
 
-Comments for Linux:
--The settings in digitizer.pro must agree with the Qt build settings
--Kdevelop 3 works smoothly with the Makefile to compile and test Engauge
--Use other command line options for "configure" at your own risk
 
-8. DEVELOPER INSTALL - Mac OSX Using Makefile
----------------------------------------------
 
-1. See if Qt is installed. Some tricks are to try running 'qmake -v' and to
-   look in '/usr/lib' for a directory like 'qt-3.3.3'
-2. If Qt from Trolltech is not already installed, then
-   install Qt/Mac (see http://qt.nokia.com/developer/platforms/index.html)
-   with the following environment variables:
-     QTDIR=$HOME/qt-mac-free-3.X.X
-     QMAKESPEC=$QTDIR/mkspecs/macx-g++
-   and the following command line options for "configure":
-     -fast
-     -platform macx-g++
-     -shared
-     -qt-imgfmt-jpeg
-     -qt-imgfmt-mng
-     -qt-libpng
-     -qt-gif
-     -qt-zlib
-     -thread
-3. Get a copy of the source code using anonymous cvs access by running 
-   'cvs -z3 -d:pserver:anonymous@digitizer.cvs.sourceforge.net:/cvsroot/digitizer
-   checkout -P digitizer' 
-   -OR-
-   by downloading the source tarball from digitizer.sourceforge.net and running
-   'tar xvfz digit-src-X_Y.tar.gz'
-   -OR-
-   by downloading the source zip file from digitizer.sourceforge.net and running
-   'unzip digit-src-X_Y.zip'
-4. 'cd digitizer'
-5. 'qmake -macx digitizer.pro'
-6. 'make'
-7. If you have linking problems, see "DEVELOPER INSTALL - Linking problems"
-8. You can now run the digitizer executable
-
-Comments for OSX:
--The settings in digitizer.pro must agree with the Qt build settings
--Mac version of Qt library (rather than the x11 version) is used, and
- it is built using the threaded and shared options
--Fink is not used so users do not need to install it first
--ssh keys for sourceforge compile farm use rsa1 keys rather than dsa keys
--Use other command line options for "configure" at your own risk
-
-9. DEVELOPER INSTALL - MS Windows With QtSDK
---------------------------------------------------------------------
-
-1. Install QtSDK. When prompted, select 'Custom installation' so you
-   can pick the 'MinGW' development tools
-2. Download the FFTW 3.X.X source code from http://www.fftw.org
-3. In the QtSDK menu open a 'MADDE Terminal'
-4. Set the following environment variables:
-   4a) FFTW_HOME to where you will install the FFTW library
-   4b) QMAKESPEC=Win32-g++
-5. In the FFTW subdirectory:
-      ./configure --prefix=$FFTW_HOME
-      make
-      make install
-5. Download the Engauge source code from http://sourceforge.net
-6. In the Engauge subdirectory:
-      qmake digitizer.pro
-      make
-
-10. DEVELOPER INSTALL - MS Windows With Visual C++ 6.0 Using IDE
-----------------------------------------------------------------
-
-Warning, this section is out of date since around 2006!
-
-1. Install noncommercial Qt 4 using the settings from the same step in the previous 
-   section. See http://qt.nokia.com/developer/platforms/index.html
-2. Set QTDIR environment variable to the qt directory (typically c:\qt)
-3. Extract, but do not build, the complete source code package of FFTW 3.X.X from 
-   http://www.fftw.org into its own directory. Only the header files from this
-   package will be used so no compilation is needed
-4. Set the FFTW_HOME environment variable in Control Panel / System /
-   Environment Variables to point to the main FFTW source code directory
-6. Run 'cvs checkout digitizer'
-7. Open project file digitizer.dsw (which refers to file digitizer.dsp)
-8. Select the build type as either Release or Debug, using 
-   'Set Active Configuration'
-9. Optionally add a console window for debugging, by changing the
-   "/subsystem:windows" linker option to "/subsystem:console"
-10. Extract the two files libfftw3-3.def and libfftw3-3.dll from the version 3.X.X
-    dll package at http://www.fftw.org/install/windows, into the digitizer/bin 
-    directory created in the previous step
-11. According to the directions at http://www.fftw.org/install/windows, create the 
-    library file libfftw3-3.lib by running the Visual Studio 6 'lib' utility in the 
-    digitizer/bin using
-    'lib /machine:i386 /def:libfftw3-3.def'
-12. Run 'Project/Build'
-13. If the moc files are not automatically built, see the next section for
-    an explanation and workaround
-14. If you have linking problems, see "DEVELOPER INSTALL - Linking problems"
-15. You can now run the digitizer.exe executable
-
-Comments for Windows:
--The settings in digitizer.pro must agree with the Qt build settings
--You may have problems building in Visual Studio: 
-
-  Symptom 1 - You check out the source files onto a Microsoft Windows
-  system, and then try to build the project. However, the moc files
-  are not generated so the build fails.
-
-  Symptom 2 - The digitizer.dsp project file looks fine when you first
-  open it within an editor, but after saving the file with any changes
-  you notice the file has been condensed into a single, very long, line.
-
-  Reason - The digitizer.dsp project file is corrupted. This file
-  is autogenerated by the VC++ IDE. Before it was committed to cvs, 
-  it probably was copied to a Linux system, which changed the formatting.
-  Even though you probably cannot see the difference in an editor, the 
-  formatting change confuses the VC++ IDE, which prevents the moc
-  files from getting generated. 
-
-  Good Solution - In Windows, open the file, before it is corrupted, in 
-  Word, and then save it as a text file in MSDOS format with CR/LFs. This
-  solution is temporary.
-
-  Better Solution - In Linux, make sure the file has only a NL (newline)
-  at the end of each line, rather than CR/NL, using 
-  "od -a digitizer.dsp | more". If there are carriage returns, remove
-  them using "tr <digitizer.dsp >digitizer.fixed -d '\r'; 
-  mv digitizer.fixed digitizer.dsp". Then immediately commit into cvs.
- 
-  Best Solution - Everybody stops using Windows.
-
-11. DEVELOPER INSTALL - Linking problems
-----------------------------------------
-
-Usually a problem linking involves a missing 'qt' or 'qt-mt' library.
-If you have installed Qt, then make sure the QTDIR environment variable
-is pointing to the Qt directory. Then, look at the 'lib' subdirectory 
-under the main Qt directory. In that subdirectory you will find
-the Qt library.
-
-If Qt was built with multithreading (since the 'thread' option was chosen)
-then the Qt library has 'qt-mt' in its name, otherwise that library
-has just 'qt' in its name.
-
-By adding or removing 'thread' from the CONFIG line of digitizer.pro,
-you can build Engauge Digitizer with or without, respectively, 
-multithreading so that it can link correctly.
-
-Another source of linking problems is the failure to link with 
-the Xft and Xrender libraries, on a system where the Qt library was 
-built with Xft and Xrender support so fonts would look professional.
-To fix these linking problems, either rebuild Qt without that
-support (and settle for ugly fonts), or add "-lXft -lfreetype" to 
-LIBS in digitizer.pro and then rebuilt Engauge.
-
-12. INTERNATIONALIZATION
+6. INTERNATIONALIZATION
 ------------------------
 
 The following steps will create a translation file:

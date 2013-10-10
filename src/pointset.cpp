@@ -555,16 +555,9 @@ void PointSet::mergeUniqueXValues(QList<double>* list,
   // remove duplicate entries caused by two or more curves having points with identical
   // exported x coordinates, since these duplicates are useless and cause problems (i.e. sql
   // insert will crash)
-  QString xLast, xNew;
-  for (itr = list->begin(); itr != list->end(); ++itr)
-  {
-    xNew.setNum(*itr, 'g', xPrecision);
-    
-    if (xLast == xNew)
-      itr = list->remove(itr);
-
-    xLast = xNew;
-  }
+  qSort(list->begin(), list->end());
+  itr = std::unique (list->begin(), list->end());
+  list->erase(itr, list->end());
 }
 
 QString PointSet::exportCurveAll(ExportSettings xport, int xPrecision, int yPrecision)
