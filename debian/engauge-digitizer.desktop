@@ -7,3 +7,4 @@ Exec=engauge %F
 MimeType=text/plain
 Categories=Education;Science;DataVisualization
 Icon=/usr/share/pixmaps/engauge-digitizer.xpm
+Keywords=Analog-Digital Converter;
