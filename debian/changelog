@@ -9,6 +9,7 @@ engauge-digitizer (5.2-1) UNRELEASED; urgency=low
   * Updated to standards version 3.9.4
   * Minimum debian/rules files now using dh
   * Added keywords to desktop file
+  * Added Vcs-git and Vcs-Browser fields to debian/control
 
  -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Thu, 10 Oct 2013 20:21:57 +0200
 
