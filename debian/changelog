@@ -1,4 +1,4 @@
-engauge-digitizer (5.2-1) UNRELEASED; urgency=low
+engauge-digitizer (5.2-1) unstable; urgency=low
 
   * New upstream release (Closes: #716732)
    - Makes patch Added-missing-include-fix-FTBFS-on-gcc-4.7 obsolete
