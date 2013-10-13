@@ -1,13 +1,16 @@
-engauge-digitizer (5.1-1) unstable; urgency=low
+engauge-digitizer (5.2-1) UNRELEASED; urgency=low
 
   * New upstream release (Closes: #716732)
    - Makes patch Added-missing-include-fix-FTBFS-on-gcc-4.7 obsolete
+   - Makes patch fix_qreal_vs_double.patch obsolete
    - Fixes segmentation fault in point match (Closes: #695858)
-  * Moved to cdbs
+   - Fixes segmentation fault when exporting certain curves (Closes: #725165)
   * Fixed lintian warnings in dep-5 copyright formatting
   * Updated to standards version 3.9.4
+  * Minimum debian/rules files now using dh
+  * Added keywords to desktop file
 
- -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Mon, 22 July 2013 14:01:34 +0200
+ -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Thu, 10 Oct 2013 20:21:57 +0200
 
 engauge-digitizer (5.0-3) unstable; urgency=low
 
