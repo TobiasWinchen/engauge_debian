@@ -3,7 +3,7 @@ Section: science
 Priority: optional
 Maintainer: Tobias Winchen <winchen@physik.rwth-aachen.de> 
 Build-Depends: dpkg-dev (>= 1.16.1~), debhelper (>= 7), libqt4-dev, libfftw3-dev
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Vcs-git: git://github.com/winchen/engauge_debian.git
 Vcs-Browser: https://github.com/winchen/engauge_debian
 Homepage: http://digitizer.sourceforge.net/
@@ -30,7 +30,7 @@ Description: interactively extracts numbers from bitmap graphs or maps
 Package: engauge-digitizer-doc
 Section: doc
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}
 Recommends: engauge-digitizer
 Description: engauge-digitizer user manual and tutorial
  engauge-digitizer converts an image file showing a graph or map into numbers.
