@@ -6,10 +6,11 @@ engauge-digitizer (5.2-1) unstable; urgency=low
    - Fixes segmentation fault in point match (Closes: #695858)
    - Fixes segmentation fault when exporting certain curves (Closes: #725165)
   * Fixed lintian warnings in dep-5 copyright formatting
-  * Updated to standards version 3.9.4
+  * Updated to standards version 3.9.5
   * Minimum debian/rules files now using dh
   * Added keywords to desktop file
   * Added Vcs-git and Vcs-Browser fields to debian/control
+  * removed shlibs:Depends dependency for engauge-doc
 
  -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Thu, 10 Oct 2013 20:21:57 +0200
 
