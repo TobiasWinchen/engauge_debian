@@ -1,0 +1,487 @@
+Description: Use buffer variable to allow strict aliasing
+	The compiler warned "dereferencing type-punned pointer will break strict-
+	aliasing rules" as at several points in the (de)serialization data was
+	streamed into variables via casting to reference. Now a buffer variable is
+	used instead.
+	The patch is part of an upstream commit.
+Origin: http://sourceforge.net/p/digitizer/code/ci/463a89ff29bff06bd2e2349cc3964e261846864d/
+Reviewed-By: Tobias Winchen <winchen@physik.rwth-aachen.de>, Mark Mitchell <markmitch@users.sf.net>
+Last-Update: 2013-11-12
+
+diff --git src/digitdoc.cpp src/digitdoc.cpp
+index 20d9f5b..97ee1c6 100644
+--- src/digitdoc.cpp
++++ src/digitdoc.cpp
+@@ -349,6 +349,8 @@ bool DigitDoc::supportedVersionNumber(QString versionNumber)
+ 
+ bool DigitDoc::openDocument(const QString &filename)
+ {
++  Q_INT32 extractionQInt32; // temp value
++
+   QFile f(filename);
+   if (!f.open (QIODevice::ReadOnly))
+     return false;
+@@ -356,7 +358,8 @@ bool DigitDoc::openDocument(const QString &filename)
+   QDataStream str (&f);
+ 
+   Q_INT32 magicNumber;
+-  str >> (Q_INT32 &) magicNumber;
++  str >> extractionQInt32;
++  magicNumber = extractionQInt32;
+ 
+   if (magicNumber != MagicNumber)
+   {
+@@ -382,7 +385,8 @@ bool DigitDoc::openDocument(const QString &filename)
+     return false;
+   }
+ 
+-  str >> (Q_INT32 &) m_backgroundSelection;
++  str >> extractionQInt32;
++  m_backgroundSelection = (BackgroundSelection) extractionQInt32;
+   str >> m_originalPixmap;
+ 
+   str >> m_title;
+@@ -390,32 +394,47 @@ bool DigitDoc::openDocument(const QString &filename)
+   str >> m_curveCmbText;
+   str >> m_measureCmbText;
+ 
+-  str >> (Q_INT32 &) m_coordSettings.frame;
++  str >> extractionQInt32;
++  m_coordSettings.frame = (ReferenceFrame) extractionQInt32;
+   if (versionNumber < 3)
+      m_coordSettings.originRadius = 0.0;
+   else
+      str >> (double &) m_coordSettings.originRadius;
+-  str >> (Q_INT32 &) m_coordSettings.thetaUnits;
+-  str >> (Q_INT32 &) m_coordSettings.xThetaScale;
+-  str >> (Q_INT32 &) m_coordSettings.yRScale;
+-
+-  str >> (Q_INT32 &) m_exportSettings.delimiters;
+-  str >> (Q_INT32 &) m_exportSettings.layout;
+-  str >> (Q_INT32 &) m_exportSettings.pointsSelection;
+-  str >> (Q_INT32 &) m_exportSettings.header;
++  str >> extractionQInt32;
++  m_coordSettings.thetaUnits = (ThetaUnits) extractionQInt32;
++  str >> extractionQInt32;
++  m_coordSettings.xThetaScale = (Scale) extractionQInt32;
++  str >> extractionQInt32;
++  m_coordSettings.yRScale = (Scale) extractionQInt32;
++
++  str >> extractionQInt32;
++  m_exportSettings.delimiters = (ExportDelimiters) extractionQInt32;
++  str >> extractionQInt32;
++  m_exportSettings.layout = (ExportLayout) extractionQInt32;
++  str >> extractionQInt32;
++  m_exportSettings.pointsSelection = (ExportPointsSelection) extractionQInt32;
++  str >> extractionQInt32;
++  m_exportSettings.header = (ExportHeader) extractionQInt32;
+   if (versionNumber >= 5.2) {
+     str >> m_exportSettings.xLabel;
+     str >> m_exportSettings.thetaLabel;
+   }
+ 
+-  str >> (Q_INT32 &) m_gridRemovalSettings.removeThinLines;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.removeThinLines = extractionQInt32;
+   str >> (double &) m_gridRemovalSettings.thinThickness;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.removeGridlines;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.gridMesh.initialized;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.gridMesh.countX;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.gridMesh.countY;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.gridMesh.gridSetX;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.gridMesh.gridSetY;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.removeGridlines = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.gridMesh.initialized = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.gridMesh.countX = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.gridMesh.countY = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.gridMesh.gridSetX = (GridSet) extractionQInt32;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.gridMesh.gridSetY = (GridSet) extractionQInt32;
+   str >> (double &) m_gridRemovalSettings.gridMesh.startX;
+   str >> (double &) m_gridRemovalSettings.gridMesh.startY;
+   str >> (double &) m_gridRemovalSettings.gridMesh.stepX;
+@@ -423,7 +442,8 @@ bool DigitDoc::openDocument(const QString &filename)
+   str >> (double &) m_gridRemovalSettings.gridMesh.stopX;
+   str >> (double &) m_gridRemovalSettings.gridMesh.stopY;
+   str >> (double &) m_gridRemovalSettings.gridDistance;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.removeColor;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.removeColor = extractionQInt32;
+ 
+   if (versionNumber >= 5) 
+   {
+@@ -436,15 +456,22 @@ bool DigitDoc::openDocument(const QString &filename)
+      m_gridRemovalSettings.color.setRgb( p );
+   }
+ 
+-  str >> (Q_INT32 &) m_gridRemovalSettings.foregroundThresholdLow;
+-  str >> (Q_INT32 &) m_gridRemovalSettings.foregroundThresholdHigh;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.foregroundThresholdLow = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridRemovalSettings.foregroundThresholdHigh = extractionQInt32;
+   str >> (double &) m_gridRemovalSettings.gapSeparation;
+ 
+-  str >> (Q_INT32 &) m_gridDisplaySettings.initialized;
+-  str >> (Q_INT32 &) m_gridDisplaySettings.countX;
+-  str >> (Q_INT32 &) m_gridDisplaySettings.countY;
+-  str >> (Q_INT32 &) m_gridDisplaySettings.gridSetX;
+-  str >> (Q_INT32 &) m_gridDisplaySettings.gridSetY;
++  str >> extractionQInt32;
++  m_gridDisplaySettings.initialized = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridDisplaySettings.countX = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridDisplaySettings.countY = extractionQInt32;
++  str >> extractionQInt32;
++  m_gridDisplaySettings.gridSetX = (GridSet) extractionQInt32;
++  str >> extractionQInt32;
++  m_gridDisplaySettings.gridSetY = (GridSet) extractionQInt32;
+   str >> (double &) m_gridDisplaySettings.startX;
+   str >> (double &) m_gridDisplaySettings.startY;
+   str >> (double &) m_gridDisplaySettings.stepX;
+@@ -452,39 +479,62 @@ bool DigitDoc::openDocument(const QString &filename)
+   str >> (double &) m_gridDisplaySettings.stopX;
+   str >> (double &) m_gridDisplaySettings.stopY;
+ 
+-  str >> (Q_INT32 &) m_segmentSettings.minPoints;
+-  str >> (Q_INT32 &) m_segmentSettings.pointSeparation;
+-  str >> (Q_INT32 &) m_segmentSettings.lineSize;
+-  str >> (Q_INT32 &) m_segmentSettings.lineColor;
+-
+-  str >> (Q_INT32 &) m_pointMatchSettings.pointSeparation;
+-  str >> (Q_INT32 &) m_pointMatchSettings.pointSize;
+-  str >> (Q_INT32 &) m_pointMatchSettings.acceptedColor;
+-  str >> (Q_INT32 &) m_pointMatchSettings.rejectedColor;
++  str >> extractionQInt32;
++  m_segmentSettings.minPoints = extractionQInt32;
++  str >> extractionQInt32;
++  m_segmentSettings.pointSeparation = extractionQInt32;
++  str >> extractionQInt32;
++  m_segmentSettings.lineSize = (LineSize) extractionQInt32;
++  str >> extractionQInt32;
++  m_segmentSettings.lineColor = (Color) extractionQInt32;
++
++  str >> extractionQInt32;
++  m_pointMatchSettings.pointSeparation = extractionQInt32;
++  str >> extractionQInt32;
++  m_pointMatchSettings.pointSize = extractionQInt32;
++  str >> extractionQInt32;
++  m_pointMatchSettings.acceptedColor = (Color) extractionQInt32;
++  str >> extractionQInt32;
++  m_pointMatchSettings.rejectedColor = (Color) extractionQInt32;
+   if (versionNumber < 4)
+   {
+     // synchronize with DefaultSettings::initializeSettingsToFactoryDefaults
+     m_pointMatchSettings.candidateColor = DigitBlue;
+   }
+   else
+-    str >> (Q_INT32 &) m_pointMatchSettings.candidateColor;
+-
+-  str >> (Q_INT32 &) m_discretizeSettings.discretizeMethod;
+-  str >> (Q_INT32 &) m_discretizeSettings.intensityThresholdLow;
+-  str >> (Q_INT32 &) m_discretizeSettings.intensityThresholdHigh;
+-  str >> (Q_INT32 &) m_discretizeSettings.foregroundThresholdLow;
+-  str >> (Q_INT32 &) m_discretizeSettings.foregroundThresholdHigh;
+-  str >> (Q_INT32 &) m_discretizeSettings.hueThresholdLow;
+-  str >> (Q_INT32 &) m_discretizeSettings.hueThresholdHigh;
+-  str >> (Q_INT32 &) m_discretizeSettings.saturationThresholdLow;
+-  str >> (Q_INT32 &) m_discretizeSettings.saturationThresholdHigh;
+-  str >> (Q_INT32 &) m_discretizeSettings.valueThresholdLow;
+-  str >> (Q_INT32 &) m_discretizeSettings.valueThresholdHigh;
++  {
++    str >> extractionQInt32;
++    m_pointMatchSettings.candidateColor = (Color) extractionQInt32;
++  }
++
++  str >> extractionQInt32;
++  m_discretizeSettings.discretizeMethod = (DiscretizeMethod) extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.intensityThresholdLow = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.intensityThresholdHigh = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.foregroundThresholdLow = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.foregroundThresholdHigh = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.hueThresholdLow = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.hueThresholdHigh = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.saturationThresholdLow = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.saturationThresholdHigh = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.valueThresholdLow = extractionQInt32;
++  str >> extractionQInt32;
++  m_discretizeSettings.valueThresholdHigh = extractionQInt32;
+ 
+   ASSERT_ENGAUGE(m_pointSets != 0);
+   m_pointSets->serializeRead(str, canvas());
+ 
+-  str >> (Q_INT32 &) magicNumber;
++  str >> extractionQInt32;
++  magicNumber = extractionQInt32;
+ 
+   if (magicNumber != MagicNumber)
+   {
+@@ -523,15 +573,15 @@ bool DigitDoc::saveDocument(const QString &filename)
+   QDataStream str (&f);
+ 
+ #ifdef __SUNPRO_CC
+-  str << (Q_INT32 &) MagicNumber;
++  str << (Q_INT32) MagicNumber;
+ #else
+-  str << (const Q_INT32 &) MagicNumber;
++  str << (const Q_INT32) MagicNumber;
+ #endif
+ 
+   str << VersionNumber.toDouble(); // numeric value is ambiguous (2.1 or 2.10?)
+   str << VersionNumber;
+ 
+-  str << (Q_INT32 &) m_backgroundSelection;
++  str << (Q_INT32) m_backgroundSelection;
+   str << m_originalPixmap;
+ 
+   str << m_title;
+@@ -539,82 +589,82 @@ bool DigitDoc::saveDocument(const QString &filename)
+   str << m_curveCmbText;
+   str << m_measureCmbText;
+ 
+-  str << (Q_INT32 &) m_coordSettings.frame;
+-  str << (double &) m_coordSettings.originRadius;
+-  str << (Q_INT32 &) m_coordSettings.thetaUnits;
+-  str << (Q_INT32 &) m_coordSettings.xThetaScale;
+-  str << (Q_INT32 &) m_coordSettings.yRScale;
++  str << (Q_INT32) m_coordSettings.frame;
++  str << (double) m_coordSettings.originRadius;
++  str << (Q_INT32) m_coordSettings.thetaUnits;
++  str << (Q_INT32) m_coordSettings.xThetaScale;
++  str << (Q_INT32) m_coordSettings.yRScale;
+ 
+-  str << (Q_INT32 &) m_exportSettings.delimiters;
+-  str << (Q_INT32 &) m_exportSettings.layout;
+-  str << (Q_INT32 &) m_exportSettings.pointsSelection;
+-  str << (Q_INT32 &) m_exportSettings.header;
++  str << (Q_INT32) m_exportSettings.delimiters;
++  str << (Q_INT32) m_exportSettings.layout;
++  str << (Q_INT32) m_exportSettings.pointsSelection;
++  str << (Q_INT32) m_exportSettings.header;
+   str << m_exportSettings.xLabel;
+   str << m_exportSettings.thetaLabel;
+ 
+-  str << (Q_INT32 &) m_gridRemovalSettings.removeThinLines;
+-  str << (double &) m_gridRemovalSettings.thinThickness;
+-  str << (Q_INT32 &) m_gridRemovalSettings.removeGridlines;
+-  str << (Q_INT32 &) m_gridRemovalSettings.gridMesh.initialized;
+-  str << (Q_INT32 &) m_gridRemovalSettings.gridMesh.countX;
+-  str << (Q_INT32 &) m_gridRemovalSettings.gridMesh.countY;
+-  str << (Q_INT32 &) m_gridRemovalSettings.gridMesh.gridSetX;
+-  str << (Q_INT32 &) m_gridRemovalSettings.gridMesh.gridSetY;
+-  str << (double &) m_gridRemovalSettings.gridMesh.startX;
+-  str << (double &) m_gridRemovalSettings.gridMesh.startY;
+-  str << (double &) m_gridRemovalSettings.gridMesh.stepX;
+-  str << (double &) m_gridRemovalSettings.gridMesh.stepY;
+-  str << (double &) m_gridRemovalSettings.gridMesh.stopX;
+-  str << (double &) m_gridRemovalSettings.gridMesh.stopY;
+-  str << (double &) m_gridRemovalSettings.gridDistance;
+-  str << (Q_INT32 &) m_gridRemovalSettings.removeColor;
++  str << (Q_INT32) m_gridRemovalSettings.removeThinLines;
++  str << (double) m_gridRemovalSettings.thinThickness;
++  str << (Q_INT32) m_gridRemovalSettings.removeGridlines;
++  str << (Q_INT32) m_gridRemovalSettings.gridMesh.initialized;
++  str << (Q_INT32) m_gridRemovalSettings.gridMesh.countX;
++  str << (Q_INT32) m_gridRemovalSettings.gridMesh.countY;
++  str << (Q_INT32) m_gridRemovalSettings.gridMesh.gridSetX;
++  str << (Q_INT32) m_gridRemovalSettings.gridMesh.gridSetY;
++  str << (double) m_gridRemovalSettings.gridMesh.startX;
++  str << (double) m_gridRemovalSettings.gridMesh.startY;
++  str << (double) m_gridRemovalSettings.gridMesh.stepX;
++  str << (double) m_gridRemovalSettings.gridMesh.stepY;
++  str << (double) m_gridRemovalSettings.gridMesh.stopX;
++  str << (double) m_gridRemovalSettings.gridMesh.stopY;
++  str << (double) m_gridRemovalSettings.gridDistance;
++  str << (Q_INT32) m_gridRemovalSettings.removeColor;
+   str << m_gridRemovalSettings.color;
+-  str << (Q_INT32 &) m_gridRemovalSettings.foregroundThresholdLow;
+-  str << (Q_INT32 &) m_gridRemovalSettings.foregroundThresholdHigh;
+-  str << (double &) m_gridRemovalSettings.gapSeparation;
+-
+-  str << (Q_INT32 &) m_gridDisplaySettings.initialized;
+-  str << (Q_INT32 &) m_gridDisplaySettings.countX;
+-  str << (Q_INT32 &) m_gridDisplaySettings.countY;
+-  str << (Q_INT32 &) m_gridDisplaySettings.gridSetX;
+-  str << (Q_INT32 &) m_gridDisplaySettings.gridSetY;
+-  str << (double &) m_gridDisplaySettings.startX;
+-  str << (double &) m_gridDisplaySettings.startY;
+-  str << (double &) m_gridDisplaySettings.stepX;
+-  str << (double &) m_gridDisplaySettings.stepY;
+-  str << (double &) m_gridDisplaySettings.stopX;
+-  str << (double &) m_gridDisplaySettings.stopY;
+-
+-  str << (Q_INT32 &) m_segmentSettings.minPoints;
+-  str << (Q_INT32 &) m_segmentSettings.pointSeparation;
+-  str << (Q_INT32 &) m_segmentSettings.lineSize;
+-  str << (Q_INT32 &) m_segmentSettings.lineColor;
+-
+-  str << (Q_INT32 &) m_pointMatchSettings.pointSeparation;
+-  str << (Q_INT32 &) m_pointMatchSettings.pointSize;
+-  str << (Q_INT32 &) m_pointMatchSettings.acceptedColor;
+-  str << (Q_INT32 &) m_pointMatchSettings.rejectedColor;
+-  str << (Q_INT32 &) m_pointMatchSettings.candidateColor;
++  str << (Q_INT32) m_gridRemovalSettings.foregroundThresholdLow;
++  str << (Q_INT32) m_gridRemovalSettings.foregroundThresholdHigh;
++  str << (double) m_gridRemovalSettings.gapSeparation;
++
++  str << (Q_INT32) m_gridDisplaySettings.initialized;
++  str << (Q_INT32) m_gridDisplaySettings.countX;
++  str << (Q_INT32) m_gridDisplaySettings.countY;
++  str << (Q_INT32) m_gridDisplaySettings.gridSetX;
++  str << (Q_INT32) m_gridDisplaySettings.gridSetY;
++  str << (double) m_gridDisplaySettings.startX;
++  str << (double) m_gridDisplaySettings.startY;
++  str << (double) m_gridDisplaySettings.stepX;
++  str << (double) m_gridDisplaySettings.stepY;
++  str << (double) m_gridDisplaySettings.stopX;
++  str << (double) m_gridDisplaySettings.stopY;
++
++  str << (Q_INT32) m_segmentSettings.minPoints;
++  str << (Q_INT32) m_segmentSettings.pointSeparation;
++  str << (Q_INT32) m_segmentSettings.lineSize;
++  str << (Q_INT32) m_segmentSettings.lineColor;
++
++  str << (Q_INT32) m_pointMatchSettings.pointSeparation;
++  str << (Q_INT32) m_pointMatchSettings.pointSize;
++  str << (Q_INT32) m_pointMatchSettings.acceptedColor;
++  str << (Q_INT32) m_pointMatchSettings.rejectedColor;
++  str << (Q_INT32) m_pointMatchSettings.candidateColor;
+     
+-  str << (Q_INT32 &) m_discretizeSettings.discretizeMethod;
+-  str << (Q_INT32 &) m_discretizeSettings.intensityThresholdLow;
+-  str << (Q_INT32 &) m_discretizeSettings.intensityThresholdHigh;
+-  str << (Q_INT32 &) m_discretizeSettings.foregroundThresholdLow;
+-  str << (Q_INT32 &) m_discretizeSettings.foregroundThresholdHigh;
+-  str << (Q_INT32 &) m_discretizeSettings.hueThresholdLow;
+-  str << (Q_INT32 &) m_discretizeSettings.hueThresholdHigh;
+-  str << (Q_INT32 &) m_discretizeSettings.saturationThresholdLow;
+-  str << (Q_INT32 &) m_discretizeSettings.saturationThresholdHigh;
+-  str << (Q_INT32 &) m_discretizeSettings.valueThresholdLow;
+-  str << (Q_INT32 &) m_discretizeSettings.valueThresholdHigh;
++  str << (Q_INT32) m_discretizeSettings.discretizeMethod;
++  str << (Q_INT32) m_discretizeSettings.intensityThresholdLow;
++  str << (Q_INT32) m_discretizeSettings.intensityThresholdHigh;
++  str << (Q_INT32) m_discretizeSettings.foregroundThresholdLow;
++  str << (Q_INT32) m_discretizeSettings.foregroundThresholdHigh;
++  str << (Q_INT32) m_discretizeSettings.hueThresholdLow;
++  str << (Q_INT32) m_discretizeSettings.hueThresholdHigh;
++  str << (Q_INT32) m_discretizeSettings.saturationThresholdLow;
++  str << (Q_INT32) m_discretizeSettings.saturationThresholdHigh;
++  str << (Q_INT32) m_discretizeSettings.valueThresholdLow;
++  str << (Q_INT32) m_discretizeSettings.valueThresholdHigh;
+ 
+   ASSERT_ENGAUGE(m_pointSets != 0);
+   m_pointSets->serializeWrite(str);
+ 
+ #ifdef __SUNPRO_CC
+-  str << (Q_INT32 &) MagicNumber;
++  str << (Q_INT32) MagicNumber;
+ #else
+-  str << (const Q_INT32 &) MagicNumber;
++  str << (const Q_INT32) MagicNumber;
+ #endif
+ 
+   f.close();
+diff --git src/pointset.cpp src/pointset.cpp
+index 66f38f9..5a5a1c6 100644
+--- src/pointset.cpp
++++ src/pointset.cpp
+@@ -25,6 +25,7 @@
+ #include <QList>
+ #include <QPixmap>
+ 
++#include <algorithm>
+ #include <math.h>
+ 
+ #include "pointset.h"
+@@ -536,7 +537,7 @@ bool PointSet::pointSetScreenLimits(double *xMin, double *xMax, double *yMin, do
+ }
+ 
+ void PointSet::mergeUniqueXValues(QList<double>* list,
+-  int xPrecision)
++  int /* xPrecision */)
+ {
+   ASSERT_ENGAUGE(list != 0);
+   
+@@ -694,16 +695,16 @@ bool PointSet::adjustForLogScale(Scale scale, double* pointXY)
+ void PointSet::serializeWrite(QDataStream &s) const
+ {
+   s << m_name;
+-  s << (Q_INT32 &) m_style.pointShape;
+-  s << (Q_INT32 &) m_style.pointSize;
+-  s << (Q_INT32 &) m_style.pointLineSize;
+-  s << (Q_INT32 &) m_style.pointLineColor;
+-  s << (Q_INT32 &) m_style.pointInColor;
+-  s << (Q_INT32 &) m_style.lineSize;
+-  s << (Q_INT32 &) m_style.lineColor;
+-  s << (Q_INT32 &) m_style.lineConnectAs;
+-
+-  s << (const Q_INT32 &) m_points.count();
++  s << (Q_INT32) m_style.pointShape;
++  s << (Q_INT32) m_style.pointSize;
++  s << (Q_INT32) m_style.pointLineSize;
++  s << (Q_INT32) m_style.pointLineColor;
++  s << (Q_INT32) m_style.pointInColor;
++  s << (Q_INT32) m_style.lineSize;
++  s << (Q_INT32) m_style.lineColor;
++  s << (Q_INT32) m_style.lineConnectAs;
++
++  s << (Q_INT32) m_points.count();
+   PointListIterator itr(m_points);
+   Point* point;
+   while ((point = itr.current()) != 0)
+@@ -720,18 +721,28 @@ void PointSet::serializeRead(QDataStream &s, Q3Canvas* canvas)
+ {
+   ASSERT_ENGAUGE(canvas != 0);
+   
++  Q_INT32 extractionQInt32;
++
+   s >> m_name;
+-  s >> (Q_INT32 &) m_style.pointShape;
+-  s >> (Q_INT32 &) m_style.pointSize;
+-  s >> (Q_INT32 &) m_style.pointLineSize;
+-  s >> (Q_INT32 &) m_style.pointLineColor;
+-  s >> (Q_INT32 &) m_style.pointInColor;
+-  s >> (Q_INT32 &) m_style.lineSize;
+-  s >> (Q_INT32 &) m_style.lineColor;
+-  s >> (Q_INT32 &) m_style.lineConnectAs;
+-
+-  int count;
+-  s >> (Q_INT32 &) count;
++  s >> extractionQInt32;
++  m_style.pointShape = (PointShape) extractionQInt32;
++  s >> extractionQInt32;
++  m_style.pointSize = (PointSize) extractionQInt32;
++  s >> extractionQInt32;
++  m_style.pointLineSize = (PointLineSize) extractionQInt32;
++  s >> extractionQInt32;
++  m_style.pointLineColor = (Color) extractionQInt32;
++  s >> extractionQInt32;
++  m_style.pointInColor = (Color) extractionQInt32;
++  s >> extractionQInt32;
++  m_style.lineSize = (LineSize) extractionQInt32;
++  s >> extractionQInt32;
++  m_style.lineColor = (Color) extractionQInt32;
++  s >> extractionQInt32;
++  m_style.lineConnectAs = (LineConnectAs) extractionQInt32;
++
++  s >> extractionQInt32;
++  int count = extractionQInt32;
+   QList<QRect> updateRectList;
+   for (int i = 0; i < count; i++)
+   {
