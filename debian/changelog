@@ -5,9 +5,11 @@ engauge-digitizer (5.2-1) unstable; urgency=low
    - Makes patch fix_qreal_vs_double.patch obsolete
    - Fixes segmentation fault in point match (Closes: #695858)
    - Fixes segmentation fault when exporting certain curves (Closes: #725165)
-  * Fixed lintian warnings in dep-5 copyright formatting
-  * Updated to standards version 3.9.5
   * Minimum debian/rules files now using dh
+  * Updated to standards version 3.9.5
+  * Updated to debhelper 9
+  * Added patch from upstream allowing strict aliasing 
+  * Fixed lintian warnings in dep-5 copyright formatting
   * Added keywords to desktop file
   * Added Vcs-git and Vcs-Browser fields to debian/control
   * removed shlibs:Depends dependency for engauge-doc
