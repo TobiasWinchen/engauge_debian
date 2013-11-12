@@ -1,17 +1,7 @@
-Description: Use buffer variable to allow strict aliasing
-	The compiler warned "dereferencing type-punned pointer will break strict-
-	aliasing rules" as at several points in the (de)serialization data was
-	streamed into variables via casting to reference. Now a buffer variable is
-	used instead.
-	The patch is part of an upstream commit.
-Origin: http://sourceforge.net/p/digitizer/code/ci/463a89ff29bff06bd2e2349cc3964e261846864d/
-Reviewed-By: Tobias Winchen <winchen@physik.rwth-aachen.de>, Mark Mitchell <markmitch@users.sf.net>
-Last-Update: 2013-11-12
-
-diff --git src/digitdoc.cpp src/digitdoc.cpp
+diff --git a/src/digitdoc.cpp b/src/digitdoc.cpp
 index 20d9f5b..97ee1c6 100644
---- src/digitdoc.cpp
-+++ src/digitdoc.cpp
+--- a/src/digitdoc.cpp
++++ b/src/digitdoc.cpp
 @@ -349,6 +349,8 @@ bool DigitDoc::supportedVersionNumber(QString versionNumber)
  
  bool DigitDoc::openDocument(const QString &filename)
@@ -397,10 +387,10 @@ index 20d9f5b..97ee1c6 100644
  #endif
  
    f.close();
-diff --git src/pointset.cpp src/pointset.cpp
+diff --git a/src/pointset.cpp b/src/pointset.cpp
 index 66f38f9..5a5a1c6 100644
---- src/pointset.cpp
-+++ src/pointset.cpp
+--- a/src/pointset.cpp
++++ b/src/pointset.cpp
 @@ -25,6 +25,7 @@
  #include <QList>
  #include <QPixmap>
