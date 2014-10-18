@@ -1,3 +1,10 @@
+engauge-digitizer (5.2-2) UNRELEASED; urgency=medium
+
+  * Fixed watch file
+  * Fixed typos in control, copyright and .desktop
+
+ -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Sat, 18 Oct 2014 09:27:02 +0200
+
 engauge-digitizer (5.2-1) unstable; urgency=low
 
   * New upstream release (Closes: #716732)
