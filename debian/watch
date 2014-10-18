@@ -1,5 +1,4 @@
 version=3
-
-http://sf.net/digitizer/digit-src-(\d+)_(\d+)\.tar\.gz
+http://sf.net/digitizer/engauge_(\d+)\.(\d+)\.tgz
 
 
