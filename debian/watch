@@ -1,4 +1,5 @@
 version=3
-http://sf.net/digitizer/engauge_(\d+)\.(\d+)\.tgz
+opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/engauge-$1\.tar\.gz/ \
+https://github.com/markummitchell/engauge6/tags .*/v?(\d\S*)\.tar\.gz
 
 
