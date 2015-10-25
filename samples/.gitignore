@@ -1,0 +1,9 @@
+engauge*log
+engauge*log*
+gridclassifier_*
+*.dig
+*.tsv
+convolution.gnuplot
+image.gnuplot
+sample.gnuplot
+segment.gnuplot

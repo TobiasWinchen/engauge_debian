@@ -1,148 +1,127 @@
+Windows - Steps to build and run engauge executable:
+----------------------------------------------------
+These steps build and run, in Microsoft Windows, the standard engauge executable for digitizing data.
 
-                             INSTALL
-                        Engauge Digitizer
+1) Install the MinGW version of the Qt Open Source toolkit from http://www.qt.io. Since the default
+   Qt Open Source download supports Microsoft Visual Studio rather than MinGW, careful navigation
+   of the Qt website is required to find, and then download, the Qt installation package that
+   explicitly targets the MinGW compiler. The MinGW compiler provides the correct header files and system
+   functions (unlike Visual Studio).
 
-Table of Contents:
-   1. REQUIREMENTS
-   1.1 Before installing a binary release
-   1.2 Before installing a source code release
-   2. USER INSTALL - Mac OSX Executable Release
-   3. USER INSTALL - MS Windows Executable Release
-   4. USER INSTALL - Source Release
-   5. DEVELOPER INSTALL - Using Makefile
-   6. INTERNATIONALIZATION
+   Note that the MinGW version of the Qt Open Source toolkit provides both Qt and MinGW. There is no
+   need to install a standalone version of MinGW.
 
-1. REQUIREMENTS
----------------
-1.1 Before installing a binary release
-----------------------------
-If you are installing a binary version of Engauge Digitizer, you do not need
-to worry about installing other packages first. The required packages will either
-be bundled with Engauge, or installed automatically if you are using a package
-manager such as Ubuntu's Synaptic.
+   Qt Open Source 5.5.1 has been tested with Engauge.
 
-1.2 Before installing a source code release
+   HINT - At this point, the MSYS shell is available by clicking on the msys.bat shortcut on the Windows
+          desktop. The MSYS shell is preferred over the Cygwin shell (if you have installed Cygwin earlier).
+
+2) Download and build log4cpp from http://log4cpp.sourceforge.net. Version 1.1 was tested with Engauge. 
+   The following minor changes were required for the code to compile:
+  
+   2a) In config-MinGW32.h, comment out '#define int64_t __int64' to prevent 'long long long is too long for gcc'
+   2b) In DailyRollingFileAppender.cpp, insert '#include <time.h>'
+   2c) In DailyRollingFileAppender.cpp, replace 'time(X)' by 'time_t(X)' where X is the argument
+   2d) In DailyRollingFileAppender.cpp, replace 'localtime_s(X,Y)' by 'localtime(Y)' where X and Y are arguments
+
+   Then following the normal configure, make and make install steps.
+
+3) Download and build fftw from http://www.fftw.org. Version 3.3.4 was tested with Engauge.
+   
+   Then following the normal configure, make and make install steps.
+
+4) Set LOG4CPP_HOME and FFTW_HOME environment variables to point to the installation directories of 
+   log4cpp and fftw in the previous steps.
+
+5) Build engauge using either the command line approach, or qtcreator. The command line approach is:
+
+   5a) qmake engauge.pro
+   5b) make
+
+   The qtcreator approach is
+
+   5a) qtcreator
+   5b) File / Open / open engauge.pro
+   5c) Build / BuildAll
+   5d) Run 
+
+Linux - Steps to build and run engauge executable:
+--------------------------------------------------
+These steps build and run, in Linux, the standard engauge executable for digitizing data.
+
+1) Install open source version 5 of the Qt toolkit. This is probably
+   available for your operating systems as a source tarball, or many packages.
+   If there is a development version of qt5, that should be installed as 
+   a minimum
+
+     --Package(s)--     --Comment--
+     *qt5-dev*          Qt version 5 toolkit for building engauge
+
+2) Install package dependencies using your package manager. Different packages
+   may be substituted, or additional packages added, according to the feedback
+   supplied in step #3:
+
+     --Package(s)--     --Comment--
+     libfftw3-dev       For computing fourier transforms. Tested with 3.3.3-7
+     liblog4cpp-dev     For logging. Tested with 1.0.4
+     libpng12-dev       For reading png image files (optional)
+     libjpeg-dev        For reading jpeg image files (optional)
+     libopenjpeg-dev    For reading jpeg2000 image files (optional). Compiles
+                        with version 2.1.7 but not with version 2.1.3
+
+3) Run qmake on this file to generate make files. The qmake executable will
+   display what functionality will, and what functionality will not, be included 
+   in engauge as a function of the currently installed packages.
+
+     > cd src
+     > qmake engauge.pro
+
+   By default, the debug version will be built by qmake. To build a release version
+   instead, set environment variable ENGAUGE_RELEASE=1 before running qmake.
+
+4) Build the executable using the make files from the previous step:
+
+     > make
+
+5) Generate the help files
+
+     > ../help/build
+
+6) Run engauge
+
+     > ../bin/engauge
+
+Linux - Steps to build engauge test executables and perform tests
+---------------------------------------------------------
+These steps build and test engauge, in Linux.
+
+1) Verify the standard version of engauge executable can be built and run
+
+2) Build and test. Every line PASS/FAIL line should say PASS. If no PASS/FAIL lines
+   appear then the build probably failed, in which case the build_and_run_all_tests.log
+   file can be examined to identify the build issues
+
+     > cd src
+     > ./build_and_run_all_tests
+
+Steps to generate doxygen documentation
+---------------------------------------
+This generates doxygen documentation
+
+1) Run doxygen
+
+     > cd src
+     > doxygen
+
+2) Open engauge6/doc/doxygen/html/index.html in your browser
+
+Steps to generate a software metrics report
 -------------------------------------------
-If you are compiling Engauge Digitizer from source code, the following two packages
-must first be installed:
+This generates doxygen documentation
 
-  1. Version 4 of Qt from qt.nokia.com
+1) Run cccc
 
-         *******************************************************************
-         * Comments and warnings:                                          *
-         * 1. Do NOT install Version 3! You must install version 4         *
-         * 2. You may download the open source version for free, although  *
-         *    purchasing a commercial version entitles you to customer     *
-         *    support from the wonderful staff at Trolltech, and to        *
-         *    include Qt in commercial products                            *
-         * 3. The QTDIR environment variable must point to the Qt          *
-         *    installation directory                                       *
-         * 4. The PATH environment variable must point to the qmake tool   *
-         *    of Qt. Hint - if you have compilation problems on a computer *
-         *    with multiple versions of Qt, then try 'qmake -v' to see if  *
-         *    you are using the wrong version of Qt. If so, then adjust    *
-         *    your PATH variable to use Qt version 4                       *
-         * 5. In Microsoft Windows the preferred setup is using QtSDK from *
-         *    qt.nokia.com with the optional MinGW package installed       *
-         *    during the QtSDK installation. Details are given below.      *
-         *******************************************************************
+     > cd src
+     > docccc
 
-  2. Version 3.1.2 of FFTW from www.fftw.org 
-
-         *******************************************************************
-         * Comments and warnings:                                          *
-         * 1. Version 3.1.2 is guaranteed to work, although other versions *
-         *    will probably also work                                      *
-         * 2. Linux users may be able to install a package for their       *
-         *    distribution using their standard package installer. This is *
-         *    the preferred method.                                        *
-         * 3. The FFTW source may be downloaded from www.fftw.org and      *
-         *    installed manually. In this case, the standard instalation   *
-         *    steps are followed:                                          *
-         *    3a) ./configure                                              *
-         *    3b) make                                                     *
-         *    3c) make install                                             *
-         *******************************************************************
-
-Note that open source versions of both Qt and FFTW are freely available.
-
-
-2. USER INSTALL - Mac OSX Executable Release
---------------------------------------------
-
-Untar the executable release package. The executable name is Engauge.app.
-The samples directory contains some sample image and document files, but 
-it must be copied from inside the bundle. To copy the samples directory,
-open the bundle using 'Show contents', then click on the Contents
-directory, and then copy the samples directory.
-
-
-3. USER INSTALL - MS Windows Executable Release
------------------------------------------------
-
-Unzip the executable release package. The executable name is 
-digitizer.exe. The samples directory contains some sample image and 
-document files.
-
-
-4. USER INSTALL - Source Release
---------------------------------
-
-This installation method is much harder than installing one of the 
-executable releases. However, this is the only option for unsupported 
-operating systems.
-
-Building your own executable is not too much of a problem if you have 
-already installed Qt from Trolltech (qt.nokia.com) installed, but
-if you have yet to install the Qt toolkit, you may have much work 
-ahead of you. 
-
-There are two source release packages - zip file and tarball. Both contain
-the same contents, and both work under MS Windows, Mac OSX, Linux, and
-a wide variety of other platforms.
-
-
-5. DEVELOPER INSTALL - Using Makefile
--------------------------------------------
-
-1. See if Qt is installed. Some tricks are to try running 'qmake -v' and to
-   look in '/usr/lib' for a directory like 'qt-3.3.3'
-2. If Qt from Trolltech is not already installed, then
-   install Qt/X11 (see http://qt.nokia.com/developer/platforms/index.html)
-3. Get a copy of the source code using anonymous git
-		git clone http://git.code.sf.net/p/digitizer/code digitizer-code
-   -OR-
-   by downloading the source tarball from digitizer.sourceforge.net and running
-   'tar xvfz digit-src-X_Y.tar.gz'
-4. 'cd digitizer'
-5. 'qmake -unix digitizer.pro'
-6. 'make'
-7. You can now run the digitizer executable
-
-
-
-6. INTERNATIONALIZATION
-------------------------
-
-The following steps will create a translation file:
-
-1. Open http://babelfish.altavista.com/tr for translations
-2. Edit digitizer.pro to add the appropriate translation file, and
-   check the modified file into cvs. This step is only performed for
-   new languages, and is skipped if there is already an entry.
-3. Run 'lupdate digitizer.pro' to create a 'digitizer_XX_YY.ts' file.
-4. Run 'linguist digitizer_XX_YY.ts' and use the babelfish webpage to 
-   translate
-5. Save the modified *.ts file, being sure to check it into cvs so
-   the changes will never be lost
-6. Run 'lrelease digitizer_XX_YY.ts' to get the digitizer_XX_YY.qm file
-7. Make sure main.cpp loads in the appropriate qm files
-
-WARNING - I would like to gently discourage any volunteers from
-attempting to translate the text of Engauge Digitizer. Some brave
-volunteers have contacted me about translating from English, only 
-to realize that the simple Engauge interface is actually hiding an
-amazing amount of documentation. The work involved is really too 
-much for a single volunteer - and that work would have to be
-updated often because the code is still under development. I am
-extremely pleased that people have volunteered for this task though!
+2) Open engauge6/doc/cccc/index.html in your browser
