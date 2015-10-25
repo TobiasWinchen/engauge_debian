@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+    <namespace>engaugedigitizer.net</namespace>
+    <virtualFolder>doc</virtualFolder>
+    <filterSection>
+        <toc>
+            <section title="Glossary of terms" ref="glossary.html"></section>
+            <section title="Tutorials">
+                <section title="Manually digitizing a simple line graph" ref="tutormanlinegraph.html"></section>
+                <section title="Manually digitizing a simple point graph" ref="tutormanpointgraph.html"></section>
+                <section title="Manually digitizing a simple map" ref="tutormanlinegraph.html"></section>
+                <section title="Automatically digitizing a simple line graph" ref="tutorautolinegraph.html"></section>
+                <section title="Automatically digitizing a simple point graph" ref="tutorautopointgraph.html"></section>
+	    </section>
+            <section title="Answers to general Frequently Asked Questions (FAQ)" ref="index.html">
+                <section title="What is discretizing?" ref="answerdiscretizing.html"></section>
+                <section title="What are the general steps for digitizing line graphs?" ref="answerlinegraph.html"></section>
+                <section title="What are the general steps for digitizing point graphs?" ref="answerpointgraph.html"></section>
+                <section title="What are the general steps for digitizing maps?" ref="answermap.html"></section>
+                <section title="How can I select objects in Select mode?" ref="answerselectmode.html"></section>
+                <section title="What are the constraints when working with maps?" ref="answermapconst.html"></section>
+                <section title="How do the various dialog boxes work?" ref="dialogs.html"></section>
+                <section title="How do I get information out of Engauge?" ref="answerout.html"></section>
+                <section title="How do I get better accuracy in the numbers from Engauge?" ref="betteraccuracy.html"></section>
+                <section title="How can I add Engauge Digitizer to the Windows Explorer context menu?" ref="contextmenuwindows.html"></section>
+                <section title="What are the command line options?" ref="commandlineoptions.html"></section>
+                <section title="What other help options are available?" ref="answerother.html"></section>
+            </section>
+            <section title="Answers for users who are having problems">
+                <section title="What happened to my image?" ref="answerdiscretizing.html"></section>
+                <section title="The coordinates are wrong, how do I fix them?" ref="fixingaxispoints.html"></section>
+            </section>         
+        </toc>
+        <keywords>
+	  <keyword name="Digitize line" ref="./.php"/> 
+	  <keyword name="Digitize points" ref="./.php"/> 
+	  <keyword name="Export digitized points" ref="./.php"/> 
+	  <keyword name="Import image" ref="./.php"/> 
+	  <keyword name="View filtered image" ref="./.php"/> 
+	  <keyword name="View original image" ref="./.php"/> 
+        </keywords>
+        <files>
+            <file>animation.png</file>
+            <file>answerdiscretizing.html</file>
+            <file>answerlinegraph.html</file>
+            <file>answermapconst.html</file>
+            <file>answermap.html</file>
+            <file>answermeasuring.html</file>
+            <file>answerother.html</file>
+            <file>answerout.html</file>
+            <file>answerpointgraph.html</file>
+            <file>answerselectmode.html</file>
+            <file>betteraccuracy.html</file>
+            <file>commandlineoptions.html</file>
+            <file>contextmenuwindows.html</file>
+            <file>dateconvert.jpg</file>
+            <file>dateformats.css</file>
+            <file>dateformats.html</file>
+            <file>dialogs.html</file>
+            <file>discretize_bad_color_after.png</file>
+            <file>discretize_bad_color_before.png</file>
+            <file>discretize_bad_gray_after.png</file>
+            <file>discretize_bad_gray_before.png</file>
+            <file>discretize_ok_after.png</file>
+            <file>discretize_ok_before.png</file>
+            <file>dlgcoordsys1.png</file>
+            <file>dlgcoordsys.html</file>
+            <file>dlgcurvegeometry1.png</file>
+            <file>dlgcurvegeometry.html</file>
+            <file>dlgcurves1.png</file>
+            <file>dlgcurves.html</file>
+            <file>dlgdiscretize1.png</file>
+            <file>dlgdiscretize.html</file>
+            <file>dlgexport1.png</file>
+            <file>dlgexport.html</file>
+            <file>dlgmeasuregeometry1.png</file>
+            <file>dlgmeasuregeometry.html</file>
+            <file>dlgmeasures1.png</file>
+            <file>dlgmeasures.html</file>
+            <file>dlgpointmatch1.png</file>
+            <file>dlgpointmatch.html</file>
+            <file>dlgsegments1.png</file>
+            <file>dlgsegments.html</file>
+            <file>dlgsessions.html</file>
+            <file>dlgsessions.png</file>
+            <file>fixingaxispoints.html</file>
+            <file>fixingaxispoints.png</file>
+            <file>glossary.html</file>
+            <file>gridremoveafter.png</file>
+            <file>gridremovebefore.png</file>
+            <file>index.html</file>
+            <file>pointmatchrequirements.html</file>
+            <file>pointmatchrequirements.png</file>
+            <file>tutorautolinegraph10.png</file>
+            <file>tutorautolinegraph11.png</file>
+            <file>tutorautolinegraph1.png</file>
+            <file>tutorautolinegraph2.png</file>
+            <file>tutorautolinegraph3.png</file>
+            <file>tutorautolinegraph4.png</file>
+            <file>tutorautolinegraph5.png</file>
+            <file>tutorautolinegraph6.png</file>
+            <file>tutorautolinegraph7.png</file>
+            <file>tutorautolinegraph9.png</file>
+            <file>tutorautolinegraph.html</file>
+            <file>tutorautopointgraph10.png</file>
+            <file>tutorautopointgraph11.png</file>
+            <file>tutorautopointgraph12.png</file>
+            <file>tutorautopointgraph13.png</file>
+            <file>tutorautopointgraph1.png</file>
+            <file>tutorautopointgraph2.png</file>
+            <file>tutorautopointgraph3.png</file>
+            <file>tutorautopointgraph4.png</file>
+            <file>tutorautopointgraph5.png</file>
+            <file>tutorautopointgraph6.png</file>
+            <file>tutorautopointgraph7.png</file>
+            <file>tutorautopointgraph9.png</file>
+            <file>tutorautopointgraph.html</file>
+            <file>tutormanlinegraph1.png</file>
+            <file>tutormanlinegraph2.png</file>
+            <file>tutormanlinegraph3.png</file>
+            <file>tutormanlinegraph4.png</file>
+            <file>tutormanlinegraph5.png</file>
+            <file>tutormanlinegraph6.png</file>
+            <file>tutormanlinegraph7.png</file>
+            <file>tutormanlinegraph8.png</file>
+            <file>tutormanlinegraph.html</file>
+            <file>tutormanmap1.png</file>
+            <file>tutormanmap2.png</file>
+            <file>tutormanmap3.png</file>
+            <file>tutormanmap4.png</file>
+            <file>tutormanmap5.png</file>
+            <file>tutormanmap6.png</file>
+            <file>tutormanmap7.png</file>
+            <file>tutormanmap8.png</file>
+            <file>tutormanmap.html</file>
+            <file>tutormanpointgraph1.png</file>
+            <file>tutormanpointgraph2.png</file>
+            <file>tutormanpointgraph3.png</file>
+            <file>tutormanpointgraph4.png</file>
+            <file>tutormanpointgraph5.png</file>
+            <file>tutormanpointgraph6.png</file>
+            <file>tutormanpointgraph7.png</file>
+            <file>tutormanpointgraph8.png</file>
+            <file>tutormanpointgraph.html</file>
+            <file>windowscontexta.jpg</file>
+            <file>windowscontextb.jpg</file>
+            <file>windowscontextc.jpg</file>
+        </files>
+    </filterSection>
+</QtHelpProject>
+

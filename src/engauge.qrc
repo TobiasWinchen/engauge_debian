@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/engauge">
+        <file>img/cursor_eyedropper.xpm</file>
+        <file>img/cursor_eyedropper_mask.xpm</file>
+        <file>img/SpreadsheetsForDoc.png</file>
+        <file>img/16-checked.png</file>
+        <file>img/16-unchecked.png</file>
+        <file>img/12-DigitAxis.png</file>
+        <file>img/12-DigitColorPicker.png</file>
+        <file>img/12-DigitCurve.png</file>
+        <file>img/12-DigitPointMatch.png</file>
+        <file>img/12-DigitSelect.png</file>
+        <file>img/12-DigitSegment.png</file>
+        <file>img/16-DigitAxis.png</file>
+        <file>img/16-DigitColorPicker.png</file>
+        <file>img/16-DigitCurve.png</file>
+        <file>img/16-DigitPointMatch.png</file>
+        <file>img/16-DigitSegment.png</file>
+        <file>img/16-DigitSelect.png</file>
+        <file>img/panel_axis_points.png</file>
+        <file>img/panel_lines_points.png</file>
+        <file>img/panel_segment_fill.png</file>
+        <file>img/panel_color_filter.png</file>
+        <file>img/panel_point_match.png</file>
+        <file>img/panel_curve_selection.png</file>
+        <file>img/panel_checklist.png</file>
+    </qresource>
+</RCC>
