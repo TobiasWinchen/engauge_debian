@@ -1,8 +1,6 @@
 Description: Fix target location for makefile
 Last-Update: 2015-10-25
 
-Index: engauge-digitizer/src/engauge.pro
-===================================================================
 --- engauge-digitizer.orig/src/engauge.pro
 +++ engauge-digitizer/src/engauge.pro
 @@ -489,7 +489,7 @@ SOURCES += \

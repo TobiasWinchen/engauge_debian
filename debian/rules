@@ -11,19 +11,16 @@ override_dh_auto_configure:
 override_dh_auto_build:
 	# build documentation
 	qcollectiongenerator help/engauge.qhcp -o help/engauge.qhc
+	mkdir -p bin/
+	mv help/engauge.qhc bin/
+	mv help/engauge.qch bin/
 	dh_auto_build
-
 
 override_dh_clean:
 	rm -rf bin/
-	rm -rf help/engauge.qhc
-	rm -rf help/engauge.qch
 	dh_clean
 
 override_dh_install:
 	mkdir -p debian/engauge-digitizer/usr/share/pixmaps/
 	install -m644 src/img/bannerapp_128.xpm debian/engauge-digitizer/usr/share/pixmaps/engauge-digitizer.xpm
-	mkdir -p debian/engauge-digitizer/usr/share/engauge-digitizer
-	install -m644 help/engauge.qch debian/engauge-digitizer/usr/share/engauge-digitizer/engauge.qch
-	install -m644 help/engauge.qhc debian/engauge-digitizer/usr/share/engauge-digitizer/engauge.qhc
 	dh_install

@@ -1,10 +1,13 @@
+Description: Add doc directory to search path for help 
+Last-Update: 2015-10-25
+
 --- a/src/Help/HelpWindow.cpp
 +++ b/src/Help/HelpWindow.cpp
 @@ -46,6 +46,7 @@
    QStringList paths;
    paths << "/documentation/engauge.qhc";
    paths << "/../share/doc/engauge-digitizer/engauge.qhc";
-+  paths << "/usr/share/engauge-digitizer/engauge.qhc";
++  paths << "/usr/share/engauge-digitizer-doc/engauge.qhc";
  
    QStringList::iterator itr;
    for (itr = paths.begin(); itr != paths.end(); itr++) {

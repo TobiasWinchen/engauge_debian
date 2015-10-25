@@ -1,0 +1,14 @@
+Description: Add hardening flags 
+Last-Update: 2015-10-25
+
+--- a/src/engauge.pro
++++ b/src/engauge.pro
+@@ -584,3 +584,8 @@
+       message(Building release version without support for JPEG2000 files)
+     }
+ }
++
++QMAKE_CPPFLAGS *= $(shell dpkg-buildflags --get CPPFLAGS)
++QMAKE_CFLAGS   *= $(shell dpkg-buildflags --get CFLAGS)
++QMAKE_CXXFLAGS *= $(shell dpkg-buildflags --get CXXFLAGS)
++QMAKE_LFLAGS   *= $(shell dpkg-buildflags --get LDFLAGS)

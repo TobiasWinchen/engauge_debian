@@ -11,8 +11,6 @@ Homepage: http://digitizer.sourceforge.net/
 Package: engauge-digitizer
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Replaces: engauge-digitizer-doc 
-Breaks: engauge-digitizer-doc 
 Description: interactively extracts numbers from bitmap graphs or maps
  This digitizing software converts an image file showing a graph or map into
  xy data (coordinates). Some people use it for obtaining the original data
@@ -27,3 +25,14 @@ Description: interactively extracts numbers from bitmap graphs or maps
     * Support for drag-and-drop and copy-and-paste
     * Context sensitive help, user manual and tutorials explain every feature
     * Preview windows give immediate feedback while modifying settings
+
+Package: engauge-digitizer-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: engauge-digitizer
+Description: engauge-digitizer user manual and tutorial
+ engauge-digitizer converts an image file showing a graph or map into numbers.
+ .
+ This package contains the HTML user guide and tutorial, which is accessible
+ from within the main program.
