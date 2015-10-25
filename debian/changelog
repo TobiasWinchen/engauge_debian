@@ -1,8 +1,10 @@
 engauge-digitizer (6.0-1) unstable; urgency=medium
 
-  * New upstream release
+  * New upstream release(Closes:  #426036, #426340)
   * Fixed watch file
   * Fixed typos in control, copyright and .desktop
+  * Update to standards version 3.9.6
+  * Removed engauge-digitizer-doc as seperate package 
 
  -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Sun, 25 Oct 2015 09:02:42 +0100
 

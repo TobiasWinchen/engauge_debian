@@ -1,1 +1,2 @@
-usermanual/* usr/share/doc/engauge-digitizer-doc/html/
+bin/engauge.qch usr/share/doc/engauge-digitizer-doc/
+bin/engauge.qhc usr/share/doc/engauge-digitizer-doc/
