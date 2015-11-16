@@ -107,8 +107,6 @@ const QString TSV_FILENAME_EXTENSION ("tsv");
 
 const unsigned int MAX_RECENT_FILE_LIST_SIZE = 8;
 
-const char *VERSION_NUMBER = "6.0";
-
 MainWindow::MainWindow(const QString &errorReportFile,
                        bool isGnuplot,
                        QWidget *parent) :
@@ -131,7 +129,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
 
   setCurrentFile ("");
   createIcons();
-  setWindowFlags (Qt::WindowContextHelpButtonHint);
+  setWindowFlags (Qt::WindowContextHelpButtonHint | windowFlags ()); // Add help to default buttons
   setWindowTitle (engaugeWindowTitle ());
 
   createCentralWidget();
@@ -355,6 +353,13 @@ void MainWindow::createActionsFile ()
     m_actionRecentFiles.append (recentFileAction);
   }
 
+  m_actionClose = new QAction(tr ("&Close"), this);
+  m_actionClose->setShortcut (QKeySequence::Close);
+  m_actionClose->setStatusTip (tr ("Closes the open document document."));
+  m_actionClose->setWhatsThis (tr ("Close Document\n\n"
+                                   "Closes the open document."));
+  connect (m_actionClose, SIGNAL (triggered ()), this, SLOT (slotFileClose ()));
+
   m_actionSave = new QAction(tr ("&Save"), this);
   m_actionSave->setShortcut (QKeySequence::Save);
   m_actionSave->setStatusTip (tr ("Saves the current document."));
@@ -435,10 +440,10 @@ void MainWindow::createActionsSettings ()
                                             "Coordinate settings determine how the graph coordinates are mapped to the pixels in the image"));
   connect (m_actionSettingsCoords, SIGNAL (triggered ()), this, SLOT (slotSettingsCoords ()));
 
-  m_actionSettingsCurveAddRemove = new QAction (tr ("Curve Add/Remove"), this);
+  m_actionSettingsCurveAddRemove = new QAction (tr ("Add/Remove Curve"), this);
   m_actionSettingsCurveAddRemove->setStatusTip (tr ("Add or Remove Curves."));
-  m_actionSettingsCurveAddRemove->setWhatsThis (tr ("Curve Add/Remove\n\n"
-                                                    "Curve Add/Remove settings control which curves are included in the current document"));
+  m_actionSettingsCurveAddRemove->setWhatsThis (tr ("Add/Remove Curve\n\n"
+                                                    "Add/Remove Curve settings control which curves are included in the current document"));
   connect (m_actionSettingsCurveAddRemove, SIGNAL (triggered ()), this, SLOT (slotSettingsCurveAddRemove ()));
 
   m_actionSettingsCurveProperties = new QAction (tr ("Curve Properties"), this);
@@ -760,6 +765,7 @@ void MainWindow::createMenus()
     m_menuFileOpenRecent->addAction (m_actionRecentFiles.at (i));
   }
   m_menuFile->addMenu (m_menuFileOpenRecent);
+  m_menuFile->addAction (m_actionClose);
   m_menuFile->insertSeparator (m_actionSave);
   m_menuFile->addAction (m_actionSave);
   m_menuFile->addAction (m_actionSaveAs);
@@ -1789,7 +1795,8 @@ void MainWindow::setupAfterLoad (const QString &fileName,
                                               m_cmbCurve->currentText ());
   m_backgroundStateContext->setBackgroundImage ((BackgroundImage) m_cmbBackground->currentIndex ());
 
-  slotViewZoomFill();
+  // Preference for issue #25 is 100% rather than fill mode
+  slotViewZoom1To1 ();
 
   setCurrentFile(fileName);
   m_statusBar->showTemporaryMessage (temporaryMessage);
@@ -1976,6 +1983,42 @@ void MainWindow::slotEditPaste ()
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditPaste";
 }
 
+void MainWindow::slotFileClose()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFileClose";
+
+  if (maybeSave ()) {
+
+    // Transition from defined to undefined. This must be after the clearing of the screen
+    // since the axes checker screen item (and maybe others) must still exist
+    m_transformationStateContext->triggerStateTransition(TRANSFORMATION_STATE_UNDEFINED,
+                                                         cmdMediator(),
+                                                         m_transformation,
+                                                         selectedGraphCurve());
+
+    // Transition to empty state so an inadvertent mouse press does not trigger, for example,
+    // the creation of an axis point on a non-existent GraphicsScene (=crash)
+    m_digitizeStateContext->requestImmediateStateTransition (DIGITIZE_STATE_EMPTY);
+
+    // Remove screen objects
+    m_scene->resetOnLoad ();
+
+    // Remove background
+    m_backgroundStateContext->close ();
+
+    // Remove scroll bars if they exist
+    m_scene->setSceneRect (QRectF (0, 0, 1, 1));
+
+    // Deallocate Document
+    delete m_cmdMediator;
+    m_cmdMediator = 0;
+    m_currentFile = "";
+    m_engaugeFile = "";
+
+    updateControls();
+  }
+}
+
 void MainWindow::slotFileExport ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFileExport";
@@ -2114,6 +2157,13 @@ void MainWindow::slotFileOpen()
 
     }
   }
+}
+
+void MainWindow::slotFileOpenDraggedDigFile (QString fileName)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFileOpenDraggedDigFile";
+
+  loadDocumentFile (fileName);
 }
 
 void MainWindow::slotFilePrint()
@@ -2883,7 +2933,8 @@ void MainWindow::updateControls ()
 
   m_menuFileOpenRecent->setEnabled ((m_actionRecentFiles.count () > 0) &&
                                     (m_actionRecentFiles.at(0)->isVisible ())); // Need at least one visible recent file entry
-  m_actionSave->setEnabled (!m_engaugeFile.isEmpty ());
+  m_actionClose->setEnabled (!m_currentFile.isEmpty ());
+  m_actionSave->setEnabled (!m_currentFile.isEmpty ());
   m_actionSaveAs->setEnabled (!m_currentFile.isEmpty ());
   m_actionExport->setEnabled (!m_currentFile.isEmpty ());
   m_actionPrint->setEnabled (!m_currentFile.isEmpty ());

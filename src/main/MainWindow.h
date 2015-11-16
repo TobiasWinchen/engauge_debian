@@ -181,12 +181,14 @@ private slots:
   void slotEditCut ();
   void slotEditDelete ();
   void slotEditPaste ();
+  void slotFileClose ();
   void slotFileExport ();
   void slotFileImport();
   void slotFileImportDraggedImage(QImage);
   void slotFileImportDraggedImageUrl(QUrl);
   void slotFileImportImage(QString, QImage);
   void slotFileOpen();
+  void slotFileOpenDraggedDigFile (QString);
   void slotFilePrint();
   bool slotFileSave(); /// Slot method that is sometimes called directly with return value expected
   bool slotFileSaveAs(); /// Slot method that is sometimes called directly with return value expected
@@ -310,6 +312,7 @@ private:
   QAction *m_actionOpen;
   QMenu *m_menuFileOpenRecent;
   QList<QAction*> m_actionRecentFiles;
+  QAction *m_actionClose;
   QAction *m_actionSave;
   QAction *m_actionSaveAs;
   QAction *m_actionExport;

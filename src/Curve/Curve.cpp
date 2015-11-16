@@ -1,10 +1,13 @@
 #include "Curve.h"
 #include "CurvesGraphs.h"
+#include "CurveStyle.h"
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "Logger.h"
+#include "MigrateToVersion6.h"
 #include "Point.h"
 #include "PointComparator.h"
+#include <QDataStream>
 #include <QDebug>
 #include <QMap>
 #include <QTextStream>
@@ -16,6 +19,7 @@
 const QString AXIS_CURVE_NAME ("Axes");
 const int AXIS_CURVE_ORDINAL = 0;
 const QString DEFAULT_GRAPH_CURVE_NAME ("Curve1");
+const QString DUMMY_CURVE_NAME ("dummy");
 const QString TAB_DELIMITER ("\t");
 
 typedef QMap<double, QString> XOrThetaToPointIdentifier;
@@ -35,6 +39,64 @@ Curve::Curve (const Curve &curve) :
   m_colorFilterSettings (curve.colorFilterSettings ()),
   m_curveStyle (curve.curveStyle ())
 {
+}
+
+Curve::Curve (QDataStream &str)
+{
+  MigrateToVersion6 migrate;
+
+  qint32 int32, xScreen, yScreen;
+  double xGraph, yGraph;
+
+  str >> m_curveName;
+  str >> int32;
+  m_curveStyle.setPointShape(migrate.pointShape (int32));
+  str >> int32;
+  m_curveStyle.setPointRadius(int32);
+  str >> int32;
+  m_curveStyle.setPointLineWidth (int32);
+  str >> int32;
+  m_curveStyle.setPointColor(migrate.colorPalette (int32));
+  str >> int32; // Point interior color
+  str >> int32;
+  m_curveStyle.setLineWidth(int32);
+  str >> int32;
+  if (m_curveName == AXIS_CURVE_NAME) {
+    m_curveStyle.setLineColor(migrate.colorPalette (int32));
+  } else {
+    m_curveStyle.setLineColor(COLOR_PALETTE_TRANSPARENT);
+  }
+  str >> int32;
+  m_curveStyle.setLineConnectAs(migrate.curveConnectAs (int32));
+
+  str >> int32;
+  int count = int32;
+  int ordinal = 0;
+  for (int i = 0; i < count; i++) {
+
+    str >> xScreen;
+    str >> yScreen;
+    str >> xGraph;
+    str >> yGraph;
+    if (m_curveName == AXIS_CURVE_NAME) {
+
+      // Axis point, with graph coordinates set by user and managed here
+      Point point (m_curveName,
+                   QPointF (xScreen, yScreen),
+                   QPointF (xGraph, yGraph),
+                   ordinal++);
+
+      addPoint(point);
+    } else {
+
+      // Curve point, with graph coordinates managed elsewhere
+      Point point (m_curveName,
+                   QPointF (xScreen, yScreen));
+      point.setOrdinal (ordinal++);
+
+      addPoint(point);
+    }
+  }
 }
 
 Curve::Curve (QXmlStreamReader &reader)

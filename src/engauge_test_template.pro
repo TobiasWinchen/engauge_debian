@@ -197,6 +197,7 @@ HEADERS  += \
     Logger/Logger.h \
     Logger/LoggerUpload.h \
     main/MainWindow.h \
+    util/MigrateToVersion6.h \
     Mime/MimePoints.h \
     util/mmsubs.h \
     Network/NetworkClient.h \
@@ -426,6 +427,7 @@ SOURCES += \
     Logger/Logger.cpp \
     Logger/LoggerUpload.cpp \
     main/MainWindow.cpp \
+    util/MigrateToVersion6.cpp \
     Mime/MimePoints.cpp \
     util/mmsubs.cpp \
     Network/NetworkClient.cpp \
@@ -482,6 +484,11 @@ TARGET = ../bin/TEST
 
 QT += core gui network printsupport testlib widgets xml help
 
+win32-g++* {
+CONFIG += windows
+LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
+}
+
 LIBS += -llog4cpp -lfftw3
 INCLUDEPATH += Background \
                Callback \
@@ -523,14 +530,19 @@ INCLUDEPATH += Background \
                util \
                View
 
+win32-g++* {
+INCLUDEPATH += $$(FFTW_HOME)/include \
+               $$(LOG4CPP_HOME)/include
+}
+
 RESOURCES += \
     engauge.qrc
 
 jpeg2000 {
     CONFIG(debug,debug|release) {
-      message(Building debug version with support for JPEG2000 files)
+      message(Building debug version with internal support for JPEG2000 files)
     } else {
-      message(Building release version with support for JPEG2000 files)
+      message(Building release version with internal support for JPEG2000 files)
     }
     _JPEG2000_INCLUDE = $$(JPEG2000_INCLUDE)
     _JPEG2000_LIB = $$(JPEG2000_LIB)
@@ -559,8 +571,8 @@ jpeg2000 {
 
 } else {
     CONFIG(debug,debug|release) {
-      message(Building debug version without support for JPEG2000 files)
+      message(Building debug version without internal support for JPEG2000 files)
     } else {
-      message(Building release version without support for JPEG2000 files)
+      message(Building release version without internal support for JPEG2000 files)
     }
 }

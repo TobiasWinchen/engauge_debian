@@ -5,26 +5,17 @@ engauge6
 
 Rewrite of Engauge Digitizer from Qt3/Qt4 to Qt5
 
-Status
-------
-This project aims to replace the 10 year old Engauge Digitizer software project that lives on sourceforge.net, with a newer version. The replacement is required since the Qt3 toolkit that Engauge relies on is disappearing. Engauge6 uses the new Qt5 library which should be available for many years.
+Versions
+--------
+October 25, 2015, version 6.0 is being upgraded to be able to read older Digitizer documents for issue #20. Upgrades for Linux package maintainers have been added.
 
-As of September 2015, Engauge6 has:
-
-* Over 25,000 lines of Engauge6 C++ code in github
-* Beta functionality - so user testing is welcome
-* Issue tracking in the github issue tracker
-* GitHub wiki for informal communication, and GitHub issue tracker for requirements, bugs, etc.
+October 23, 2015, version 6.0 of Engauge 6 was released. This is a major rewrite of the 10 year old Engauge Digitizer software project that lives on sourceforge.net. The replacement is required since the Qt3 toolkit that Engauge relies on is disappearing. Engauge6 uses the new Qt5 library which should be available for many years, and also offers many new features.
 
 Developers and users are encouraged to offer their suggestions and comments!
 
 Features
 --------
-Ideas for new features in Engauge6:
-
-1. Call OpenCV (or ?) to automatically recognize axes and axis coordinates
-
-New features already added to Engauge6:
+New features in Engauge6:
 
 1. Undo/redo of all operations means recovering from mistakes and experimenting with options is painless
 2. Wizard provides an interactive tutorial to explain the basic steps
@@ -41,3 +32,7 @@ New features already added to Engauge6:
 12. Uploadable error report generated when a programming error is encountered, for identifying problems and improving
     user support
 13. Test suite for regression testing minimizes code breakage as new features are added
+
+Contributors
+------------
+Thanks to Zbigniew Jędrzejewski-Szmek, Tamás Nagy, Baurzhan Muftakhidinov, Tobias Winchen and other contributors and users!
