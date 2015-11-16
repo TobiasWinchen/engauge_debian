@@ -5,6 +5,7 @@
 #include "EngaugeAssert.h"
 #include "Logger.h"
 #include "Point.h"
+#include <qdebug.h>
 #include <QTextStream>
 #include <QXmlStreamWriter>
 #include "Transformation.h"
@@ -139,6 +140,28 @@ void CurvesGraphs::iterateThroughCurvesPoints (const Functor2wRet<const QString 
 
     const Curve &curve = *itr;
     curve.iterateThroughCurvePoints (ftorWithCallback);
+  }
+}
+
+void CurvesGraphs::loadPreVersion6(QDataStream &str)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "CurvesGraphs::loadPreVersion6";
+
+  int i;
+
+  qint32 numberCurvesGraphs;
+  str >> numberCurvesGraphs;
+  for (i = 0; i < numberCurvesGraphs; i++) {
+    Curve curve (str);
+    m_curvesGraphs.append (curve);
+  }
+
+  qint32 numberCurvesMeasures;
+  str >> numberCurvesMeasures;
+  for (i = 0; i < numberCurvesMeasures; i++) {
+    Curve curve (str);
+
+    // Measures get dropped on the floor
   }
 }
 
