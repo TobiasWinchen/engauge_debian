@@ -1,3 +1,2 @@
 add_search_path_for_help.diff
-change_build_target_location.diff
 add_qmake_hardening_flags_to_project.diff

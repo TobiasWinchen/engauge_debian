@@ -3,8 +3,8 @@ Last-Update: 2015-10-25
 
 --- a/src/Help/HelpWindow.cpp
 +++ b/src/Help/HelpWindow.cpp
-@@ -46,6 +46,7 @@
-   QStringList paths;
+@@ -53,6 +53,7 @@
+ #endif
    paths << "/documentation/engauge.qhc";
    paths << "/../share/doc/engauge-digitizer/engauge.qhc";
 +  paths << "/usr/share/engauge-digitizer-doc/engauge.qhc";

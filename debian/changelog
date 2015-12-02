@@ -1,4 +1,4 @@
-engauge-digitizer (6.0-1) unstable; urgency=medium
+engauge-digitizer (6.2-1) UNRELEASED; urgency=medium
 
   * New upstream release(Closes:  #426036, #426340)
   * Fixed watch file
@@ -8,7 +8,7 @@ engauge-digitizer (6.0-1) unstable; urgency=medium
   * Updated licenses 
   * Added hardening flags 
 
- -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Sun, 25 Oct 2015 09:02:42 +0100
+ -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Mon, 16 Nov 2015 18:52:28 +0100
 
 engauge-digitizer (5.2-1) unstable; urgency=low
 
