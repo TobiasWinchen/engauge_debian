@@ -1,6 +1,6 @@
 engauge-digitizer (6.2-1) UNRELEASED; urgency=medium
 
-  * New upstream release(Closes:  #426036, #426340)
+  * New upstream release (Closes:  #426036, #426340)
   * Fixed watch file
   * Fixed typos in control, copyright and .desktop
   * Update to standards version 3.9.6
