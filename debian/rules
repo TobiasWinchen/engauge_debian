@@ -2,6 +2,8 @@
 # -*- makefile -*-
 DPKG_EXPORT_BUILDFLAGS = 1
 
+export QT_SELECT := qt5
+
 %:
 	dh $@ --parallel
 
