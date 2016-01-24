@@ -9,7 +9,7 @@ engauge-digitizer (6.2-1) unstable; urgency=medium
   * Updated licenses 
   * Added hardening flags 
 
- -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Mon, 07 Dec 2015 22:55:13 +0100
+ -- Tobias Winchen <tobias@winchen.de>  Sun, 24 Jan 2016 12:23:42 +0100
 
 engauge-digitizer (5.2-1) unstable; urgency=low
 
