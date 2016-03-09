@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CallbackBoundingRects.h"
 #include "CmdMediator.h"
 #include "CmdSettingsExportFormat.h"
@@ -7,6 +13,7 @@
 #include "ExportFileRelations.h"
 #include "Logger.h"
 #include "MainWindow.h"
+#include "MainWindowModel.h"
 #include <QComboBox>
 #include <QDoubleValidator>
 #include <QGridLayout>
@@ -18,10 +25,12 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollBar>
+#include <QSettings>
 #include <QTabWidget>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QVBoxLayout>
+#include "Settings.h"
 #include "Transformation.h"
 
 const int MIN_INDENT_COLUMN_WIDTH = 20;
@@ -30,12 +39,12 @@ const int MIN_EDIT_WIDTH = 110;
 const int MAX_EDIT_WIDTH = 180;
 
 const int TAB_WIDGET_INDEX_FUNCTIONS = 0;
-const int TAB_WIDGET_INDEX_RELATIONS = 1;
+//const int TAB_WIDGET_INDEX_RELATIONS = 1;
 
 const QString EMPTY_PREVIEW;
 
 DlgSettingsExportFormat::DlgSettingsExportFormat(MainWindow &mainWindow) :
-  DlgSettingsAbstractBase ("Export Format",
+  DlgSettingsAbstractBase (tr ("Export Format"),
                            "DlgSettingsExportFormat",
                            mainWindow),
   m_modelExportBefore (0),
@@ -82,7 +91,7 @@ void DlgSettingsExportFormat::createCurveSelection (QGridLayout *layout, int &ro
   layout->addWidget (m_btnInclude, row++, 1);
   connect (m_btnInclude, SIGNAL (released ()), this, SLOT (slotInclude()));
 
-  m_btnExclude = new QPushButton (tr ("Exclude>"));
+  m_btnExclude = new QPushButton (tr ("Exclude>>"));
   m_btnExclude->setEnabled (false);
   m_btnExclude->setWhatsThis (tr ("Move the currently selected curve(s) from the included list"));
   layout->addWidget (m_btnExclude, row++, 1);
@@ -95,24 +104,27 @@ void DlgSettingsExportFormat::createDelimiters (QHBoxLayout *layoutMisc)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createDelimiters";
 
-  QGroupBox *groupDelimiters = new QGroupBox (tr ("Delimiters"));
+  QGroupBox *groupDelimiters = new QGroupBox (tr ("Default Delimiters"));
   layoutMisc->addWidget (groupDelimiters, 1);
 
   QVBoxLayout *layoutDelimiters = new QVBoxLayout;
   groupDelimiters->setLayout (layoutDelimiters);
 
   m_btnDelimitersCommas = new QRadioButton (exportDelimiterToString (EXPORT_DELIMITER_COMMA));
-  m_btnDelimitersCommas->setWhatsThis (tr ("Exported file will have commas between adjacent values"));
+  m_btnDelimitersCommas->setWhatsThis (tr ("Exported file will have commas between adjacent values.\n\n"
+                                           "This setting is overridden for TSV files"));
   layoutDelimiters->addWidget (m_btnDelimitersCommas);
   connect (m_btnDelimitersCommas, SIGNAL (released ()), this, SLOT (slotDelimitersCommas()));
 
   m_btnDelimitersSpaces = new QRadioButton (exportDelimiterToString (EXPORT_DELIMITER_SPACE));
-  m_btnDelimitersSpaces->setWhatsThis (tr ("Exported file will have spaces between adjacent values"));
+  m_btnDelimitersSpaces->setWhatsThis (tr ("Exported file will have spaces between adjacent values.\n\n"
+                                           "This setting is overridden for CSV and TSV files"));
   layoutDelimiters->addWidget (m_btnDelimitersSpaces);
   connect (m_btnDelimitersSpaces, SIGNAL (released ()), this, SLOT (slotDelimitersSpaces()));
 
   m_btnDelimitersTabs = new QRadioButton (exportDelimiterToString (EXPORT_DELIMITER_TAB));
-  m_btnDelimitersTabs->setWhatsThis (tr ("Exported file will have tabs between adjacent values"));
+  m_btnDelimitersTabs->setWhatsThis (tr ("Exported file will have tabs between adjacent values.\n\n"
+                                         "This setting is overridden for CSV files"));
   layoutDelimiters->addWidget (m_btnDelimitersTabs);
   connect (m_btnDelimitersTabs, SIGNAL (released ()), this, SLOT (slotDelimitersTabs()));
 }
@@ -174,7 +186,7 @@ void DlgSettingsExportFormat::createFunctionsPointsSelection (QHBoxLayout *layou
   layoutPointsSelections->addWidget (m_btnFunctionsPointsEvenlySpaced, row++, 0, 1, 4);
   connect (m_btnFunctionsPointsEvenlySpaced, SIGNAL (released()), this, SLOT (slotFunctionsPointsEvenlySpaced()));
 
-  QLabel *labelInterval = new QLabel ("Interval:");
+  QLabel *labelInterval = new QLabel (tr ("Interval:"));
   layoutPointsSelections->addWidget (labelInterval, row, 1, 1, 1, Qt::AlignRight);
 
   m_editFunctionsPointsEvenlySpacing = new QLineEdit;
@@ -192,10 +204,10 @@ void DlgSettingsExportFormat::createFunctionsPointsSelection (QHBoxLayout *layou
   connect (m_editFunctionsPointsEvenlySpacing, SIGNAL (textChanged(const QString &)), this, SLOT (slotFunctionsPointsEvenlySpacedInterval(const QString &)));
 
   m_cmbFunctionsPointsEvenlySpacingUnits = new QComboBox;
-  m_cmbFunctionsPointsEvenlySpacingUnits->setWhatsThis ("Units for spacing interval.\n\n"
-                                                        "Pixel units are preferred when the spacing is to be independent of the X scale. The spacing will be "
-                                                        "consistent across the graph, even if the X scale is logarithmic.\n\n"
-                                                        "Graph units are preferred when the spacing is to depend on the X scale.");
+  m_cmbFunctionsPointsEvenlySpacingUnits->setWhatsThis (tr ("Units for spacing interval.\n\n"
+                                                            "Pixel units are preferred when the spacing is to be independent of the X scale. The spacing will be "
+                                                            "consistent across the graph, even if the X scale is logarithmic.\n\n"
+                                                            "Graph units are preferred when the spacing is to depend on the X scale."));
   m_cmbFunctionsPointsEvenlySpacingUnits->addItem(exportPointsIntervalUnitsToString (EXPORT_POINTS_INTERVAL_UNITS_GRAPH),
                                                                                      QVariant (EXPORT_POINTS_INTERVAL_UNITS_GRAPH));
   m_cmbFunctionsPointsEvenlySpacingUnits->addItem(exportPointsIntervalUnitsToString (EXPORT_POINTS_INTERVAL_UNITS_SCREEN),
@@ -244,6 +256,16 @@ void DlgSettingsExportFormat::createHeader (QHBoxLayout *layoutMisc)
                 COLUMN_LABEL);
 }
 
+void DlgSettingsExportFormat::createOptionalSaveDefault (QHBoxLayout *layout)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createOptionalSaveDefault";
+
+  m_btnSaveDefault = new QPushButton (tr ("Save As Default"));
+  m_btnSaveDefault->setWhatsThis (tr ("Save the settings for use as future defaults."));
+  connect (m_btnSaveDefault, SIGNAL (released ()), this, SLOT (slotSaveDefault ()));
+  layout->addWidget (m_btnSaveDefault, 0, Qt::AlignLeft);
+}
+
 void DlgSettingsExportFormat::createPreview(QGridLayout *layout, int &row)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createPreview";
@@ -283,7 +305,7 @@ void DlgSettingsExportFormat::createRelationsPointsSelection (QHBoxLayout *layou
   layoutPointsSelections->addWidget (m_btnRelationsPointsEvenlySpaced, row++, 0, 1, 4);
   connect (m_btnRelationsPointsEvenlySpaced, SIGNAL (released()), this, SLOT (slotRelationsPointsEvenlySpaced()));
 
-  QLabel *labelInterval = new QLabel ("Interval:");
+  QLabel *labelInterval = new QLabel (tr ("Interval:"));
   layoutPointsSelections->addWidget (labelInterval, row, 1, 1, 1, Qt::AlignRight);
 
   m_editRelationsPointsEvenlySpacing = new QLineEdit;
@@ -297,10 +319,10 @@ void DlgSettingsExportFormat::createRelationsPointsSelection (QHBoxLayout *layou
   connect (m_editRelationsPointsEvenlySpacing, SIGNAL (textChanged(const QString &)), this, SLOT (slotRelationsPointsEvenlySpacedInterval(const QString &)));
 
   m_cmbRelationsPointsEvenlySpacingUnits = new QComboBox;
-  m_cmbRelationsPointsEvenlySpacingUnits->setWhatsThis ("Units for spacing interval.\n\n"
-                                                        "Pixel units are preferred when the spacing is to be independent of the X and Y scales. The spacing will be "
-                                                        "consistent across the graph, even if a scale is logarithmic or the X and Y scales are different.\n\n"
-                                                        "Graph units are usually preferred when the X and Y scales are identical.");
+  m_cmbRelationsPointsEvenlySpacingUnits->setWhatsThis (tr ("Units for spacing interval.\n\n"
+                                                            "Pixel units are preferred when the spacing is to be independent of the X and Y scales. The spacing will be "
+                                                            "consistent across the graph, even if a scale is logarithmic or the X and Y scales are different.\n\n"
+                                                            "Graph units are usually preferred when the X and Y scales are identical."));
   m_cmbRelationsPointsEvenlySpacingUnits->addItem(exportPointsIntervalUnitsToString (EXPORT_POINTS_INTERVAL_UNITS_GRAPH),
                                                                                      QVariant (EXPORT_POINTS_INTERVAL_UNITS_GRAPH));
   m_cmbRelationsPointsEvenlySpacingUnits->addItem(exportPointsIntervalUnitsToString (EXPORT_POINTS_INTERVAL_UNITS_SCREEN),
@@ -796,6 +818,37 @@ void DlgSettingsExportFormat::slotRelationsPointsRaw()
   updatePreview();
 }
 
+void DlgSettingsExportFormat::slotSaveDefault()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotSaveDefault";
+
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
+  settings.beginGroup (SETTINGS_GROUP_EXPORT);
+
+  settings.setValue (SETTINGS_EXPORT_DELIMITER,
+                     QVariant (m_modelExportAfter->delimiter()));
+  settings.setValue (SETTINGS_EXPORT_HEADER,
+                     QVariant (m_modelExportAfter->header()));
+  settings.setValue (SETTINGS_EXPORT_LAYOUT_FUNCTIONS,
+                     QVariant (m_modelExportAfter->layoutFunctions()));
+  settings.setValue (SETTINGS_EXPORT_POINTS_INTERVAL_FUNCTIONS,
+                     QVariant (m_modelExportAfter->pointsIntervalFunctions()));
+  settings.setValue (SETTINGS_EXPORT_POINTS_INTERVAL_RELATIONS,
+                     QVariant (m_modelExportAfter->pointsIntervalUnitsRelations()));
+  settings.setValue (SETTINGS_EXPORT_POINTS_INTERVAL_UNITS_FUNCTIONS,
+                     QVariant (m_modelExportAfter->pointsIntervalUnitsFunctions()));
+  settings.setValue (SETTINGS_EXPORT_POINTS_INTERVAL_UNITS_RELATIONS,
+                     QVariant (m_modelExportAfter->pointsIntervalUnitsRelations()));
+  settings.setValue (SETTINGS_EXPORT_POINTS_SELECTION_FUNCTIONS,
+                     QVariant (m_modelExportAfter->pointsSelectionFunctions()));
+  settings.setValue (SETTINGS_EXPORT_POINTS_SELECTION_RELATIONS,
+                     QVariant (m_modelExportAfter->pointsSelectionFunctions()));
+  settings.setValue (SETTINGS_EXPORT_X_LABEL,
+                     QVariant (m_modelExportAfter->xLabel()));
+
+  settings.endGroup ();
+}
+
 void DlgSettingsExportFormat::slotTabChanged (int)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotTabChanged";
@@ -882,7 +935,8 @@ void DlgSettingsExportFormat::updatePreview()
       ExportFileFunctions exportStrategy;
       exportStrategy.exportToFile (*m_modelExportAfter,
                                    cmdMediator().document(),
-                                    mainWindow().transformation(),
+                                   mainWindow().modelMainWindow(),
+                                   mainWindow().transformation(),
                                    str);
 
     } else {
@@ -890,6 +944,7 @@ void DlgSettingsExportFormat::updatePreview()
       ExportFileRelations exportStrategy;
       exportStrategy.exportToFile (*m_modelExportAfter,
                                    cmdMediator().document(),
+                                   mainWindow().modelMainWindow(),
                                    mainWindow().transformation(),
                                    str);
 

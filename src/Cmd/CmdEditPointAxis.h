@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CMD_EDIT_POINT_AXIS_H
 #define CMD_EDIT_POINT_AXIS_H
 
@@ -16,7 +22,8 @@ class CmdEditPointAxis : public CmdAbstract
                    Document &document,
                    const QString &pointIdentifier,
                    const QPointF &posGraphBefore,
-                   const QPointF &posGraphAfter);
+                   const QPointF &posGraphAfter,
+                   bool isXOnly);
 
   /// Constructor for parsing error report file xml
   CmdEditPointAxis(MainWindow &mainWindow,
@@ -36,6 +43,7 @@ private:
   QString m_pointIdentifier;
   QPointF m_posGraphBefore;
   QPointF m_posGraphAfter;
+  bool m_isXOnly;
 };
 
 #endif // CMD_EDIT_POINT_AXIS_H

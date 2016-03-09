@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "DocumentSerialize.h"
 
 const QString DOCUMENT_SERIALIZE_APPLICATION ("Application");
@@ -6,6 +12,7 @@ const QString DOCUMENT_SERIALIZE_AXES_CHECKER ("AxesChecker");
 const QString DOCUMENT_SERIALIZE_AXES_CHECKER_LINE_COLOR ("LineColor");
 const QString DOCUMENT_SERIALIZE_AXES_CHECKER_MODE ("Mode");
 const QString DOCUMENT_SERIALIZE_AXES_CHECKER_SECONDS ("Seconds");
+const QString DOCUMENT_SERIALIZE_AXES_POINTS_REQUIRED ("AxesPointsRequired");
 const QString DOCUMENT_SERIALIZE_BOOL_FALSE ("False");
 const QString DOCUMENT_SERIALIZE_BOOL_TRUE ("True");
 const QString DOCUMENT_SERIALIZE_CMD ("Cmd");
@@ -20,14 +27,15 @@ const QString DOCUMENT_SERIALIZE_CMD_EDIT_POINT_AXIS ("CmdEditPointAxis");
 const QString DOCUMENT_SERIALIZE_CMD_MEDIATOR ("CmdMediator");
 const QString DOCUMENT_SERIALIZE_CMD_MOVE_BY ("CmdMoveBy");
 const QString DOCUMENT_SERIALIZE_CMD_PASTE ("CmdPaste");
+const QString DOCUMENT_SERIALIZE_CMD_SELECT_COORD_SYSTEM ("CmdSelectCoordSystem");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_AXES_CHECKER ("CmdSettingsAxesChecker");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_COLOR_FILTER ("CmdSettingsColorFilter");
-const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_COMMON ("CmdSettingsCommon");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_COORDS ("CmdSettingsCoords");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_CURVE_ADD_REMOVE ("CmdSettingsCurveAddRemove");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_CURVE_PROPERTIES ("CmdSettingsCurveProperties");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_DIGITIZE_CURVE ("CmdSettingsDigitizeCurve");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_EXPORT ("CmdSettingsExport");
+const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_GENERAL ("CmdSettingsGeneral");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_GRID_REMOVAL ("CmdSettingsGridRemoval");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_POINT_MATCH ("CmdSettingsPointMatch");
 const QString DOCUMENT_SERIALIZE_CMD_SETTINGS_SEGMENTS ("CmdSettingsSegments");
@@ -45,9 +53,8 @@ const QString DOCUMENT_SERIALIZE_COLOR_FILTER_SATURATION_HIGH ("SaturationHigh")
 const QString DOCUMENT_SERIALIZE_COLOR_FILTER_SATURATION_LOW ("SaturationLow");
 const QString DOCUMENT_SERIALIZE_COLOR_FILTER_VALUE_HIGH ("ValueHigh");
 const QString DOCUMENT_SERIALIZE_COLOR_FILTER_VALUE_LOW ("ValueLow");
-const QString DOCUMENT_SERIALIZE_COMMON ("Common");
-const QString DOCUMENT_SERIALIZE_COMMON_CURSOR_SIZE ("CursorSize");
-const QString DOCUMENT_SERIALIZE_COMMON_EXTRA_PRECISION ("ExtraPrecision");
+const QString DOCUMENT_SERIALIZE_COMMON ("Common"); // Superceded by DOCUMENT_SERIALIZE_GENERAL but kept so old documents can be loaded
+const QString DOCUMENT_SERIALIZE_COORD_SYSTEM ("CoordSystem");
 const QString DOCUMENT_SERIALIZE_COORDS ("Coords");
 const QString DOCUMENT_SERIALIZE_COORDS_ORIGIN_RADIUS ("Coords");
 const QString DOCUMENT_SERIALIZE_COORDS_SCALE_X_THETA ("ScaleXTheta");
@@ -91,7 +98,7 @@ const QString DOCUMENT_SERIALIZE_ERROR_COMMENT ("Comment");
 const QString DOCUMENT_SERIALIZE_ERROR_CONTEXT ("Context");
 const QString DOCUMENT_SERIALIZE_ERROR_FILE ("File");
 const QString DOCUMENT_SERIALIZE_ERROR_LINE ("Line");
-const QString DOCUMENT_SERIALIZE_ERROR_REPORT ("ErrorReport");
+const QString DOCUMENT_SERIALIZE_ERROR_REPORT ("ErrorReport"); // Treated same as DOCUMENT_SERIALIZE_DOCUMENT
 const QString DOCUMENT_SERIALIZE_EXPORT ("Export");
 const QString DOCUMENT_SERIALIZE_EXPORT_CURVE_NAME_NOT_EXPORTED ("CurveNameNotExported");
 const QString DOCUMENT_SERIALIZE_EXPORT_CURVE_NAME_NOT_EXPORTED_NAME ("CurveNameNotSupportedName");
@@ -114,6 +121,10 @@ const QString DOCUMENT_SERIALIZE_EXPORT_X_LABEL ("XLabel");
 const QString DOCUMENT_SERIALIZE_FILE ("File");
 const QString DOCUMENT_SERIALIZE_FILE_IMPORTED ("Imported");
 const QString DOCUMENT_SERIALIZE_FILTER ("Filter");
+const QString DOCUMENT_SERIALIZE_GENERAL ("General");
+const QString DOCUMENT_SERIALIZE_GENERAL_CURSOR_SIZE ("CursorSize");
+const QString DOCUMENT_SERIALIZE_GENERAL_EXTRA_PRECISION ("ExtraPrecision");
+const QString DOCUMENT_SERIALIZE_GENERAL_ZOOM_CONTROL ("ZoomControl");
 const QString DOCUMENT_SERIALIZE_GRAPH_X ("GraphX");
 const QString DOCUMENT_SERIALIZE_GRAPH_X_AFTER ("GraphXAfter");
 const QString DOCUMENT_SERIALIZE_GRAPH_X_BEFORE ("GraphXBefore");
@@ -150,6 +161,7 @@ const QString DOCUMENT_SERIALIZE_LINE_STYLE_CONNECT_AS ("ConnectAs");
 const QString DOCUMENT_SERIALIZE_LINE_STYLE_CONNECT_AS_STRING ("ConnectAsString");
 const QString DOCUMENT_SERIALIZE_LINE_STYLE_CURVE_NAME ("CurveName");
 const QString DOCUMENT_SERIALIZE_LINE_STYLE_WIDTH ("Width");
+const QString DOCUMENT_SERIALIZE_MAIN_WINDOW ("MainWindow");
 const QString DOCUMENT_SERIALIZE_MOVED ("Moved");
 const QString DOCUMENT_SERIALIZE_OPERATING_SYSTEM ("OperatingSystem");
 const QString DOCUMENT_SERIALIZE_OPERATING_SYSTEM_ENDIAN ("Endian");
@@ -162,6 +174,7 @@ const QString DOCUMENT_SERIALIZE_POINT_IDENTIFIER_NAME ("Name");
 const QString DOCUMENT_SERIALIZE_POINT_IDENTIFIERS ("Identifiers");
 const QString DOCUMENT_SERIALIZE_POINT_IDENTIFIER_VALUE ("Value");
 const QString DOCUMENT_SERIALIZE_POINT_IS_AXIS_POINT ("IsAxisPoint");
+const QString DOCUMENT_SERIALIZE_POINT_IS_X_ONLY ("IsXOnly");
 const QString DOCUMENT_SERIALIZE_POINT_MATCH ("PointMatch");
 const QString DOCUMENT_SERIALIZE_POINT_MATCH_POINT_SIZE ("PointSize");
 const QString DOCUMENT_SERIALIZE_POINT_MATCH_COLOR_ACCEPTED ("ColorAccepted");

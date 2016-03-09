@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
 #include "DlgSettingsAbstractBase.h"
 #include "EngaugeAssert.h"
@@ -19,7 +25,8 @@ DlgSettingsAbstractBase::DlgSettingsAbstractBase(const QString &title,
   QDialog (&mainWindow),
   m_mainWindow (mainWindow),
   m_cmdMediator (0),
-  m_dialogName (dialogName)
+  m_dialogName (dialogName),
+  m_disableOkAtStartup (true)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsAbstractBase::DlgSettingsAbstractBase"
                               << " name=" << m_dialogName.toLatin1().data();
@@ -61,19 +68,30 @@ void DlgSettingsAbstractBase::finishPanel (QWidget *subPanel)
   QWidget *panelButtons = new QWidget (this);
   QHBoxLayout *buttonLayout = new QHBoxLayout (panelButtons);
 
+  createOptionalSaveDefault(buttonLayout);
+
+  QHBoxLayout *layoutRightSide = new QHBoxLayout;
+
+  QWidget *widgetRightSide = new QWidget;
+  widgetRightSide->setLayout (layoutRightSide);
+  buttonLayout->addWidget (widgetRightSide);
+
+  QSpacerItem *spacerExpanding = new QSpacerItem (40, 5, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  layoutRightSide->addItem (spacerExpanding);
+
   m_btnOk = new QPushButton (tr ("Ok"));
   m_btnOk->setEnabled (false); // Nothing to save initially
-  buttonLayout->addWidget (m_btnOk);
+  layoutRightSide->addWidget (m_btnOk, 0, Qt::AlignRight);
   connect (m_btnOk, SIGNAL (released ()), this, SLOT (slotOk ()));
 
-  QSpacerItem *spacer = new QSpacerItem (40, 5, QSizePolicy::Minimum, QSizePolicy::Minimum);
-  buttonLayout->addItem (spacer);
+  QSpacerItem *spacerFixed = new QSpacerItem (40, 5, QSizePolicy::Fixed, QSizePolicy::Fixed);
+  layoutRightSide->addItem (spacerFixed);
 
   m_btnCancel = new QPushButton (tr ("Cancel"));
-  buttonLayout->addWidget (m_btnCancel);
+  layoutRightSide->addWidget (m_btnCancel, 0, Qt::AlignRight);
   connect (m_btnCancel, SIGNAL (released ()), this, SLOT (slotCancel ()));
 
-  panelLayout->addWidget (panelButtons, STRETCH_ON, Qt::AlignRight);
+  panelLayout->addWidget (panelButtons, STRETCH_ON);
   panelLayout->setStretch (panelLayout->count () - 1, STRETCH_OFF);
 }
 
@@ -125,9 +143,16 @@ void DlgSettingsAbstractBase::setCmdMediator (CmdMediator &cmdMediator)
   m_cmdMediator = &cmdMediator;
 }
 
+void DlgSettingsAbstractBase::setDisableOkAtStartup(bool disableOkAtStartup)
+{
+  m_disableOkAtStartup = disableOkAtStartup;
+}
+
 void DlgSettingsAbstractBase::showEvent (QShowEvent * /* event */)
 {
-  m_btnOk->setEnabled (false);
+  if (m_disableOkAtStartup) {
+    m_btnOk->setEnabled (false);
+  }
 
   QSettings settings;
   if (settings.contains (m_dialogName)) {

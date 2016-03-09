@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "ColorFilter.h"
 #include "Correlation.h"
 #include "DocumentModelCoords.h"
@@ -224,7 +230,7 @@ void GridClassifier::dumpGnuplotCoordinate (const QString &coordinateLabel,
             << GNUPLOT_DELIMITER << binCountMax * picketFence [bin] << "\n";
   }
 
-  delete picketFence;
+  delete [] picketFence;
 }
 
 void GridClassifier::dumpGnuplotCorrelations (const QString &coordinateLabel,
@@ -421,7 +427,7 @@ void GridClassifier::searchCountSpace (double bins [],
     isFirst = false;
   }
 
-  free (picketFence);
+  delete picketFence;
 }
 
 void GridClassifier::searchStartStepSpace (bool isGnuplot,
@@ -446,14 +452,15 @@ void GridClassifier::searchStartStepSpace (bool isGnuplot,
   Correlation correlation (m_numHistogramBins);
   double *picketFence = new double [m_numHistogramBins];
   int binStart;
-  double corr, corrMax;
+  double corr = 0, corrMax = 0;
   bool isFirst = true;
 
   // We do not explicitly search(=loop) through binStart here, since Correlation::correlateWithShift will take
   // care of that for us
 
-  // Step search starts out small, and stops at value that gives count substantially greater than 2
-  for (int binStep = MIN_STEP_PIXELS; binStep < m_numHistogramBins / 4; binStep++) {
+  // Step search starts out small, and stops at value that gives count substantially greater than 2. Freakishly small
+  // images need to have MIN_STEP_PIXELS overridden so the loop iterates at least once
+  for (int binStep = qMin (MIN_STEP_PIXELS, m_numHistogramBins / 8); binStep < m_numHistogramBins / 4; binStep++) {
 
     loadPicketFence (picketFence,
                      BIN_START_UNSHIFTED,
@@ -469,23 +476,29 @@ void GridClassifier::searchStartStepSpace (bool isGnuplot,
                                     correlations);
     if (isFirst || (corr > corrMax)) {
 
-      binStartMax = binStart + BIN_START_UNSHIFTED + 1; // Compensate for the shift performed inside loadPicketFence
-      binStepMax = binStep;
-      corrMax = corr;
-      copyVectorToVector (bins, signalA);
-      copyVectorToVector (picketFence, signalB);
-      copyVectorToVector (correlations, correlationsMax);
+      int binStartMaxNext = binStart + BIN_START_UNSHIFTED + 1; // Compensate for the shift performed inside loadPicketFence
 
-      // Output a gnuplot file. We should see the correlation values consistently increasing
-      if (isGnuplot) {
+      // Make sure binStartMax never goes out of bounds
+      if (binStartMaxNext < m_numHistogramBins) {
 
-        dumpGnuplotCoordinate(coordinateLabel,
-                              corr,
-                              bins,
-                              valueMin,
-                              valueMax,
-                              binStart,
-                              binStep);
+        binStartMax = binStartMaxNext;
+        binStepMax = binStep;
+        corrMax = corr;
+        copyVectorToVector (bins, signalA);
+        copyVectorToVector (picketFence, signalB);
+        copyVectorToVector (correlations, correlationsMax);
+
+        // Output a gnuplot file. We should see the correlation values consistently increasing
+        if (isGnuplot) {
+
+           dumpGnuplotCoordinate(coordinateLabel,
+                                corr,
+                                bins,
+                                valueMin,
+                                valueMax,
+                                binStart,
+                                binStep);
+        }
       }
     }
 
@@ -510,9 +523,9 @@ void GridClassifier::searchStartStepSpace (bool isGnuplot,
                              correlationsMax);
   }
 
-  free (signalA);
-  free (signalB);
-  free (correlations);
-  free (correlationsMax);
-  free (picketFence);
+  delete signalA;
+  delete signalB;
+  delete correlations;
+  delete correlationsMax;
+  delete picketFence;
 }

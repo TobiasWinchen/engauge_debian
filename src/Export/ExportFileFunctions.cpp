@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CallbackGatherXThetaValuesFunctions.h"
 #include "CurveConnectAs.h"
 #include "Document.h"
@@ -23,6 +29,7 @@ ExportFileFunctions::ExportFileFunctions()
 
 void ExportFileFunctions::exportAllPerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
                                                               const Document &document,
+                                                              const MainWindowModel &modelMainWindow,
                                                               const QStringList &curvesIncluded,
                                                               const ExportValuesXOrY &xThetaValues,
                                                               const QString &delimiter,
@@ -39,6 +46,7 @@ void ExportFileFunctions::exportAllPerLineXThetaValuesMerged (const DocumentMode
                            yRadiusValues);
   loadYRadiusValues (modelExportOverride,
                      document,
+                     modelMainWindow,
                      curvesIncluded,
                      transformation,
                      xThetaValues,
@@ -46,6 +54,7 @@ void ExportFileFunctions::exportAllPerLineXThetaValuesMerged (const DocumentMode
 
   outputXThetaYRadiusValues (modelExportOverride,
                              document.modelCoords(),
+                             modelMainWindow,
                              curvesIncluded,
                              xThetaValues,
                              transformation,
@@ -57,6 +66,7 @@ void ExportFileFunctions::exportAllPerLineXThetaValuesMerged (const DocumentMode
 
 void ExportFileFunctions::exportOnePerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
                                                               const Document &document,
+                                                              const MainWindowModel &modelMainWindow,
                                                               const QStringList &curvesIncluded,
                                                               const ExportValuesXOrY &xThetaValues,
                                                               const QString &delimiter,
@@ -86,12 +96,14 @@ void ExportFileFunctions::exportOnePerLineXThetaValuesMerged (const DocumentMode
                              yRadiusValues);
     loadYRadiusValues (modelExportOverride,
                        document,
+                       modelMainWindow,
                        curvesIncluded,
                        transformation,
                        xThetaValues,
                        yRadiusValues);
     outputXThetaYRadiusValues (modelExportOverride,
                                document.modelCoords(),
+                               modelMainWindow,
                                curvesIncluded,
                                xThetaValues,
                                transformation,
@@ -104,6 +116,7 @@ void ExportFileFunctions::exportOnePerLineXThetaValuesMerged (const DocumentMode
 
 void ExportFileFunctions::exportToFile (const DocumentModelExportFormat &modelExportOverride,
                                         const Document &document,
+                                        const MainWindowModel &modelMainWindow,
                                         const Transformation &transformation,
                                         QTextStream &str) const
 {
@@ -139,6 +152,7 @@ void ExportFileFunctions::exportToFile (const DocumentModelExportFormat &modelEx
     if (modelExportOverride.layoutFunctions() == EXPORT_LAYOUT_ALL_PER_LINE) {
       exportAllPerLineXThetaValuesMerged (modelExportOverride,
                                           document,
+                                          modelMainWindow,
                                           curvesIncluded,
                                           xThetaValuesMerged,
                                           delimiter,
@@ -147,6 +161,7 @@ void ExportFileFunctions::exportToFile (const DocumentModelExportFormat &modelEx
     } else {
       exportOnePerLineXThetaValuesMerged (modelExportOverride,
                                           document,
+                                          modelMainWindow,
                                           curvesIncluded,
                                           xThetaValuesMerged,
                                           delimiter,
@@ -222,6 +237,7 @@ double ExportFileFunctions::linearlyInterpolate (const Points &points,
 
 void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &modelExportOverride,
                                              const Document &document,
+                                             const MainWindowModel &modelMainWindow,
                                              const QStringList &curvesIncluded,
                                              const Transformation &transformation,
                                              const ExportValuesXOrY &xThetaValues,
@@ -242,6 +258,7 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
 
       // No interpolation. Raw points
       loadYRadiusValuesForCurveRaw (document.modelCoords(),
+                                    modelMainWindow,
                                     points,
                                     xThetaValues,
                                     transformation,
@@ -252,6 +269,7 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
       if (curve->curveStyle().lineStyle().curveConnectAs() == CONNECT_AS_FUNCTION_SMOOTH) {
 
         loadYRadiusValuesForCurveInterpolatedSmooth (document.modelCoords(),
+                                                     modelMainWindow,
                                                      points,
                                                      xThetaValues,
                                                      transformation,
@@ -260,6 +278,7 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
       } else {
 
         loadYRadiusValuesForCurveInterpolatedStraight (document.modelCoords(),
+                                                       modelMainWindow,
                                                        points,
                                                        xThetaValues,
                                                        transformation,
@@ -270,6 +289,7 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
 }
 
 void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth (const DocumentModelCoords &modelCoords,
+                                                                       const MainWindowModel &modelMainWindow,
                                                                        const Points &points,
                                                                        const ExportValuesXOrY &xThetaValues,
                                                                        const Transformation &transformation,
@@ -277,10 +297,7 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth (const Doc
 {
   LOG4CPP_INFO_S ((*mainCat)) << "ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth";
 
-  // Iteration accuracy versus number of iterations 8->256, 10->1024, 12->4096. Single pixel accuracy out of
-  // typical image size of 1024x1024 means around 10 iterations gives decent accuracy
-  const int MAX_ITERATIONS = 12;
-
+  // Convert screen coordinates to graph coordinates, in vectors suitable for spline fitting
   vector<double> t;
   vector<SplinePair> xy;
   ExportOrdinalsSmooth ordinalsSmooth;
@@ -290,32 +307,84 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth (const Doc
                                                     t,
                                                     xy);
 
-  // Fit a spline
-  Spline spline (t,
-                 xy);
-
+  // Formatting
   FormatCoordsUnits format;
+  QString dummyXThetaOut;
 
-  // Get value at desired points
-  for (int row = 0; row < xThetaValues.count(); row++) {
+  if (points.count() == 0) {
 
-    double xTheta = xThetaValues.at (row);
-    SplinePair splinePairFound = spline.findSplinePairForFunctionX (xTheta,
-                                                                    MAX_ITERATIONS);
-    double yRadius = splinePairFound.y ();
+    // Since there are no values, leave the field empty
+    for (int row = 0; row < xThetaValues.count(); row++) {
+      *(yRadiusValues [row]) = "";
+    }
 
-    // Save y/radius value for this row into yRadiusValues, after appropriate formatting
-    QString dummyXThetaOut;
-    format.unformattedToFormatted (xTheta,
-                                   yRadius,
-                                   modelCoords,
-                                   dummyXThetaOut,
-                                   *(yRadiusValues [row]),
-                                   transformation);
+  } else if (points.count() == 1 ||
+             points.count() == 2) {
+
+    // Apply the single value everywhere (N=1) or do linear interpolation (N=2)
+    for (int row = 0; row < xThetaValues.count(); row++) {
+
+      double xTheta = xThetaValues.at (row);
+      double yRadius;
+      if (points.count() == 1) {
+        yRadius = xy.at (0).y ();
+      } else {
+        double x0 = xy.at (0).x ();
+        double x1 = xy.at (1).x ();
+        double y0 = xy.at (0).y ();
+        double y1 = xy.at (1).y ();
+        if (x0 == x1) {
+          // Cannot do linear interpolation using two points at the same x value
+          yRadius = xy.at (0).y ();
+        } else {
+          double s = (xTheta - x0) / (x1 - x0);
+          yRadius = (1.0 - s) * y0 + s * y1;
+        }
+      }
+      format.unformattedToFormatted (xTheta,
+                                     yRadius,
+                                     modelCoords,
+                                     modelMainWindow,
+                                     dummyXThetaOut,
+                                     *(yRadiusValues [row]),
+                                     transformation);
+    }
+
+  } else {
+
+    // Iteration accuracy versus number of iterations 8->256, 10->1024, 12->4096. Single pixel accuracy out of
+    // typical image size of 1024x1024 means around 10 iterations gives decent accuracy for numbers much bigger
+    // than 1. A value of 12 gave some differences in the least significant figures of numbers like 10^-3 in
+    // the regression tests. Toggling between 30 and 32 made no difference in the regression tests.
+    const int MAX_ITERATIONS = 32;
+
+    // Fit a spline
+    Spline spline (t,
+                   xy);
+
+    // Get value at desired points
+    for (int row = 0; row < xThetaValues.count(); row++) {
+
+      double xTheta = xThetaValues.at (row);
+      SplinePair splinePairFound = spline.findSplinePairForFunctionX (xTheta,
+                                                                      MAX_ITERATIONS);
+      double yRadius = splinePairFound.y ();
+
+      // Save y/radius value for this row into yRadiusValues, after appropriate formatting
+      QString dummyXThetaOut;
+      format.unformattedToFormatted (xTheta,
+                                     yRadius,
+                                     modelCoords,
+                                     modelMainWindow,
+                                     dummyXThetaOut,
+                                     *(yRadiusValues [row]),
+                                     transformation);
+    }
   }
 }
 
 void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedStraight (const DocumentModelCoords &modelCoords,
+                                                                         const MainWindowModel &modelMainWindow,
                                                                          const Points &points,
                                                                          const ExportValuesXOrY &xThetaValues,
                                                                          const Transformation &transformation,
@@ -339,6 +408,7 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedStraight (const D
     format.unformattedToFormatted (xThetaValue,
                                    yRadius,
                                    modelCoords,
+                                   modelMainWindow,
                                    dummyXThetaOut,
                                    *(yRadiusValues [row]),
                                    transformation);
@@ -346,6 +416,7 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedStraight (const D
 }
 
 void ExportFileFunctions::loadYRadiusValuesForCurveRaw (const DocumentModelCoords &modelCoords,
+                                                        const MainWindowModel &modelMainWindow,
                                                         const Points &points,
                                                         const ExportValuesXOrY &xThetaValues,
                                                         const Transformation &transformation,
@@ -389,6 +460,7 @@ void ExportFileFunctions::loadYRadiusValuesForCurveRaw (const DocumentModelCoord
     format.unformattedToFormatted (posGraph.x(),
                                    posGraph.y(),
                                    modelCoords,
+                                   modelMainWindow,
                                    dummyXThetaOut,
                                    *(yRadiusValues [rowClosest]),
                                    transformation);
@@ -397,6 +469,7 @@ void ExportFileFunctions::loadYRadiusValuesForCurveRaw (const DocumentModelCoord
 
 void ExportFileFunctions::outputXThetaYRadiusValues (const DocumentModelExportFormat &modelExportOverride,
                                                      const DocumentModelCoords &modelCoords,
+                                                     const MainWindowModel &modelMainWindow,
                                                      const QStringList &curvesIncluded,
                                                      const ExportValuesXOrY &xThetaValuesMerged,
                                                      const Transformation &transformation,
@@ -436,6 +509,7 @@ void ExportFileFunctions::outputXThetaYRadiusValues (const DocumentModelExportFo
       format.unformattedToFormatted (xTheta,
                                      DUMMY_Y_RADIUS,
                                      modelCoords,
+                                     modelMainWindow,
                                      xThetaString,
                                      yRadiusString,
                                      transformation);

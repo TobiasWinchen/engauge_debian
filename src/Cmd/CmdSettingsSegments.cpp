@@ -1,9 +1,16 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdSettingsSegments.h"
 #include "Document.h"
 #include "DocumentSerialize.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include <QXmlStreamReader>
+#include "Xml.h"
 
 const QString CMD_DESCRIPTION ("Segments settings");
 
@@ -30,8 +37,41 @@ CmdSettingsSegments::CmdSettingsSegments (MainWindow &mainWindow,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsSegments::CmdSettingsSegments";
 
-  m_modelSegmentsBefore.loadXml (reader);
-  m_modelSegmentsAfter.loadXml (reader);
+  bool success = true;
+
+  // Read until end of this subtree
+  bool isBefore = true;
+  while ((reader.tokenType() != QXmlStreamReader::EndElement) ||
+  (reader.name() != DOCUMENT_SERIALIZE_CMD)){
+    loadNextFromReader(reader);
+    if (reader.atEnd()) {
+      xmlExitWithError (reader,
+                        QString ("%1 %2")
+                        .arg (QObject::tr ("Reached end of file before finding end element for"))
+                        .arg (DOCUMENT_SERIALIZE_CMD));
+      success = false;
+      break;
+    }
+
+    if ((reader.tokenType() == QXmlStreamReader::StartElement) &&
+        (reader.name() == DOCUMENT_SERIALIZE_SEGMENTS)) {
+
+      if (isBefore) {
+
+        m_modelSegmentsBefore.loadXml (reader);
+        isBefore = false;
+
+      } else {
+
+        m_modelSegmentsAfter.loadXml (reader);
+
+      }
+    }
+  }
+
+  if (!success) {
+    reader.raiseError ("Cannot read segments settings");
+  }
 }
 
 CmdSettingsSegments::~CmdSettingsSegments ()

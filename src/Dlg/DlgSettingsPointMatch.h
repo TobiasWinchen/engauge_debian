@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DLG_SETTINGS_POINT_MATCH_H
 #define DLG_SETTINGS_POINT_MATCH_H
 
@@ -24,6 +30,7 @@ public:
   DlgSettingsPointMatch(MainWindow &mainWindow);
   virtual ~DlgSettingsPointMatch();
 
+  virtual void createOptionalSaveDefault (QHBoxLayout *layout);
   virtual QWidget *createSubPanel ();
   virtual void load (CmdMediator &cmdMediator);
 

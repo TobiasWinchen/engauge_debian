@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "DocumentModelSegments.h"
 #include "EngaugeAssert.h"
 #include <iostream>
@@ -505,7 +511,7 @@ void Segment::removeUnneededLines (int *foldedLines)
     }
   }
 
-  if (m_isGnuplot) {
+  if (strDump != 0) {
 
     // Final gnuplot processing
     *strDump << "set terminal x11 persist\n";

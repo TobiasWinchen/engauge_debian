@@ -1,32 +1,39 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CoordSymbol.h"
 #include "CoordUnitsPolarTheta.h"
+#include <QObject>
 
 QString coordUnitsPolarThetaToBriefType (CoordUnitsPolarTheta coordUnits)
 {
   switch (coordUnits) {
     case COORD_UNITS_POLAR_THETA_DEGREES:
-      return "Degrees";
+      return QObject::tr ("Degrees");
 
     case COORD_UNITS_POLAR_THETA_DEGREES_MINUTES:
-      return "Degrees";
+      return QObject::tr ("Degrees");
 
     case COORD_UNITS_POLAR_THETA_DEGREES_MINUTES_SECONDS:
-      return "Degrees";
+      return QObject::tr ("Degrees");
 
     case COORD_UNITS_POLAR_THETA_DEGREES_MINUTES_SECONDS_NSEW:
-      return "Degrees";
+      return QObject::tr ("Degrees");
 
     case COORD_UNITS_POLAR_THETA_GRADIANS:
-      return "Gradians";
+      return QObject::tr ("Gradians");
 
     case COORD_UNITS_POLAR_THETA_RADIANS:
-      return "Radians";
+      return QObject::tr ("Radians");
 
     case COORD_UNITS_POLAR_THETA_TURNS:
-      return "Turns";
+      return QObject::tr ("Turns");
 
     default:
-      return "Unknown";
+      return QObject::tr ("Unknown");
   }
 }
 
@@ -55,6 +62,6 @@ QString coordUnitsPolarThetaToString (CoordUnitsPolarTheta coordUnits)
       return POLAR_UNITS_TURNS;
 
     default:
-      return "Unknown";
+      return QObject::tr ("Unknown");
   }
 }

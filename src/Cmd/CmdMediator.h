@@ -1,8 +1,15 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CMD_MEDIATOR_H
 #define CMD_MEDIATOR_H
 
 #include "CoordsType.h"
 #include "Document.h"
+#include "DocumentAxesPointsRequired.h"
 #include "PointStyle.h"
 #include <QUndoStack>
 
@@ -16,7 +23,7 @@ class QImage;
 class CmdMediator : public QUndoStack
 {
 public:
-  /// Constructor for imported images and dragged images.
+  /// Constructor for imported images and dragged images. Only one coordinate system is created but others can be added later.
   CmdMediator (MainWindow &mainWindow,
                const QImage &image);
 
@@ -26,6 +33,9 @@ public:
 
   /// Destructor
   ~CmdMediator();
+
+  /// Provide the current CoordSystem to commands with read-only access, primarily for undo/redo processing.
+  const CoordSystem &coordSystem () const;
 
   /// See Document::curveAxes
   const Curve &curveAxes () const;
@@ -63,6 +73,10 @@ public:
 
   /// Serialize to xml
   void saveXml(QXmlStreamWriter &writer) const;
+
+  /// Set the number of axes points required. This is called during the Document creation process, after imported images have
+  /// been previewed or loaded files have had at least some xml parsing
+  void setDocumentAxesPointsRequired (DocumentAxesPointsRequired documentAxesPointsRequired);
 
   /// Wrapper for Document::successfulRead
   bool successfulRead () const;

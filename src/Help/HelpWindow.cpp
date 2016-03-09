@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "HelpBrowser.h"
 #include "HelpWindow.h"
 #include "Logger.h"
@@ -23,9 +29,9 @@ HelpWindow::HelpWindow(QWidget *parent) :
 
   QTabWidget *tabs = new QTabWidget;
   tabs->addTab (helpEngine->contentWidget(),
-                "Contents");
+                tr ("Contents"));
   tabs->addTab (helpEngine->indexWidget(),
-                "Index");
+                tr ("Index"));
 
   HelpBrowser *browser = new HelpBrowser (helpEngine);
   browser->setSource (QUrl ("qthelp://engaugedigitizer.net/doc/index.html"));

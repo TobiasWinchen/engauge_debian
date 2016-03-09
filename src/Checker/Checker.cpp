@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "Checker.h"
 #include "EngaugeAssert.h"
 #include "EnumsToQt.h"
@@ -12,11 +18,11 @@
 #include "QtToString.h"
 #include "Transformation.h"
 
-const int NUM_AXES_POINTS = 3;
+const int NUM_AXES_POINTS_3 = 3;
+const int NUM_AXES_POINTS_4 = 4;
 
 extern const QString DUMMY_CURVE_NAME;
 const int Z_VALUE_IN_FRONT = 100;
-const int NO_SIDE = -1;
 
 // To emphasize that the axis lines are still there, we make these checker somewhat transparent
 const double CHECKER_OPACITY = 0.6;
@@ -30,7 +36,6 @@ const double PI = 3.1415926535;
 const double TWO_PI = 2.0 * PI;
 const double DEGREES_TO_RADIANS = PI / 180.0;
 const double RADIANS_TO_TICS = 5760 / TWO_PI;
-const double RADIANS_TO_DEGREES = 180.0 / PI;
 
 Checker::Checker(QGraphicsScene &scene) :
   m_scene (scene)
@@ -432,11 +437,13 @@ double Checker::minScreenDistanceFromPoints (const QPointF &posScreen,
 void Checker::prepareForDisplay (const QPolygonF &polygon,
                                  int pointRadius,
                                  const DocumentModelAxesChecker &modelAxesChecker,
-                                 const DocumentModelCoords &modelCoords)
+                                 const DocumentModelCoords &modelCoords,
+                                 DocumentAxesPointsRequired documentAxesPointsRequired)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Checker::prepareForDisplay";
 
-  ENGAUGE_ASSERT (polygon.count () == NUM_AXES_POINTS);
+  ENGAUGE_ASSERT ((polygon.count () == NUM_AXES_POINTS_3) ||
+                  (polygon.count () == NUM_AXES_POINTS_4));
 
   // Convert pixel coordinates in QPointF to screen and graph coordinates in Point using
   // identity transformation, so this routine can reuse computations provided by Transformation
@@ -448,7 +455,8 @@ void Checker::prepareForDisplay (const QPolygonF &polygon,
 
     Point p (DUMMY_CURVE_NAME,
              pF,
-             pF);
+             pF,
+             false);
     points.push_back (p);
   }
 
@@ -459,19 +467,22 @@ void Checker::prepareForDisplay (const QPolygonF &polygon,
                      pointRadius,
                      modelAxesChecker,
                      modelCoords,
-                     transformIdentity);
+                     transformIdentity,
+                     documentAxesPointsRequired);
 }
 
 void Checker::prepareForDisplay (const QList<Point> &points,
                                  int pointRadius,
                                  const DocumentModelAxesChecker &modelAxesChecker,
                                  const DocumentModelCoords &modelCoords,
-                                 const Transformation &transformation)
+                                 const Transformation &transformation,
+                                 DocumentAxesPointsRequired documentAxesPointsRequired)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Checker::prepareForDisplay "
                               << " transformation=" << transformation;
 
-  ENGAUGE_ASSERT (points.count () == NUM_AXES_POINTS);
+  ENGAUGE_ASSERT ((points.count () == NUM_AXES_POINTS_3) ||
+                  (points.count () == NUM_AXES_POINTS_4));
 
   // Remove previous lines
   deleteSide (m_sideLeft);
@@ -479,20 +490,39 @@ void Checker::prepareForDisplay (const QList<Point> &points,
   deleteSide (m_sideRight);
   deleteSide (m_sideBottom);
 
+  bool fourPoints = (documentAxesPointsRequired == DOCUMENT_AXES_POINTS_REQUIRED_4);
+
   // Get the min and max of x and y. We initialize yTo to prevent compiler warning
-  double xFrom, xTo, yFrom, yTo = 0;
+  double xFrom = 0, xTo = 0, yFrom = 0, yTo = 0;
   int i;
-  for (i = 0; i < NUM_AXES_POINTS; i++) {
-    if (i == 0) {
-      xFrom = points.at(i).posGraph().x();
-      xTo   = points.at(i).posGraph().x();
-      yFrom = points.at(i).posGraph().y();
-      yTo   = points.at(i).posGraph().y();
+  bool firstX = true;
+  bool firstY = true;
+  for (i = 0; i < points.count(); i++) {
+    if (!fourPoints || (points.at(i).isXOnly() && fourPoints)) {
+
+      // X coordinate is defined
+      if (firstX) {
+        xFrom = points.at(i).posGraph().x();
+        xTo   = points.at(i).posGraph().x();
+        firstX = false;
+      } else {
+        xFrom = qMin (xFrom, points.at(i).posGraph().x());
+        xTo   = qMax (xTo  , points.at(i).posGraph().x());
+      }
     }
-    xFrom = qMin (xFrom, points.at(i).posGraph().x());
-    xTo   = qMax (xTo  , points.at(i).posGraph().x());
-    yFrom = qMin (yFrom, points.at(i).posGraph().y());
-    yTo   = qMax (yTo  , points.at(i).posGraph().y());
+
+    if (!fourPoints || (!points.at(i).isXOnly() && fourPoints)) {
+
+      // Y coordinate is defined
+      if (firstY) {
+        yFrom = points.at(i).posGraph().y();
+        yTo   = points.at(i).posGraph().y();
+        firstY = false;
+      } else {
+        yFrom = qMin (yFrom, points.at(i).posGraph().y());
+        yTo   = qMax (yTo  , points.at(i).posGraph().y());
+      }
+    }
   }
 
   // Min and max of angles needs special processing since periodicity introduces some ambiguity. This is a noop for rectangular coordinates

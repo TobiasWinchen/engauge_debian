@@ -1,8 +1,15 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef TRANSFORMATION_H
 #define TRANSFORMATION_H
 
 #include "CmdMediator.h"
 #include "DocumentModelCoords.h"
+#include "MainWindowModel.h"
 #include <QPointF>
 #include <QString>
 #include <QTransform>
@@ -83,7 +90,7 @@ public:
   void resetOnLoad();
 
   /// Transform is defined when at least three axis points have been digitized
-  bool transformIsDefined() const { return m_transformIsDefined; }
+  bool transformIsDefined() const;
 
   /// Transform from linear cartesian graph coordinates to cartesian, polar, linear, log coordinates
   void transformLinearCartesianGraphToRawGraph (const QPointF &coordGraph,
@@ -114,7 +121,8 @@ public:
 
   /// Update transform by iterating through the axis points.
   void update (bool fileIsLoaded,
-               const CmdMediator &cmdMediator);
+               const CmdMediator &cmdMediator,
+               const MainWindowModel &modelMainWindow);
 
 private:
 
@@ -122,7 +130,8 @@ private:
   double roundOffSmallValues (double value, double range);
 
   // Model coords are set upon entry from CmdMediator
-  void setModelCoords (const DocumentModelCoords &modelCoords);
+  void setModelCoords (const DocumentModelCoords &modelCoords,
+                       const MainWindowModel &modelMainWindow);
 
   // Compute transform from screen and graph points. The 3x3 matrices are handled as QTransform since QMatrix is deprecated
   void updateTransformFromMatrices (const QTransform &matrixScreen,
@@ -136,6 +145,9 @@ private:
 
   // Coordinates information from last time the transform was updated. Only defined if  m_transformIsDefined is true
   DocumentModelCoords m_modelCoords;
+
+  // Formatting information
+  MainWindowModel m_modelMainWindow;
 };
 
 /// Stream operator

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DLG_SETTINGS_CURVE_PROPERTIES_H
 #define DLG_SETTINGS_CURVE_PROPERTIES_H
 
@@ -22,6 +28,7 @@ public:
   DlgSettingsCurveProperties(MainWindow &mainWindow);
   virtual ~DlgSettingsCurveProperties();
 
+  virtual void createOptionalSaveDefault (QHBoxLayout *layout);
   virtual QWidget *createSubPanel ();
   virtual void load (CmdMediator &cmdMediator);
 
@@ -37,6 +44,7 @@ private slots:
   void slotPointLineWidth (int);
   void slotPointRadius(int);
   void slotPointShape(const QString &);
+  void slotSaveDefault();
 
 protected:
   virtual void handleOk ();
@@ -67,6 +75,8 @@ private:
   QSpinBox *m_spinLineWidth;
   QComboBox *m_cmbLineColor;
   QComboBox *m_cmbLineType;
+
+  QPushButton *m_btnSaveDefault;
 
   QGraphicsScene *m_scenePreview;
   ViewPreview *m_viewPreview;

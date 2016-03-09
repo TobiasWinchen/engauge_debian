@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CHECKLIST_GUIDE_PAGE_H
 #define CHECKLIST_GUIDE_PAGE_H
 
@@ -20,10 +26,12 @@ class ChecklistGuidePage : public QWizardPage
   void addHtml (const QString &html);
 
   /// Insert radio button and corresponding label
-  QRadioButton *addLabelAndRadioButton (const QString &label);
+  QRadioButton *addLabelAndRadioButton (const QString &label,
+                                        const QString &whatsThis);
 
   /// Insert line edit
-  void addLineEdit (ChecklistLineEdit *edit);
+  void addLineEdit (ChecklistLineEdit *edit,
+                    const QString &whatsThis);
 
  private:
   ChecklistGuidePage();

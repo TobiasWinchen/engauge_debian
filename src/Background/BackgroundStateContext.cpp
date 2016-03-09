@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "BackgroundStateContext.h"
 #include "BackgroundStateCurve.h"
 #include "BackgroundStateNone.h"
@@ -128,8 +134,6 @@ void BackgroundStateContext::setCurveSelected (const Transformation &transformat
   LOG4CPP_INFO_S ((*mainCat)) << "BackgroundStateContext::setCurveSelected"
                               << " curve=" << curveSelected.toLatin1().data();
 
-  ENGAUGE_ASSERT (!curveSelected.isEmpty ());
-
   for (int backgroundState = 0; backgroundState < NUM_BACKGROUND_STATES; backgroundState++) {
 
     m_states [backgroundState]->setCurveSelected (transformation,
@@ -144,7 +148,9 @@ void BackgroundStateContext::setPixmap (const Transformation &transformation,
                                         const DocumentModelColorFilter &modelColorFilter,
                                         const QPixmap &pixmapOriginal)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "BackgroundStateContext::setPixmap";
+  LOG4CPP_INFO_S ((*mainCat)) << "BackgroundStateContext::setPixmap"
+                              << " image=" << pixmapOriginal.width() << "x" << pixmapOriginal.height()
+                              << " currentState=" << m_states [m_currentState]->state().toLatin1().data();
 
   for (int backgroundState = 0; backgroundState < NUM_BACKGROUND_STATES; backgroundState++) {
 

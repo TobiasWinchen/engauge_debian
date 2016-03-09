@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
@@ -5,7 +11,7 @@
 #include "TutorialStateAbstractBase.h"
 #include "TutorialStateContext.h"
 
-const int DELTA_FONT_SIZE = 2;
+//const int DELTA_FONT_SIZE = 2;
 const int TITLE_PADDING = 5;
 const double Z_TITLE = 2.0; // On top of everything else
 

@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include "MainWindow.h"
 #include <qmath.h>
+#include <QStringList>
 #include <QtTest/QtTest>
 #include "Test/TestCorrelation.h"
 
@@ -19,15 +20,21 @@ void TestCorrelation::cleanupTestCase ()
 void TestCorrelation::initTestCase ()
 {
   const QString NO_ERROR_REPORT_LOG_FILE;
+  const QString NO_REGRESSION_OPEN_FILE;
   const bool NO_GNUPLOT_LOG_FILES = false;
+  const bool NO_REGRESSION_IMPORT = false;
   const bool DEBUG_FLAG = false;
+  const QStringList NO_LOAD_STARTUP_FILES;
 
   initializeLogging ("engauge_test",
                      "engauge_test.log",
                      DEBUG_FLAG);
 
   MainWindow w (NO_ERROR_REPORT_LOG_FILE,
-                NO_GNUPLOT_LOG_FILES);
+                NO_REGRESSION_OPEN_FILE,
+                NO_GNUPLOT_LOG_FILES,
+                NO_REGRESSION_IMPORT,
+                NO_LOAD_STARTUP_FILES);
   w.show ();
 }
 

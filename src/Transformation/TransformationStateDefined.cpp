@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CallbackAxesCheckerFromAxesPoints.h"
 #include "Checker.h"
 #include "CmdMediator.h"
@@ -121,7 +127,8 @@ void TransformationStateDefined::updateAxesChecker (CmdMediator &cmdMediator,
                                     cmdMediator.document().modelCurveStyles().pointRadius(AXIS_CURVE_NAME),
                                     cmdMediator.document().modelAxesChecker(),
                                     cmdMediator.document().modelCoords(),
-                                    transformation);
+                                    transformation,
+                                    cmdMediator.document().documentAxesPointsRequired());
   m_axesChecker->setVisible (true);
   startTimer (cmdMediator.document().modelAxesChecker());
 }

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef POINT_MATCH_ALGORITHM_H
 #define POINT_MATCH_ALGORITHM_H
 
@@ -43,16 +49,16 @@ class PointMatchAlgorithm
   void assembleLocalMaxima(double* convolution,
                            PointMatchList& listCreated,
                            int width,
-                           int height,
-                           int sampleXCenter,
-                           int sampleYCenter);
+                           int height);
 
   // Compute convolution in image space from phase space image and sample arrays
   void computeConvolution(fftw_complex* imagePrime,
                           fftw_complex* samplePrime,
                           int width,
                           int height,
-                          double** convolution);
+                          double** convolution,
+                          int sampleXCenter,
+                          int sampleYCenter);
 
   // In-place replacement of matrix by its complex conjugate
   void conjugateMatrix(int width,

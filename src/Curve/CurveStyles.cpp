@@ -1,4 +1,11 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
+#include "CoordSystem.h"
 #include "CurveStyles.h"
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
@@ -12,20 +19,20 @@ CurveStyles::CurveStyles()
 {
 }
 
-CurveStyles::CurveStyles (const Document &document)
+CurveStyles::CurveStyles (const CoordSystem &coordSystem)
 {
   // Axis curve
-  const Curve &curveAxes = document.curveAxes();
+  const Curve &curveAxes = coordSystem.curveAxes();
   m_curveStyles [AXIS_CURVE_NAME].setLineStyle (curveAxes.curveStyle().lineStyle());
   m_curveStyles [AXIS_CURVE_NAME].setPointStyle (curveAxes.curveStyle().pointStyle());
 
   // Graph curves
-  QStringList graphCurveNames = document.curvesGraphsNames();
+  QStringList graphCurveNames = coordSystem.curvesGraphsNames();
   QStringList::const_iterator itr;
   for (itr = graphCurveNames.begin (); itr != graphCurveNames.end (); itr++) {
 
     const QString &graphCurveName = *itr;
-    const Curve *graphCurve = document.curveForCurveName(graphCurveName);
+    const Curve *graphCurve = coordSystem.curveForCurveName(graphCurveName);
     m_curveStyles [graphCurveName].setLineStyle (graphCurve->curveStyle().lineStyle());
     m_curveStyles [graphCurveName].setPointStyle (graphCurve->curveStyle().pointStyle());
   }

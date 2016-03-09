@@ -1,6 +1,13 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdAbstract.h"
 #include "CmdAddPointAxis.h"
 #include "CmdAddPointGraph.h"
+#include "CmdAddPointsGraph.h"
 #include "CmdCopy.h"
 #include "CmdCut.h"
 #include "CmdDelete.h"
@@ -8,6 +15,7 @@
 #include "CmdFactory.h"
 #include "CmdMoveBy.h"
 #include "CmdPaste.h"
+#include "CmdSelectCoordSystem.h"
 #include "CmdSettingsAxesChecker.h"
 #include "CmdSettingsColorFilter.h"
 #include "CmdSettingsCoords.h"
@@ -57,6 +65,11 @@ CmdAbstract *CmdFactory::createCmd (MainWindow &mainWindow,
                                 document,
                                 cmdDescription,
                                 reader);
+  } else if (cmdType == DOCUMENT_SERIALIZE_CMD_ADD_POINTS_GRAPH) {
+    cmd = new CmdAddPointsGraph (mainWindow,
+                                 document,
+                                 cmdDescription,
+                                 reader);
   } else if (cmdType == DOCUMENT_SERIALIZE_CMD_COPY) {
     cmd = new CmdCopy (mainWindow,
                        document,
@@ -87,6 +100,11 @@ CmdAbstract *CmdFactory::createCmd (MainWindow &mainWindow,
                         document,
                         cmdDescription,
                         reader);
+  } else if (cmdType == DOCUMENT_SERIALIZE_CMD_SELECT_COORD_SYSTEM) {
+    cmd = new CmdSelectCoordSystem (mainWindow,
+                                    document, 
+                                    cmdDescription,
+                                    reader);
   } else if (cmdType == DOCUMENT_SERIALIZE_CMD_SETTINGS_AXES_CHECKER) {
     cmd = new CmdSettingsAxesChecker (mainWindow,
                                       document,

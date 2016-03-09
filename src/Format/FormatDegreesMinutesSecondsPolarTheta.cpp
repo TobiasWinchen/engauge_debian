@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CoordSymbol.h"
 #include "EngaugeAssert.h"
 #include "FormatDegreesMinutesSecondsPolarTheta.h"
@@ -7,7 +13,6 @@
 #include <QStringList>
 
 const int DECIMAL_TO_MINUTES = 60.0;
-const int DECIMAL_TO_SECONDS = 60.0;
 
 FormatDegreesMinutesSecondsPolarTheta::FormatDegreesMinutesSecondsPolarTheta()
 {
@@ -50,10 +55,11 @@ QString FormatDegreesMinutesSecondsPolarTheta::formatOutputDegrees (double value
 {
   LOG4CPP_INFO_S ((*mainCat)) << "FormatDegreesMinutesSecondsPolarTheta::formatOutputDegrees";
 
-  // Even for just degrees we include the degrees symbol since user would have picked regular numbers if that symbol was unwanted
-  return QString ("%1%2")
-           .arg (value)
-           .arg (QChar (COORD_SYMBOL_DEGREES));
+  // Since version 6 there has been no number-only option (=without degrees symbol) for theta in CoordUnitsPolarTheta.
+  // The degrees symbol causes more problems than it is worth for COORD_UNITS_POLAR_THETA_DEGREES, so we output only
+  // the number and skip the degrees symbol here
+  return QString ("%1")
+           .arg (value);
 }
 
 QString FormatDegreesMinutesSecondsPolarTheta::formatOutputDegreesMinutes (double value) const

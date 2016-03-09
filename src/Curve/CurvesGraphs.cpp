@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "Curve.h"
 #include "CurvesGraphs.h"
 #include "CurveStyles.h"
@@ -171,34 +177,41 @@ void CurvesGraphs::loadXml(QXmlStreamReader &reader)
 
   bool success = true;
 
+  // Remove previous Curves. There is a DEFAULT_GRAPH_CURVE_NAME by default
+  m_curvesGraphs.clear();
+
   // Read until end of this subtree
   while ((reader.tokenType() != QXmlStreamReader::EndElement) ||
   (reader.name() != DOCUMENT_SERIALIZE_CURVES_GRAPHS)){
+
+    loadNextFromReader(reader);
+    if (reader.atEnd()) {
+      success = false;
+      break;
+    }
 
     if ((reader.tokenType() == QXmlStreamReader::StartElement) &&
         (reader.name () == DOCUMENT_SERIALIZE_CURVE)) {
 
       Curve curve (reader);
 
+      // Version 6 of Engauge let users create multiple curves with the same name. Reading a file with duplicate
+      // curve names can result in crashes and/or corruption, so we deconflict duplicate curve names here
+      QString DUPLICATE = QString ("-%1").arg (QObject::tr ("DUPLICATE"));
+      QString curveName = curve.curveName();
+      while (curvesGraphsNames().contains (curveName)) {
+        curveName += DUPLICATE;
+      }
+      curve.setCurveName (curveName); // No effect if curve name was not a duplicate
+
+      // Add the curve
       m_curvesGraphs.push_back (curve);
 
-    } else {
-
-      loadNextFromReader(reader);
-      if (reader.hasError()) {
-        // No need to set success flag, which raises the error, since error was already raised. Just
-        // need to exit loop immediately
-        break;
-      }
-      if (reader.atEnd()) {
-        success = false;
-        break;
-      }
     }
   }
 
   if (!success) {
-    reader.raiseError ("Cannot read graph curves data");
+    reader.raiseError (QObject::tr ("Cannot read graph curves data"));
   }
 }
 

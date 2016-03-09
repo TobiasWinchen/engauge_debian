@@ -1,7 +1,14 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "Logger.h"
 #include "PointIdentifiers.h"
+#include <QObject>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include "Xml.h"
@@ -77,7 +84,7 @@ void PointIdentifiers::loadXml (QXmlStreamReader &reader)
   }
 
   if (!success) {
-    reader.raiseError ("Cannot read point identifiers");
+    reader.raiseError (QObject::tr ("Cannot read point identifiers"));
   }
 }
 

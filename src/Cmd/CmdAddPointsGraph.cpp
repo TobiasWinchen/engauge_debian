@@ -1,9 +1,16 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdAddPointsGraph.h"
 #include "Document.h"
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "Logger.h"
 #include "MainWindow.h"
+#include <qdebug.h>
 #include "QtToString.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -39,7 +46,10 @@ CmdAddPointsGraph::CmdAddPointsGraph (MainWindow &mainWindow,
   QXmlStreamAttributes attributes = reader.attributes();
 
   if (!attributes.hasAttribute(DOCUMENT_SERIALIZE_CURVE_NAME)) {
-      ENGAUGE_ASSERT (false);
+    xmlExitWithError (reader,
+                      QString ("%1 %2")
+                      .arg (QObject::tr ("Missing attribute"))
+                      .arg (DOCUMENT_SERIALIZE_CURVE_NAME));
   }
 
   m_curveName = attributes.value(DOCUMENT_SERIALIZE_CURVE_NAME).toString();
@@ -53,7 +63,7 @@ CmdAddPointsGraph::CmdAddPointsGraph (MainWindow &mainWindow,
     }
 
     if ((reader.tokenType() == QXmlStreamReader::EndElement) &
-        (reader.name() == DOCUMENT_SERIALIZE_POINTS)) {
+        (reader.name() == DOCUMENT_SERIALIZE_CMD)) {
       break;
     }
 
@@ -66,21 +76,21 @@ CmdAddPointsGraph::CmdAddPointsGraph (MainWindow &mainWindow,
 
       if (attributes.hasAttribute(DOCUMENT_SERIALIZE_IDENTIFIER) &&
           attributes.hasAttribute(DOCUMENT_SERIALIZE_ORDINAL) &&
-          attributes.hasAttribute(DOCUMENT_SERIALIZE_GRAPH_X) &&
-          attributes.hasAttribute(DOCUMENT_SERIALIZE_GRAPH_Y)) {
+          attributes.hasAttribute(DOCUMENT_SERIALIZE_SCREEN_X) &&
+          attributes.hasAttribute(DOCUMENT_SERIALIZE_SCREEN_Y)) {
 
         m_identifiersAdded << attributes.value(DOCUMENT_SERIALIZE_IDENTIFIER).toString();
         m_ordinals << attributes.value(DOCUMENT_SERIALIZE_ORDINAL).toDouble();
 
-        QPoint point (attributes.value(DOCUMENT_SERIALIZE_GRAPH_X).toInt(),
-                      attributes.value(DOCUMENT_SERIALIZE_GRAPH_Y).toInt());
+        QPoint point (attributes.value(DOCUMENT_SERIALIZE_SCREEN_X).toInt(),
+                      attributes.value(DOCUMENT_SERIALIZE_SCREEN_Y).toInt());
         m_points << point;
       }
     }
   }
 
   if (!success) {
-    reader.raiseError ("Cannot read points");
+    reader.raiseError (QObject::tr ("Cannot read graph points"));
   }
 }
 

@@ -26,7 +26,9 @@ CONFIG -= debug
 # 2) Full coverage requires disabling of ENGAUGE_ASSERT by setting QT_NO_DEBUG
 # 3) -Wuninitialized requires O1, O2 or O3 optimization
 DEFINES += QT_NO_DEBUG
+*-g++* {
 QMAKE_CXXFLAGS_WARN_ON += -Wreturn-type -O1 -Wuninitialized -Wunused-variable
+}
 }
 
 OBJECTS_DIR = src/.objs
@@ -77,14 +79,15 @@ HEADERS  += \
     src/Cmd/CmdMediator.h \
     src/Cmd/CmdMoveBy.h \
     src/Cmd/CmdPaste.h \
+    src/Cmd/CmdSelectCoordSystem.h \
     src/Cmd/CmdSettingsAxesChecker.h \
     src/Cmd/CmdSettingsColorFilter.h \
-    src/Cmd/CmdSettingsCommon.h \
     src/Cmd/CmdSettingsCoords.h \
     src/Cmd/CmdSettingsCurveAddRemove.h \
     src/Cmd/CmdSettingsCurveProperties.h \
     src/Cmd/CmdSettingsDigitizeCurve.h \
     src/Cmd/CmdSettingsExportFormat.h \
+    src/Cmd/CmdSettingsGeneral.h \
     src/Cmd/CmdSettingsGridRemoval.h \
     src/Cmd/CmdSettingsPointMatch.h \
     src/Cmd/CmdSettingsSegments.h \
@@ -99,6 +102,10 @@ HEADERS  += \
     src/Coord/CoordScale.h \
     src/Coord/CoordsType.h \
     src/Coord/CoordSymbol.h \
+    src/CoordSystem/CoordSystem.h \
+    src/CoordSystem/CoordSystemContext.h \
+    src/CoordSystem/CoordSystemIndex.h \
+    src/CoordSystem/CoordSystemInterface.h \
     src/Coord/CoordUnitsDate.h \
     src/Coord/CoordUnitsNonPolarTheta.h \
     src/Coord/CoordUnitsPolarTheta.h \
@@ -130,17 +137,19 @@ HEADERS  += \
     src/Dlg/DlgFilterCommand.h \
     src/Dlg/DlgFilterThread.h \
     src/Dlg/DlgFilterWorker.h \
+    src/Dlg/DlgImportAdvanced.h \
     src/Dlg/DlgRequiresTransform.h \
     src/Dlg/DlgSettingsAbstractBase.h \
     src/Dlg/DlgSettingsAxesChecker.h \
     src/Dlg/DlgSettingsColorFilter.h \
-    src/Dlg/DlgSettingsCommon.h \
     src/Dlg/DlgSettingsCoords.h \
     src/Dlg/DlgSettingsCurveAddRemove.h \
     src/Dlg/DlgSettingsCurveProperties.h \
     src/Dlg/DlgSettingsDigitizeCurve.h \
     src/Dlg/DlgSettingsExportFormat.h \
+    src/Dlg/DlgSettingsGeneral.h \
     src/Dlg/DlgSettingsGridRemoval.h \
+    src/Dlg/DlgSettingsMainWindow.h \
     src/Dlg/DlgSettingsPointMatch.h \
     src/Dlg/DlgSettingsSegments.h \
     src/Dlg/DlgValidatorAbstract.h \
@@ -149,13 +158,14 @@ HEADERS  += \
     src/Dlg/DlgValidatorFactory.h \
     src/Dlg/DlgValidatorNumber.h \
     src/Document/Document.h \
+    src/Document/DocumentAxesPointsRequired.h \
     src/Document/DocumentModelAbstractBase.h \
     src/Document/DocumentModelAxesChecker.h \
     src/Document/DocumentModelColorFilter.h \
-    src/Document/DocumentModelCommon.h \
     src/Document/DocumentModelCoords.h \
     src/Document/DocumentModelDigitizeCurve.h \
     src/Document/DocumentModelExportFormat.h \
+    src/Document/DocumentModelGeneral.h \
     src/Document/DocumentModelGridRemoval.h \
     src/Document/DocumentModelPointMatch.h \
     src/Document/DocumentModelSegments.h \
@@ -181,6 +191,14 @@ HEADERS  += \
     src/Export/ExportValuesOrdinal.h \
     src/Export/ExportValuesXOrY.h \
     src/Export/ExportXThetaValuesMergedFunctions.h \
+    src/FileCmd/FileCmdAbstract.h \
+    src/FileCmd/FileCmdClose.h \
+    src/FileCmd/FileCmdExport.h \
+    src/FileCmd/FileCmdFactory.h \
+    src/FileCmd/FileCmdImport.h \
+    src/FileCmd/FileCmdOpen.h \
+    src/FileCmd/FileCmdScript.h \
+    src/FileCmd/FileCmdSerialize.h \
     src/Filter/FilterImage.h \
     src/Format/FormatCoordsUnits.h \
     src/Format/FormatCoordsUnitsStrategyAbstractBase.h \
@@ -191,6 +209,10 @@ HEADERS  += \
     src/Format/FormatDegreesMinutesSecondsNonPolarTheta.h \
     src/Format/FormatDegreesMinutesSecondsPolarTheta.h \
     src/Callback/functor.h \
+    src/Ghosts/GhostEllipse.h \
+    src/Ghosts/GhostPath.h \
+    src/Ghosts/GhostPolygon.h \
+    src/Ghosts/Ghosts.h \
     src/Graphics/GraphicsArcItem.h \
     src/Graphics/GraphicsItemType.h \
     src/Graphics/GraphicsLinesForCurve.h \
@@ -209,10 +231,13 @@ HEADERS  += \
     src/Help/HelpBrowser.h \
     src/Help/HelpWindow.h \
     src/Line/LineStyle.h \
+    src/Load/LoadFileInfo.h \
     src/Load/LoadImageFromUrl.h \
     src/Logger/Logger.h \
     src/Logger/LoggerUpload.h \
+    src/main/MainTitleBarFormat.h \
     src/main/MainWindow.h \
+    src/main/MainWindowModel.h \
     src/util/MigrateToVersion6.h \
     src/Mime/MimePoints.h \
     src/util/mmsubs.h \
@@ -233,6 +258,7 @@ HEADERS  += \
     src/Segment/SegmentFactory.h \
     src/Segment/SegmentLine.h \
     src/Settings/Settings.h \
+    src/Settings/SettingsForGraph.h \
     src/Spline/Spline.h \
     src/Spline/SplineCoeff.h \
     src/Spline/SplinePair.h \
@@ -269,7 +295,10 @@ HEADERS  += \
     src/View/ViewProfileScale.h \
     src/View/ViewSegmentFilter.h \
     src/util/Xml.h \
-    src/include/ZoomFactor.h
+    src/Zoom/ZoomControl.h \
+    src/Zoom/ZoomFactor.h \
+    src/Zoom/ZoomFactorInitial.h \
+    src/Zoom/ZoomLabels.h
 
 SOURCES += \
     src/Background/BackgroundImage.cpp \
@@ -314,14 +343,15 @@ SOURCES += \
     src/Cmd/CmdMediator.cpp \
     src/Cmd/CmdMoveBy.cpp \
     src/Cmd/CmdPaste.cpp \
+    src/Cmd/CmdSelectCoordSystem.cpp \
     src/Cmd/CmdSettingsAxesChecker.cpp \
     src/Cmd/CmdSettingsColorFilter.cpp \
-    src/Cmd/CmdSettingsCommon.cpp \
     src/Cmd/CmdSettingsCoords.cpp \
     src/Cmd/CmdSettingsCurveAddRemove.cpp \
     src/Cmd/CmdSettingsCurveProperties.cpp \
     src/Cmd/CmdSettingsDigitizeCurve.cpp \
     src/Cmd/CmdSettingsExportFormat.cpp \
+    src/Cmd/CmdSettingsGeneral.cpp \
     src/Cmd/CmdSettingsGridRemoval.cpp \
     src/Cmd/CmdSettingsPointMatch.cpp \
     src/Cmd/CmdSettingsSegments.cpp \
@@ -334,6 +364,9 @@ SOURCES += \
     src/Coord/CoordScale.cpp \
     src/Coord/CoordsType.cpp \
     src/Coord/CoordSymbol.cpp \
+    src/CoordSystem/CoordSystem.cpp \
+    src/CoordSystem/CoordSystemContext.cpp \
+    src/CoordSystem/CoordSystemInterface.cpp \
     src/Coord/CoordUnitsDate.cpp \
     src/Coord/CoordUnitsNonPolarTheta.cpp \
     src/Coord/CoordUnitsPolarTheta.cpp \
@@ -365,17 +398,19 @@ SOURCES += \
     src/Dlg/DlgFilterCommand.cpp \
     src/Dlg/DlgFilterThread.cpp \
     src/Dlg/DlgFilterWorker.cpp \
+    src/Dlg/DlgImportAdvanced.cpp \
     src/Dlg/DlgRequiresTransform.cpp \
     src/Dlg/DlgSettingsAbstractBase.cpp \
     src/Dlg/DlgSettingsAxesChecker.cpp \
     src/Dlg/DlgSettingsColorFilter.cpp \
-    src/Dlg/DlgSettingsCommon.cpp \
     src/Dlg/DlgSettingsCoords.cpp \
     src/Dlg/DlgSettingsCurveAddRemove.cpp \
     src/Dlg/DlgSettingsCurveProperties.cpp \
     src/Dlg/DlgSettingsDigitizeCurve.cpp \
     src/Dlg/DlgSettingsExportFormat.cpp \
+    src/Dlg/DlgSettingsGeneral.cpp \
     src/Dlg/DlgSettingsGridRemoval.cpp \
+    src/Dlg/DlgSettingsMainWindow.cpp \
     src/Dlg/DlgSettingsPointMatch.cpp \
     src/Dlg/DlgSettingsSegments.cpp \
     src/Dlg/DlgValidatorAbstract.cpp \
@@ -387,10 +422,10 @@ SOURCES += \
     src/Document/DocumentModelAbstractBase.cpp \
     src/Document/DocumentModelAxesChecker.cpp \
     src/Document/DocumentModelColorFilter.cpp \
-    src/Document/DocumentModelCommon.cpp \
     src/Document/DocumentModelCoords.cpp \
     src/Document/DocumentModelDigitizeCurve.cpp \
     src/Document/DocumentModelExportFormat.cpp \
+    src/Document/DocumentModelGeneral.cpp \
     src/Document/DocumentModelGridRemoval.cpp \
     src/Document/DocumentModelPointMatch.cpp \
     src/Document/DocumentModelSegments.cpp \
@@ -412,6 +447,14 @@ SOURCES += \
     src/Export/ExportToClipboard.cpp \
     src/Export/ExportToFile.cpp \
     src/Export/ExportXThetaValuesMergedFunctions.cpp \
+    src/FileCmd/FileCmdAbstract.cpp \
+    src/FileCmd/FileCmdClose.cpp \
+    src/FileCmd/FileCmdExport.cpp \
+    src/FileCmd/FileCmdFactory.cpp \
+    src/FileCmd/FileCmdImport.cpp \
+    src/FileCmd/FileCmdOpen.cpp \
+    src/FileCmd/FileCmdScript.cpp \
+    src/FileCmd/FileCmdSerialize.cpp \
     src/Filter/FilterImage.cpp \
     src/Format/FormatCoordsUnits.cpp \
     src/Format/FormatCoordsUnitsStrategyAbstractBase.cpp \
@@ -421,6 +464,10 @@ SOURCES += \
     src/Format/FormatDegreesMinutesSecondsBase.cpp \
     src/Format/FormatDegreesMinutesSecondsNonPolarTheta.cpp \
     src/Format/FormatDegreesMinutesSecondsPolarTheta.cpp \
+    src/Ghosts/GhostEllipse.cpp \
+    src/Ghosts/GhostPath.cpp \
+    src/Ghosts/GhostPolygon.cpp \
+    src/Ghosts/Ghosts.cpp \
     src/Graphics/GraphicsArcItem.cpp \
     src/Graphics/GraphicsLinesForCurve.cpp \
     src/Graphics/GraphicsLinesForCurves.cpp \
@@ -438,11 +485,13 @@ SOURCES += \
     src/Help/HelpBrowser.cpp \
     src/Help/HelpWindow.cpp \
     src/Line/LineStyle.cpp \
+    src/Load/LoadFileInfo.cpp \
     src/Load/LoadImageFromUrl.cpp \
     src/Logger/Logger.cpp \
     src/Logger/LoggerUpload.cpp \
     src/main/main.cpp \
     src/main/MainWindow.cpp \
+    src/main/MainWindowModel.cpp \
     src/util/MigrateToVersion6.cpp \
     src/Mime/MimePoints.cpp \
     src/util/mmsubs.cpp \
@@ -460,6 +509,7 @@ SOURCES += \
     src/Segment/SegmentFactory.cpp \
     src/Segment/SegmentLine.cpp \
     src/Settings/Settings.cpp \
+    src/Settings/SettingsForGraph.cpp \
     src/Spline/Spline.cpp \
     src/Spline/SplineCoeff.cpp \
     src/Spline/SplinePair.cpp \
@@ -493,17 +543,26 @@ SOURCES += \
     src/View/ViewProfileParameters.cpp \
     src/View/ViewProfileScale.cpp \
     src/View/ViewSegmentFilter.cpp \
-    src/util/Xml.cpp
+    src/util/Xml.cpp \
+    src/Zoom/ZoomLabels.cpp
 
 TARGET = bin/engauge
 
 QT += core gui network printsupport widgets xml help
 
-win32-g++* {
+win32-* {
 CONFIG += windows
+}
+
+win32-msvc* {
+QMAKE_CXXFLAGS += -EHsc
+LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell32.lib
+} else {
+win32-g++* {
 LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
 }
 LIBS += -llog4cpp -lfftw3
+}
 
 INCLUDEPATH += src \
                src/Background \
@@ -513,6 +572,7 @@ INCLUDEPATH += src \
                src/Cmd \
                src/Color \
                src/Coord \
+               src/CoordSystem \
                src/Correlation \
                src/Cursor \
                src/Curve \
@@ -520,8 +580,10 @@ INCLUDEPATH += src \
                src/Dlg \
                src/Document \
                src/Export \
+               src/FileCmd \
                src/Filter \
                src/Format \
+               src/Ghosts \
                src/Graphics \
                src/Grid \
                src/Help \
@@ -543,9 +605,10 @@ INCLUDEPATH += src \
                src/Transformation \
                src/Tutorial \
                src/util \
-               src/View
+               src/View \
+               src/Zoom
 
-win32-g++* {
+win32-* {
 INCLUDEPATH += $$(FFTW_HOME)/include \
                $$(LOG4CPP_HOME)/include
 }

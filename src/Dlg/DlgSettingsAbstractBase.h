@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DLG_SETTINGS_ABSTRACT_BASE_H
 #define DLG_SETTINGS_ABSTRACT_BASE_H
 
@@ -7,6 +13,7 @@
 class CmdMediator;
 class MainWindow;
 class QComboBox;
+class QHBoxLayout;
 
 /// Abstract base class for all Settings dialogs.
 class DlgSettingsAbstractBase : public QDialog
@@ -23,6 +30,9 @@ public:
 protected:
   /// Provide access to Document information wrapped inside CmdMediator.
   CmdMediator &cmdMediator ();
+
+  /// Let subclass define an optional Save As Default button
+  virtual void createOptionalSaveDefault (QHBoxLayout *layout) = 0;
 
   /// Create dialog-specific panel to which base class will add Ok and Cancel buttons.
   virtual QWidget *createSubPanel () = 0;
@@ -67,6 +77,9 @@ protected:
   /// Store CmdMediator for easy access by the leaf class.
   void setCmdMediator (CmdMediator &cmdMediator);
 
+  /// Override the default Ok button behavior applied in showEvent
+  void setDisableOkAtStartup(bool disableOkAtStartup);
+
 private slots:
   /// Do preparation before dialog is displayed.
   virtual void showEvent (QShowEvent *event);
@@ -88,6 +101,7 @@ private:
   QPushButton *m_btnOk;
 
   const QString m_dialogName;
+  bool m_disableOkAtStartup;
 };
 
 #endif // DLG_SETTINGS_ABSTRACT_BASE_H

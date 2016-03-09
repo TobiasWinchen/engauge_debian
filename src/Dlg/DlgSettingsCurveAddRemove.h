@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DLG_SETTINGS_CURVE_ADD_REMOVE_H
 #define DLG_SETTINGS_CURVE_ADD_REMOVE_H
 
@@ -20,6 +26,7 @@ public:
   DlgSettingsCurveAddRemove(MainWindow &mainWindow);
   virtual ~DlgSettingsCurveAddRemove();
 
+  virtual void createOptionalSaveDefault (QHBoxLayout *layout);
   virtual QWidget *createSubPanel ();
   void load (CmdMediator &cmdMediator);
 
@@ -29,6 +36,7 @@ private slots:
                         const QVector<int> &roles);
   void slotNew ();
   void slotRemove ();
+  void slotSaveDefault();
   void slotSelectionChanged (QItemSelection, QItemSelection);
 
 protected:
@@ -51,12 +59,14 @@ private:
   void removeSelectedCurves();
   void updateControls ();
 
+  CurveNameList *m_curveNameList; // Model for m_listCurves
+  QListView *m_listCurves; // Use QListView instead of QListWidget so validators can be used
+
   QPushButton *m_btnAdd;
   QPushButton *m_btnRemove;
   QPushButton *m_btnRename;
 
-  CurveNameList *m_curveNameList; // Model for m_listCurves
-  QListView *m_listCurves; // Use QListView instead of QListWidget so validators can be used
+  QPushButton *m_btnSaveDefault;
 };
 
 #endif // DLG_SETTINGS_CURVE_ADD_REMOVE_H

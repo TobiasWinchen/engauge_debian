@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef GRAPHICSVIEW_H
 #define GRAPHICSVIEW_H
 
@@ -48,6 +54,9 @@ public:
   /// Intercept mouse release events to move one or more Points.
   virtual void mouseReleaseEvent (QMouseEvent *event);
 
+  /// Convert wheel events into zoom in/out
+  virtual void wheelEvent(QWheelEvent *event);
+
 signals:
   /// Send right click on axis point to MainWindow for editing.
   void signalContextMenuEvent (QString pointIdentifier);
@@ -76,11 +85,17 @@ signals:
   /// Send mouse release to MainWindow for moving Points.
   void signalMouseRelease (QPointF);
 
+  /// Send wheel event to MainWindow for zooming in
+  void signalViewZoomIn();
+
+  /// Send wheel event to MainWindow for zooming out
+  void signalViewZoomOut();
+
 private:
   GraphicsView();
 
   bool inBounds (const QPointF &posScreen);
-  bool loadsAsDigFile (const QString &urlString) const;
+
 };
 
 #endif // GRAPHICSVIEW_H

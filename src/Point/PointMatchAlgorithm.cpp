@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "ColorFilter.h"
 #include "DocumentModelPointMatch.h"
 #include "EngaugeAssert.h"
@@ -40,9 +46,7 @@ void PointMatchAlgorithm::allocateMemory(double** array,
 void PointMatchAlgorithm::assembleLocalMaxima(double* convolution,
                                               PointMatchList& listCreated, 
                                               int width,
-                                              int height,
-                                              int sampleXCenter,
-                                              int sampleYCenter)
+                                              int height)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "PointMatchAlgorithm::assembleLocalMaxima";
 
@@ -52,7 +56,8 @@ void PointMatchAlgorithm::assembleLocalMaxima(double* convolution,
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
 
-      double convIJ = convolution[FOLD2DINDEX(i, j, height)];
+      // Log is used since values are otherwise too huge to debug (10^10)
+      double convIJ = log10 (convolution[FOLD2DINDEX(i, j, height)]);
 
       // Loop through nearest neighbor points
       bool isLocalMax = true;
@@ -66,7 +71,8 @@ void PointMatchAlgorithm::assembleLocalMaxima(double* convolution,
             int jNeighbor = j + jDelta;
             if ((0 <= jNeighbor) && (jNeighbor < height)) {
 
-              double convNeighbor = convolution[FOLD2DINDEX(iNeighbor, jNeighbor, height)];
+              // Log is used since values are otherwise too huge to debug (10^10)
+              double convNeighbor = log10 (convolution[FOLD2DINDEX(iNeighbor, jNeighbor, height)]);
               if (convIJ < convNeighbor) {
 
                 isLocalMax = false;
@@ -83,12 +89,13 @@ void PointMatchAlgorithm::assembleLocalMaxima(double* convolution,
           }
         }
       }
-          
-      if (isLocalMax && (convIJ > SINGLE_PIXEL_CORRELATION)) {
+
+      if (isLocalMax &&
+          (convIJ > SINGLE_PIXEL_CORRELATION) ) {
 
         // Save new local maximum
-        PointMatchTriplet t (i + sampleXCenter,
-                             j + sampleYCenter,
+        PointMatchTriplet t (i,
+                             j,
                              convolution [FOLD2DINDEX(i, j, height)]);
 
         listCreated.append(t);
@@ -100,7 +107,9 @@ void PointMatchAlgorithm::assembleLocalMaxima(double* convolution,
 void PointMatchAlgorithm::computeConvolution(fftw_complex* imagePrime,
                                              fftw_complex* samplePrime,
                                              int width, int height,
-                                             double** convolution)
+                                             double** convolution,
+                                             int sampleXCenter,
+                                             int sampleYCenter)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "PointMatchAlgorithm::computeConvolution";
 
@@ -133,6 +142,26 @@ void PointMatchAlgorithm::computeConvolution(fftw_complex* imagePrime,
   fftw_execute (pConvolution);
 
   releasePhaseArray(convolutionPrime);
+
+  // The convolution pattern is shifted by (sampleXExtent, sampleYExtent). So the downstream code
+  // does not have to repeatedly compensate for that shift, we unshift it here
+  double *temp = new double [width * height];
+  ENGAUGE_CHECK_PTR(temp);
+
+  for (int i = 0; i < width; i++) {
+    for (int j = 0; j < height; j++) {
+      temp [FOLD2DINDEX(i, j, height)] = (*convolution) [FOLD2DINDEX(i, j, height)];
+    }
+  }
+  for (int iFrom = 0; iFrom < width; iFrom++) {
+    for (int jFrom = 0; jFrom < height; jFrom++) {
+      // Gnuplot of convolution file shows x and y shifts should be positive
+      int iTo = (iFrom + sampleXCenter) % width;
+      int jTo = (jFrom + sampleYCenter) % height;
+      (*convolution) [FOLD2DINDEX(iTo, jTo, height)] = temp [FOLD2DINDEX(iFrom, jFrom, height)];
+    }
+  }
+  delete [] temp;
 }
 
 void PointMatchAlgorithm::conjugateMatrix(int width,
@@ -226,7 +255,9 @@ QList<QPoint> PointMatchAlgorithm::findPoints (const QList<PointMatchPixel> &sam
                      samplePrime,
                      width,
                      height,
-                     &convolution);
+                     &convolution,
+                     sampleXCenter,
+                     sampleYCenter);
 
   if (m_isGnuplot) {
 
@@ -250,9 +281,7 @@ QList<QPoint> PointMatchAlgorithm::findPoints (const QList<PointMatchPixel> &sam
   assembleLocalMaxima(convolution,
                       listCreated,
                       width,
-                      height,
-                      sampleXCenter,
-                      sampleYCenter);
+                      height);
   qSort (listCreated);
 
   // Copy sorted match points to output

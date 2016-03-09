@@ -1,15 +1,28 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "Logger.h"
 #include "PointStyle.h"
 #include <qmath.h>
+#include <QObject>
+#include <QSettings>
 #include <QTextStream>
 #include <QtToString.h>
 #include <QXmlStreamWriter>
+#include "Settings.h"
+#include "SettingsForGraph.h"
 #include "Xml.h"
 
+const ColorPalette DEFAULT_POINT_COLOR_AXES = COLOR_PALETTE_RED;
+const ColorPalette DEFAULT_POINT_COLOR_GRAPH = COLOR_PALETTE_BLUE;
+const int DEFAULT_POINT_LINE_WIDTH = 1;
 const int DEFAULT_POINT_RADIUS = 10;
-const int DEFAULT_LINE_WIDTH = 1;
+const PointShape DEFAULT_POINT_SHAPE_AXIS = POINT_SHAPE_CROSS;
 const double PI = 3.1415926535;
 const double TWO_PI = 2.0 * PI;
 
@@ -48,14 +61,28 @@ PointStyle &PointStyle::operator=(const PointStyle &other)
 
 PointStyle PointStyle::defaultAxesCurve ()
 {
-  return PointStyle (POINT_SHAPE_CROSS,
-                     DEFAULT_POINT_RADIUS,
-                     DEFAULT_LINE_WIDTH,
-                     COLOR_PALETTE_RED);
+  // Get settings if available, otherwise use defaults
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
+  settings.beginGroup (SETTINGS_GROUP_CURVE_AXES);
+  PointShape shape = (PointShape) settings.value (SETTINGS_CURVE_POINT_SHAPE,
+                                                  DEFAULT_POINT_SHAPE_AXIS).toInt();
+  int radius = settings.value (SETTINGS_CURVE_POINT_RADIUS,
+                               DEFAULT_POINT_RADIUS).toInt();
+  int pointLineWidth = settings.value (SETTINGS_CURVE_POINT_LINE_WIDTH,
+                                       DEFAULT_POINT_LINE_WIDTH).toInt();
+  ColorPalette pointColor = (ColorPalette) settings.value (SETTINGS_CURVE_POINT_COLOR,
+                                                           DEFAULT_POINT_COLOR_AXES).toInt();
+  settings.endGroup ();
+
+  return PointStyle (shape,
+                     radius,
+                     pointLineWidth,
+                     pointColor);
 }
 
 PointStyle PointStyle::defaultGraphCurve (int index)
 {
+  // Shape is always computed on the fly
   PointShape shape = POINT_SHAPE_CROSS;
   static PointShape pointShapes [] = {POINT_SHAPE_CROSS,
                                       POINT_SHAPE_X,
@@ -63,10 +90,25 @@ PointStyle PointStyle::defaultGraphCurve (int index)
                                       POINT_SHAPE_SQUARE};
   shape = pointShapes [index % 4];
 
+  SettingsForGraph settingsForGraph;
+  int indexOneBased = index + 1;
+  QString groupName = settingsForGraph.groupNameForNthCurve (indexOneBased);
+
+  // Get settings if available, otherwise use defaults
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
+  settings.beginGroup (groupName);
+  int radius = settings.value (SETTINGS_CURVE_POINT_RADIUS,
+                               DEFAULT_POINT_RADIUS).toInt();
+  int pointLineWidth = settings.value (SETTINGS_CURVE_POINT_LINE_WIDTH,
+                                       DEFAULT_POINT_LINE_WIDTH).toInt();
+  ColorPalette pointColor = (ColorPalette) settings.value (SETTINGS_CURVE_POINT_COLOR,
+                                                           DEFAULT_POINT_COLOR_GRAPH).toInt();
+  settings.endGroup ();
+
   return PointStyle (shape,
-                     DEFAULT_POINT_RADIUS,
-                     DEFAULT_LINE_WIDTH,
-                     COLOR_PALETTE_BLUE);
+                     radius,
+                     pointLineWidth,
+                     pointColor);
 }
 
 bool PointStyle::isCircle () const
@@ -101,7 +143,7 @@ void PointStyle::loadXml(QXmlStreamReader &reader)
       loadNextFromReader(reader);
     }
   } else {
-    reader.raiseError ("Cannot read point style data");
+    reader.raiseError (QObject::tr ("Cannot read point style data"));
   }
 }
 

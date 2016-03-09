@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CHECKLIST_GUIDE_PAGE_CURVES_H
 #define CHECKLIST_GUIDE_PAGE_CURVES_H
 
@@ -14,7 +20,7 @@ class ChecklistGuidePageCurves : public ChecklistGuidePage
 
  public:
   /// Single constructor
-  ChecklistGuidePageCurves ();
+  ChecklistGuidePageCurves (const QString &title);
 
   /// Wizard selection for curve names
   QStringList curveNames () const;
@@ -30,6 +36,7 @@ class ChecklistGuidePageCurves : public ChecklistGuidePage
   bool withLines() const;
 
  private:
+  ChecklistGuidePageCurves ();
 
   bool curveNamesAreAllUnique() const;
   int NUM_CURVE_NAMES () const { return 6; }

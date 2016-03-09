@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CurveNameListEntry.h"
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
@@ -45,17 +51,6 @@ QString CurveNameListEntry::curveNameOriginal () const
 int CurveNameListEntry::numPoints () const
 {
   return m_numPoints;
-}
-
-void CurveNameListEntry::saveXml(QXmlStreamWriter &writer) const
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "CurveNameListEntry::saveXml";
-
-  writer.writeStartElement(DOCUMENT_SERIALIZE_CURVES_ENTRY);
-  writer.writeAttribute (DOCUMENT_SERIALIZE_CURVES_ENTRY_CURVE_NAME_CURRENT, m_curveNameCurrent);
-  writer.writeAttribute (DOCUMENT_SERIALIZE_CURVES_ENTRY_CURVE_NAME_ORIGINAL, m_curveNameOriginal);
-  writer.writeAttribute (DOCUMENT_SERIALIZE_CURVES_ENTRY_NUM_POINTS, QString::number (m_numPoints));
-  writer.writeEndElement();
 }
 
 void CurveNameListEntry::setCurveNameCurrent (const QString &curveNameCurrent)

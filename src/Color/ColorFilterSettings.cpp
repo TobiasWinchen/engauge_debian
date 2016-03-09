@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
 #include "ColorConstants.h"
 #include "ColorFilterSettings.h"
@@ -202,7 +208,7 @@ void ColorFilterSettings::loadXml(QXmlStreamReader &reader)
   }
 
   if (!success) {
-    reader.raiseError ("Cannot read curve filter data");
+    reader.raiseError (QObject::tr ("Cannot read curve filter data"));
   }
 }
 
@@ -285,11 +291,13 @@ int ColorFilterSettings::saturationLow () const
   return m_saturationLow;
 }
 
-void ColorFilterSettings::saveXml(QXmlStreamWriter &writer) const
+void ColorFilterSettings::saveXml(QXmlStreamWriter &writer,
+                                  const QString &curveName) const
 {
   LOG4CPP_INFO_S ((*mainCat)) << "ColorFilterSettings::saveXml";
 
   writer.writeStartElement(DOCUMENT_SERIALIZE_COLOR_FILTER);
+  writer.writeAttribute(DOCUMENT_SERIALIZE_CURVE_NAME, curveName);
   writer.writeAttribute(DOCUMENT_SERIALIZE_COLOR_FILTER_MODE, QString::number (m_colorFilterMode));
   writer.writeAttribute(DOCUMENT_SERIALIZE_COLOR_FILTER_MODE_STRING, colorFilterModeToString (m_colorFilterMode));
   writer.writeAttribute(DOCUMENT_SERIALIZE_COLOR_FILTER_INTENSITY_LOW, QString::number (m_intensityLow));

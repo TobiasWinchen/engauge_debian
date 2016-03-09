@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CURVE_NAME_LIST_H
 #define CURVE_NAME_LIST_H
 
@@ -44,6 +50,10 @@ public:
   virtual Qt::DropActions supportedDropActions () const;
 
 private:
+
+  /// Ensure curve names are never duplicated or else nasty bugs will appear when duplicates occur. Also prevent empty curve names
+  bool curveNameIsAcceptable (const QString &curveNameNew,
+                              int row) const;
 
   /// Store entries as QStrings for easy translation into QVariants. Use CurveNameListEntry to translate
   QStringList m_modelCurvesEntries;

@@ -1,14 +1,23 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DOCUMENT_H
 #define DOCUMENT_H
 
+#include "CoordSystemContext.h"
+#include "CoordSystemIndex.h"
 #include "CurvesGraphs.h"
 #include "CurveStyles.h"
+#include "DocumentAxesPointsRequired.h"
 #include "DocumentModelAxesChecker.h"
 #include "DocumentModelColorFilter.h"
-#include "DocumentModelCommon.h"
 #include "DocumentModelCoords.h"
 #include "DocumentModelDigitizeCurve.h"
 #include "DocumentModelExportFormat.h"
+#include "DocumentModelGeneral.h"
 #include "DocumentModelGridRemoval.h"
 #include "DocumentModelPointMatch.h"
 #include "DocumentModelSegments.h"
@@ -18,8 +27,10 @@
 #include <QString>
 #include <QXmlStreamReader>
 
+class CoordSystem;
 class Curve;
 class QByteArray;
+class QFile;
 class QImage;
 class QTransform;
 class QXmlStreamWriter;
@@ -29,11 +40,15 @@ class Transformation;
 class Document
 {
 public:
-  /// Constructor for imported images and dragged images
+  /// Constructor for imported images and dragged images. Only one coordinate system is create - others are added later externally
   Document (const QImage &image);
 
-  /// Constructor for opened Documents, and error report files. The specified file is opened and read
+  /// Constructor for opened Documents, and error report files. The specified file is opened and read.
   Document (const QString &fileName);
+
+  /// Add some number (0 or more) of additional coordinate systems. This is only safe to call during import
+  /// and before any changes have been made to the Document
+  void addCoordSystems(unsigned int numberCoordSystemToAdd);
 
   /// Add new graph curve to the list of existing graph curves.
   void addGraphCurveAtEnd (const QString &curveName);
@@ -43,20 +58,24 @@ public:
   /// \param posGraph Graph coordiantes from user
   /// \param identifier Identifier for new axis point
   /// \param ordinal Unique, for curve, ordinal number
+  /// \param isXOnly True if point has only an x coordinate
   void addPointAxisWithGeneratedIdentifier (const QPointF &posScreen,
                                             const QPointF &posGraph,
                                             QString &identifier,
-                                            double ordinal);
+                                            double ordinal,
+                                            bool isXOnly);
 
   /// Add a single axis point with the specified point identifier. Call this after checkAddPointAxis to guarantee success in this call.
   /// \param posScreen Screen coordinates from QGraphicsView
   /// \param posGraph Graph coordiantes from user
   /// \param identifier Identifier for new axis point
   /// \param ordinal Unique, for curve, ordinal number
+  /// \param isXOnly True if point has only an x coordinate
   void addPointAxisWithSpecifiedIdentifier (const QPointF &posScreen,
                                             const QPointF &posGraph,
                                             const QString &identifier,
-                                            double ordinal);
+                                            double ordinal,
+                                            bool isXOnly);
 
   /// Add a single graph point with a generated point identifier.
   void addPointGraphWithGeneratedIdentifier (const QString &curveName,
@@ -77,7 +96,8 @@ public:
   void checkAddPointAxis (const QPointF &posScreen,
                           const QPointF &posGraph,
                           bool &isError,
-                          QString &errorMessage);
+                          QString &errorMessage,
+                          bool isXOnly);
 
   /// Check before calling editPointAxis
   void checkEditPointAxis (const QString &pointIdentifier,
@@ -85,6 +105,15 @@ public:
                            const QPointF &posGraph,
                            bool &isError,
                            QString &errorMessage);
+
+  /// Currently active CoordSystem
+  const CoordSystem &coordSystem() const;
+
+  /// Number of CoordSystem
+  unsigned int coordSystemCount() const;
+
+  /// Index of current active CoordSystem
+  CoordSystemIndex coordSystemIndex() const;
 
   /// Get method for axis curve.
   const Curve &curveAxes () const;
@@ -101,9 +130,15 @@ public:
   /// See CurvesGraphs::curvesGraphsNumPoints.
   int curvesGraphsNumPoints (const QString &curveName) const;
 
+  /// Get method for DocumentAxesPointsRequired
+  DocumentAxesPointsRequired documentAxesPointsRequired () const;
+
   /// Edit the graph coordinates of a single axis point. Call this after checkAddPointAxis to guarantee success in this call
   void editPointAxis (const QPointF &posGraph,
                       const QString &identifier);
+
+  /// See Curve::isXOnly
+  bool isXOnly (const QString &pointIdentifier) const;
 
   /// See Curve::iterateThroughCurvePoints, for the axes curve.
   void iterateThroughCurvePointsAxes (const Functor2wRet<const QString &, const Point &, CallbackSearchReturn> &ftorWithCallback);
@@ -121,14 +156,14 @@ public:
   /// See Curve::iterateThroughCurvePoints, for all the graphs curves.
   void iterateThroughCurvesPointsGraphs (const Functor2wRet<const QString &, const Point &, CallbackSearchReturn> &ftorWithCallback) const;
 
+  /// Load the curve names in the specified Engauge file into the current document. This is called near the end of the import process only
+  bool loadCurvesFile (const QString &curvesFile);
+
   /// Get method for DocumentModelAxesChecker.
   DocumentModelAxesChecker modelAxesChecker() const;
 
   /// Get method for DocumentModelColorFilter.
   DocumentModelColorFilter modelColorFilter() const;
-
-  /// Get method for DocumentModelCommon.
-  DocumentModelCommon modelCommon() const;
 
   /// Get method for DocumentModelCoords.
   DocumentModelCoords modelCoords () const;
@@ -141,6 +176,9 @@ public:
 
   /// Get method for DocumentModelExportFormat.
   DocumentModelExportFormat modelExport() const;
+
+  /// Get method for DocumentModelGeneral.
+  DocumentModelGeneral modelGeneral() const;
 
   /// Get method for DocumentModelGridRemoval.
   DocumentModelGridRemoval modelGridRemoval() const;
@@ -189,17 +227,25 @@ public:
   /// Save document to xml
   void saveXml (QXmlStreamWriter &writer) const;
 
+  /// Set the index of current active CoordSystem
+  void setCoordSystemIndex(CoordSystemIndex coordSystemIndex);
+
   /// Let CmdAbstract classes overwrite CurvesGraphs.
   void setCurvesGraphs (const CurvesGraphs &curvesGraphs);
+
+  /// Let CmdAbstract classes overwrite CurvesGraphs.
+  void setCurvesGraphs (CoordSystemIndex coordSystemIndex,
+                        const CurvesGraphs &curvesGraphs);
+
+  /// Set the number of axes points required. This is called during the Document creation process, after imported images have
+  /// been previewed or loaded files have had at least some xml parsing
+  void setDocumentAxesPointsRequired (DocumentAxesPointsRequired documentAxesPointsRequired);
 
   /// Set method for DocumentModelAxesChecker.
   void setModelAxesChecker(const DocumentModelAxesChecker &modelAxesChecker);
 
   /// Set method for DocumentModelColorFilter.
   void setModelColorFilter(const DocumentModelColorFilter &modelColorFilter);
-
-  /// Set method for DocumentModelCommon.
-  void setModelCommon (const DocumentModelCommon &modelCommon);
 
   /// Set method for DocumentModelCoords.
   void setModelCoords (const DocumentModelCoords &modelCoords);
@@ -212,6 +258,9 @@ public:
 
   /// Set method for DocumentModelExportFormat.
   void setModelExport(const DocumentModelExportFormat &modelExport);
+
+  /// Set method for DocumentModelGeneral.
+  void setModelGeneral (const DocumentModelGeneral &modelGeneral);
 
   /// Set method for DocumentModelGridRemoval.
   void setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval);
@@ -235,34 +284,24 @@ private:
   bool bytesIndicatePreVersion6 (const QByteArray &bytes) const;
   Curve *curveForCurveName (const QString &curveName); // For use by Document only. External classes should use functors
   void generateEmptyPixmap(const QXmlStreamAttributes &attributes);
-  void loadCurvesGraphs(QXmlStreamReader &reader);
   void loadImage(QXmlStreamReader &reader);
-  void loadPostVersion5 (QXmlStreamReader &reader);
   void loadPreVersion6 (QDataStream &str);
+  void loadVersion6 (QFile *file);
+  void loadVersion7 (QFile *file);
+  int versionFromFile (QFile *file) const;
 
   // Metadata
   QString m_name;
   QPixmap m_pixmap;
 
+  // Number of axes points used is set during creation/import
+  DocumentAxesPointsRequired m_documentAxesPointsRequired;
+
   // Read variables
   bool m_successfulRead;
   QString m_reasonForUnsuccessfulRead;
 
-  // Curves
-  Curve *m_curveAxes;
-  CurvesGraphs m_curvesGraphs;
-
-  // Model objects for the various settings
-  DocumentModelAxesChecker m_modelAxesChecker;
-  // DocumentModelColorFilter is not here since filtering settings are stored inside the Curve class
-  DocumentModelCommon m_modelCommon;
-  DocumentModelCoords m_modelCoords;
-  // CurveStyles is not here since curve properties are stored inside the Curve class
-  DocumentModelDigitizeCurve m_modelDigitizeCurve;
-  DocumentModelExportFormat m_modelExport;
-  DocumentModelGridRemoval m_modelGridRemoval;
-  DocumentModelPointMatch m_modelPointMatch;
-  DocumentModelSegments m_modelSegments;
+  CoordSystemContext m_coordSystemContext;
 };
 
 #endif // DOCUMENT_H

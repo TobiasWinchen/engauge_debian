@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
 #include "CmdSettingsCurveProperties.h"
 #include "ColorPalette.h"
@@ -9,6 +15,7 @@
 #include "GraphicsView.h"
 #include "Logger.h"
 #include "MainWindow.h"
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
 #include <QGraphicsRectItem>
@@ -20,8 +27,12 @@
 #include <QListWidget>
 #include <QPen>
 #include <QPushButton>
+#include <QSettings>
+#include <QSpacerItem>
 #include <QSpinBox>
 #include <QTransform>
+#include "Settings.h"
+#include "SettingsForGraph.h"
 #include "Spline.h"
 #include "SplinePair.h"
 #include <vector>
@@ -45,7 +56,7 @@ const QPointF POS_RIGHT (2.0 * PREVIEW_WIDTH / 3.0,
                          PREVIEW_HEIGHT * 2.0 / 3.0);
 
 DlgSettingsCurveProperties::DlgSettingsCurveProperties(MainWindow &mainWindow) :
-  DlgSettingsAbstractBase ("Curve Properties",
+  DlgSettingsAbstractBase (tr ("Curve Properties"),
                            "DlgSettingsCurveProperties",
                            mainWindow),
   m_scenePreview (0),
@@ -71,7 +82,7 @@ void DlgSettingsCurveProperties::createCurveName (QGridLayout *layout,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCurveProperties::createCurveName";
 
-  QLabel *labelCurveName = new QLabel ("Curve Name:");
+  QLabel *labelCurveName = new QLabel (tr ("Curve Name:"));
   layout->addWidget (labelCurveName, row, 1);
 
   m_cmbCurveName = new QComboBox ();
@@ -85,23 +96,23 @@ void DlgSettingsCurveProperties::createLine (QGridLayout *layout,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCurveProperties::createLine";
 
-  m_groupLine = new QGroupBox ("Line");
+  m_groupLine = new QGroupBox (tr ("Line"));
   layout->addWidget (m_groupLine, row++, 2);
 
   QGridLayout *layoutGroup = new QGridLayout;
   m_groupLine->setLayout (layoutGroup);
 
-  QLabel *labelLineWidth = new QLabel ("Width:");
+  QLabel *labelLineWidth = new QLabel (tr ("Width:"));
   layoutGroup->addWidget (labelLineWidth, 0, 0);
 
   m_spinLineWidth = new QSpinBox (m_groupLine);
   m_spinLineWidth->setWhatsThis (tr ("Select a width for the lines drawn between points.\n\n"
-                                    "This applies only to graph curves. No lines are ever drawn between axis points."));
+                                     "This applies only to graph curves. No lines are ever drawn between axis points."));
   m_spinLineWidth->setMinimum(1);
   connect (m_spinLineWidth, SIGNAL (valueChanged (int)), this, SLOT (slotLineWidth (int)));
   layoutGroup->addWidget (m_spinLineWidth, 0, 1);
 
-  QLabel *labelLineColor = new QLabel ("Color:");
+  QLabel *labelLineColor = new QLabel (tr ("Color:"));
   layoutGroup->addWidget (labelLineColor, 1, 0);
 
   m_cmbLineColor = new QComboBox (m_groupLine);
@@ -111,7 +122,7 @@ void DlgSettingsCurveProperties::createLine (QGridLayout *layout,
   connect (m_cmbLineColor, SIGNAL (activated (const QString &)), this, SLOT (slotLineColor (const QString &))); // activated() ignores code changes
   layoutGroup->addWidget (m_cmbLineColor, 1, 1);
 
-  QLabel *labelLineType = new QLabel ("Connect as:");
+  QLabel *labelLineType = new QLabel (tr ("Connect as:"));
   layoutGroup->addWidget (labelLineType, 2, 0);
 
   m_cmbLineType = new QComboBox (m_groupLine);
@@ -139,13 +150,13 @@ void DlgSettingsCurveProperties::createPoint (QGridLayout *layout,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCurveProperties::createPoint";
 
-  m_groupPoint = new QGroupBox ("Point");
+  m_groupPoint = new QGroupBox (tr ("Point"));
   layout->addWidget (m_groupPoint, row++, 1);
 
   QGridLayout *layoutGroup = new QGridLayout;
   m_groupPoint->setLayout (layoutGroup);
 
-  QLabel *labelPointShape = new QLabel("Shape:");
+  QLabel *labelPointShape = new QLabel(tr ("Shape:"));
   layoutGroup->addWidget (labelPointShape, 0, 0);
 
   m_cmbPointShape = new QComboBox (m_groupPoint);
@@ -165,7 +176,7 @@ void DlgSettingsCurveProperties::createPoint (QGridLayout *layout,
   connect (m_cmbPointShape, SIGNAL (activated (const QString &)), this, SLOT (slotPointShape (const QString &))); // activated() ignores code changes
   layoutGroup->addWidget (m_cmbPointShape, 0, 1);
 
-  QLabel *labelPointRadius = new QLabel ("Radius:");
+  QLabel *labelPointRadius = new QLabel (tr ("Radius:"));
   layoutGroup->addWidget (labelPointRadius, 1, 0);
 
   m_spinPointRadius = new QSpinBox (m_groupPoint);
@@ -174,7 +185,7 @@ void DlgSettingsCurveProperties::createPoint (QGridLayout *layout,
   connect (m_spinPointRadius, SIGNAL (valueChanged (int)), this, SLOT (slotPointRadius (int)));
   layoutGroup->addWidget (m_spinPointRadius, 1, 1);
 
-  QLabel *labelPointLineWidth = new QLabel ("Line width:");
+  QLabel *labelPointLineWidth = new QLabel (tr ("Line width:"));
   layoutGroup->addWidget (labelPointLineWidth, 2, 0);
 
   m_spinPointLineWidth = new QSpinBox (m_groupPoint);
@@ -186,7 +197,7 @@ void DlgSettingsCurveProperties::createPoint (QGridLayout *layout,
   connect (m_spinPointLineWidth, SIGNAL (valueChanged (int)), this, SLOT (slotPointLineWidth (int)));
   layoutGroup->addWidget (m_spinPointLineWidth, 2, 1);
 
-  QLabel *labelPointColor = new QLabel ("Color:");
+  QLabel *labelPointColor = new QLabel (tr ("Color:"));
   layoutGroup->addWidget (labelPointColor, 3, 0);
 
   m_cmbPointColor = new QComboBox (m_groupPoint);
@@ -196,12 +207,26 @@ void DlgSettingsCurveProperties::createPoint (QGridLayout *layout,
   layoutGroup->addWidget (m_cmbPointColor, 3, 1);
 }
 
+void DlgSettingsCurveProperties::createOptionalSaveDefault (QHBoxLayout *layout)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCurveProperties::createOptionalSaveDefault";
+
+  m_btnSaveDefault = new QPushButton ("Save As Default");
+  m_btnSaveDefault->setWhatsThis (tr ("Save the visible curve settings for use as future defaults, according to the curve name selection.\n\n"
+                                      "If the visible settings are for the axes curve, then they will be used for future "
+                                      "axes curves, until new settings are saved as the defaults.\n\n"
+                                      "If the visible settings are for the Nth graph curve in the curve list, then they will be used for future "
+                                      "graph curves that are also the Nth graph curve in their curve list, until new settings are saved as the defaults."));
+  connect (m_btnSaveDefault, SIGNAL (released ()), this, SLOT (slotSaveDefault ()));
+  layout->addWidget (m_btnSaveDefault, 0, Qt::AlignLeft);
+}
+
 void DlgSettingsCurveProperties::createPreview (QGridLayout *layout,
-                                                       int &row)
+                                                int &row)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCurveProperties::createPreview";
 
-  QLabel *labelPreview = new QLabel ("Preview");
+  QLabel *labelPreview = new QLabel (tr ("Preview"));
   layout->addWidget (labelPreview, row++, 0, 1, 4);
 
   m_scenePreview = new QGraphicsScene (this);
@@ -231,11 +256,9 @@ QWidget *DlgSettingsCurveProperties::createSubPanel ()
   int row = 0;
   createCurveName (layout, row);
 
-  int rowLeft = row, rowRight = row;
+  int rowLeft = row, rowRight = row++;
   createPoint (layout, rowLeft);
   createLine (layout, rowRight);
-
-  row = qMax (rowLeft, rowRight);
   createPreview (layout, row);
 
   layout->setColumnStretch(0, 1); // Empty first column
@@ -359,8 +382,8 @@ void DlgSettingsCurveProperties::load (CmdMediator &cmdMediator)
   }
 
   // Save new data
-  m_modelCurveStylesBefore = new CurveStyles (cmdMediator.document());
-  m_modelCurveStylesAfter = new CurveStyles (cmdMediator.document());
+  m_modelCurveStylesBefore = new CurveStyles (cmdMediator.coordSystem());
+  m_modelCurveStylesAfter = new CurveStyles (cmdMediator.coordSystem());
 
   // Populate controls. First load curve name combobox. The curve-specific controls get loaded in slotCurveName
   m_cmbCurveName->clear ();
@@ -532,6 +555,42 @@ void DlgSettingsCurveProperties::slotPointShape(const QString &)
                                          (PointShape) m_cmbPointShape->currentData().toInt ());
   updateControls();
   updatePreview();
+}
+
+void DlgSettingsCurveProperties::slotSaveDefault()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCurveProperties::slotSaveDefault";
+
+  QString curve = m_cmbCurveName->currentText ();
+
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
+  if (curve == AXIS_CURVE_NAME) {
+
+    settings.beginGroup (SETTINGS_GROUP_CURVE_AXES);
+
+  } else {
+
+    SettingsForGraph settingsForGraph;
+    QString groupName = settingsForGraph.groupNameForNthCurve(m_cmbCurveName->currentIndex());
+    settings.beginGroup (groupName);
+
+  }
+
+  settings.setValue (SETTINGS_CURVE_POINT_SHAPE,
+                     m_modelCurveStylesAfter->pointShape(curve));
+  settings.setValue (SETTINGS_CURVE_LINE_COLOR,
+                     m_modelCurveStylesAfter->lineColor(curve));
+  settings.setValue (SETTINGS_CURVE_LINE_CONNECT_AS,
+                     m_modelCurveStylesAfter->lineConnectAs(curve));
+  settings.setValue (SETTINGS_CURVE_LINE_WIDTH,
+                     m_modelCurveStylesAfter->lineWidth(curve));
+  settings.setValue (SETTINGS_CURVE_POINT_COLOR,
+                     m_modelCurveStylesAfter->pointColor (curve));
+  settings.setValue (SETTINGS_CURVE_POINT_LINE_WIDTH,
+                     m_modelCurveStylesAfter->pointLineWidth(curve));
+  settings.setValue (SETTINGS_CURVE_POINT_RADIUS,
+                     m_modelCurveStylesAfter->pointRadius(curve));
+  settings.endGroup ();
 }
 
 void DlgSettingsCurveProperties::updateControls()

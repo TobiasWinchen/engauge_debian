@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdCopy.h"
 #include "DataKey.h"
 #include "Document.h"
@@ -14,6 +20,7 @@
 #include <QTextStream>
 #include "QtToString.h"
 #include <QXmlStreamReader>
+#include "Xml.h"
 
 const QString CMD_DESCRIPTION ("Copy");
 
@@ -54,7 +61,13 @@ CmdCopy::CmdCopy (MainWindow &mainWindow,
   if (!attributes.hasAttribute(DOCUMENT_SERIALIZE_TRANSFORM_DEFINED) ||
       !attributes.hasAttribute(DOCUMENT_SERIALIZE_CSV) ||
       !attributes.hasAttribute(DOCUMENT_SERIALIZE_HTML)) {
-      ENGAUGE_ASSERT (false);
+    xmlExitWithError (reader,
+                      QString ("%1 %2, %3 %4 %5")
+                      .arg (QObject::tr ("Missing attribute(s)"))
+                      .arg (DOCUMENT_SERIALIZE_TRANSFORM_DEFINED)
+                      .arg (DOCUMENT_SERIALIZE_CSV)
+                      .arg (QObject::tr ("and/or"))
+                      .arg (DOCUMENT_SERIALIZE_HTML));
   }
 
   QString defined = attributes.value(DOCUMENT_SERIALIZE_TRANSFORM_DEFINED).toString();

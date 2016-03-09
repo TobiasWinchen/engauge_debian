@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CallbackSceneUpdateAfterCommand.h"
 #include "Curve.h"
 #include "CurvesGraphs.h"
@@ -70,6 +76,25 @@ QString GraphicsScene::dumpCursors () const
       .arg (cursorImage);
 
   return dump;
+}
+
+void GraphicsScene::hideAllItemsExceptImage()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsScene::hideAllItemsExceptImage";
+
+  for (int index = 0; index < QGraphicsScene::items().count(); index++) {
+    QGraphicsItem *item = QGraphicsScene::items().at(index);
+
+    if (item->data (DATA_KEY_GRAPHICS_ITEM_TYPE).toInt() == GRAPHICS_ITEM_TYPE_IMAGE) {
+
+      item->show();
+
+    } else {
+
+      item->hide();
+
+    }
+  }
 }
 
 const QGraphicsPixmapItem *GraphicsScene::image () const
