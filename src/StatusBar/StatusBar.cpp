@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "EngaugeAssert.h"
 #include "Logger.h"
 #include <QFrame>
@@ -9,21 +15,11 @@
 #include <QWhatsThis>
 #include "StatusBar.h"
 #include "ZoomFactor.h"
+#include "ZoomLabels.h"
 
 const QString LABEL_COORDS_SCREEN ("Coordinates (pixels):");
 const QString LABEL_COORDS_GRAPH ("Coordinates (graph):");
 const QString LABEL_RESOLUTION_GRAPH ("Resolution (graph):");
-
-const QString LABEL_ZOOM_16_TO_1 ("16:1");
-const QString LABEL_ZOOM_8_TO_1 ("8:1");
-const QString LABEL_ZOOM_4_TO_1 ("4:1");
-const QString LABEL_ZOOM_2_TO_1 ("2:1");
-const QString LABEL_ZOOM_1_TO_1 ("1:1");
-const QString LABEL_ZOOM_1_TO_2 ("1:2");
-const QString LABEL_ZOOM_1_TO_4 ("1:4");
-const QString LABEL_ZOOM_1_TO_8 ("1:8");
-const QString LABEL_ZOOM_1_TO_16 ("1:16");
-const QString LABEL_ZOOM_FILL ("Fill");
 
 const int TEMPORARY_MESSAGE_LIFETIME = 5000; // Milliseconds. Two seconds is too fast even when the text is anticipated
 
@@ -56,19 +52,19 @@ StatusBar::~StatusBar ()
 
 void StatusBar::createGroupUnits ()
 {
-  m_comboUnits = new QComboBox;
-  m_comboUnits->setEnabled (false); // Disabled until file is opened
-  m_comboUnits->addItem (LABEL_COORDS_SCREEN, QVariant (STATUS_BAR_UNITS_COORDS_SCREEN));
-  m_comboUnits->addItem (LABEL_COORDS_GRAPH, QVariant (STATUS_BAR_UNITS_COORDS_GRAPH));
-  m_comboUnits->addItem (LABEL_RESOLUTION_GRAPH, QVariant (STATUS_BAR_UNITS_RESOLUTION_GRAPH));
-  m_comboUnits->setCurrentText (LABEL_COORDS_GRAPH);
-  m_comboUnits->setMaximumWidth (MIN_WIDTH_COMBO_UNITS);
-  m_comboUnits->setToolTip (tr ("Select cursor coordinate values to display."));
-  m_comboUnits->setWhatsThis (tr("Select Cursor Coordinate Values\n\n"
-                                 "Values at cursor coordinates to display. Coordinates are in screen (pixels) or "
-                                 "graph units. Resolution (which is the number of graph units per pixel) is "
-                                 "in graph units. Graph units are only available after axis points have been defined."));
-  connect (m_comboUnits, SIGNAL (activated(const QString &)), this, SLOT (slotComboUnits (const QString &))); // activated() ignores code changes
+  m_cmbUnits = new QComboBox;
+  m_cmbUnits->setEnabled (false); // Disabled until file is opened
+  m_cmbUnits->addItem (LABEL_COORDS_SCREEN, QVariant (STATUS_BAR_UNITS_COORDS_SCREEN));
+  m_cmbUnits->addItem (LABEL_COORDS_GRAPH, QVariant (STATUS_BAR_UNITS_COORDS_GRAPH));
+  m_cmbUnits->addItem (LABEL_RESOLUTION_GRAPH, QVariant (STATUS_BAR_UNITS_RESOLUTION_GRAPH));
+  m_cmbUnits->setCurrentText (LABEL_COORDS_GRAPH);
+  m_cmbUnits->setMaximumWidth (MIN_WIDTH_COMBO_UNITS);
+  m_cmbUnits->setToolTip (tr ("Select cursor coordinate values to display."));
+  m_cmbUnits->setWhatsThis (tr("Select Cursor Coordinate Values\n\n"
+                               "Values at cursor coordinates to display. Coordinates are in screen (pixels) or "
+                               "graph units. Resolution (which is the number of graph units per pixel) is "
+                               "in graph units. Graph units are only available after axis points have been defined."));
+  connect (m_cmbUnits, SIGNAL (activated(const QString &)), this, SLOT (slotComboUnits (const QString &))); // activated() ignores code changes
 
   m_editCoords = new QTextEdit;
   m_editCoords->setEnabled (false); // Disabled until file is opened
@@ -93,7 +89,7 @@ void StatusBar::createGroupUnits ()
   QHBoxLayout *groupLayout = new QHBoxLayout;
   m_groupUnits->setLayout (groupLayout);
   groupLayout->setContentsMargins (0, 0, 0, 0);
-  groupLayout->addWidget (m_comboUnits);
+  groupLayout->addWidget (m_cmbUnits);
   groupLayout->addWidget (m_editCoords);
   groupLayout->setMargin (2);
 
@@ -102,27 +98,27 @@ void StatusBar::createGroupUnits ()
 
 void StatusBar::createZoom ()
 {
-  m_comboZoom = new QComboBox ();
-  m_comboZoom->setEnabled (false); // Disabled until file is opened
-  m_comboZoom->addItem (LABEL_ZOOM_16_TO_1);
-  m_comboZoom->addItem (LABEL_ZOOM_8_TO_1);
-  m_comboZoom->addItem (LABEL_ZOOM_4_TO_1);
-  m_comboZoom->addItem (LABEL_ZOOM_2_TO_1);
-  m_comboZoom->addItem (LABEL_ZOOM_1_TO_1);
-  m_comboZoom->addItem (LABEL_ZOOM_1_TO_2);
-  m_comboZoom->addItem (LABEL_ZOOM_1_TO_4);
-  m_comboZoom->addItem (LABEL_ZOOM_1_TO_8);
-  m_comboZoom->addItem (LABEL_ZOOM_1_TO_16);
-  m_comboZoom->addItem (LABEL_ZOOM_FILL);
-  m_comboZoom->setCurrentText (LABEL_ZOOM_1_TO_1);
-  m_comboZoom->setMaximumWidth (80);
-  m_comboZoom->setToolTip (tr ("Select zoom."));
-  m_comboZoom->setWhatsThis (tr("Select Zoom\n\n"
+  m_cmbZoom = new QComboBox ();
+  m_cmbZoom->setEnabled (false); // Disabled until file is opened
+  m_cmbZoom->addItem (LABEL_ZOOM_16_TO_1);
+  m_cmbZoom->addItem (LABEL_ZOOM_8_TO_1);
+  m_cmbZoom->addItem (LABEL_ZOOM_4_TO_1);
+  m_cmbZoom->addItem (LABEL_ZOOM_2_TO_1);
+  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_1);
+  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_2);
+  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_4);
+  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_8);
+  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_16);
+  m_cmbZoom->addItem (LABEL_ZOOM_FILL);
+  m_cmbZoom->setCurrentText (LABEL_ZOOM_1_TO_1);
+  m_cmbZoom->setMaximumWidth (80);
+  m_cmbZoom->setToolTip (tr ("Select zoom."));
+  m_cmbZoom->setWhatsThis (tr("Select Zoom\n\n"
                                 "Points can be more accurately placed by zooming in."));
   // Zoom combobox must use currentTextChanged rather than activated or else fill-zoom-at-startup never takes effect
-  connect (m_comboZoom, SIGNAL (currentTextChanged(const QString &)), this, SLOT (slotComboZoom (const QString &)));
+  connect (m_cmbZoom, SIGNAL (currentTextChanged(const QString &)), this, SLOT (slotComboZoom (const QString &)));
 
-  m_statusBar.addPermanentWidget (m_comboZoom);
+  m_statusBar.addPermanentWidget (m_cmbZoom);
 }
 
 void StatusBar::setCoordinates (const QString &coordsScreen,
@@ -134,7 +130,7 @@ void StatusBar::setCoordinates (const QString &coordsScreen,
 //                               << " graph=" << coordsGraph.toLatin1 ().data ()
 //                               << " resolution=" << resolutionGraph.toLatin1 ().data ();
 
-  if (m_comboUnits->isEnabled ()) {
+  if (m_cmbUnits->isEnabled ()) {
 
     m_coordsScreen = coordsScreen;
     m_coordsGraph = coordsGraph;
@@ -233,42 +229,42 @@ void StatusBar::slotZoom(int zoom)
   // Show string for the numeric zoom value
   switch ((ZoomFactor) zoom) {
     case ZOOM_16_TO_1:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_16_TO_1);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_16_TO_1);
       break;
     case ZOOM_8_TO_1:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_8_TO_1);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_8_TO_1);
       break;
     case ZOOM_4_TO_1:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_4_TO_1);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_4_TO_1);
       break;
     case ZOOM_2_TO_1:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_2_TO_1);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_2_TO_1);
       break;
     case ZOOM_1_TO_1:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_1_TO_1);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_1_TO_1);
       break;
     case ZOOM_1_TO_2:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_1_TO_2);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_1_TO_2);
       break;
     case ZOOM_1_TO_4:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_1_TO_4);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_1_TO_4);
       break;
     case ZOOM_1_TO_8:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_1_TO_8);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_1_TO_8);
       break;
     case ZOOM_1_TO_16:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_1_TO_16);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_1_TO_16);
       break;
     case ZOOM_FILL:
-      m_comboZoom->setCurrentText (LABEL_ZOOM_FILL);
+      m_cmbZoom->setCurrentText (LABEL_ZOOM_FILL);
   }
 }
 
 void StatusBar::updateCoordsText()
 {
-  if (m_comboUnits->currentText() == LABEL_COORDS_SCREEN) {
+  if (m_cmbUnits->currentText() == LABEL_COORDS_SCREEN) {
     m_editCoords->setText (m_coordsScreen);
-  } else if (m_comboUnits->currentText()  == LABEL_COORDS_GRAPH) {
+  } else if (m_cmbUnits->currentText()  == LABEL_COORDS_GRAPH) {
     m_editCoords->setText (m_coordsGraph);
   } else {
     m_editCoords->setText (m_resolutionGraph);
@@ -277,11 +273,11 @@ void StatusBar::updateCoordsText()
 
 void StatusBar::wakeUp ()
 {
-  if (!m_comboUnits->isEnabled ()) {
+  if (!m_cmbUnits->isEnabled ()) {
 
     // First file has just been read in, so enable the widgets
-    m_comboZoom->setEnabled (true);
-    m_comboUnits->setEnabled (true);
+    m_cmbZoom->setEnabled (true);
+    m_cmbUnits->setEnabled (true);
     m_editCoords->setEnabled (true);
   }
 }

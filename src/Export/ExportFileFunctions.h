@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef EXPORT_FILE_FUNCTIONS_H
 #define EXPORT_FILE_FUNCTIONS_H
 
@@ -9,6 +15,7 @@
 class Document;
 class DocumentModelCoords;
 class DocumentModelExportFormat;
+class MainWindowModel;
 class QTextStream;
 class Transformation;
 
@@ -23,6 +30,7 @@ public:
   /// DlgSettingsExport can supply its own DocumentModelExportFormat when previewing what would be exported.
   void exportToFile (const DocumentModelExportFormat &modelExportOverride,
                      const Document &document,
+                     const MainWindowModel &modelMainWindow,
                      const Transformation &transformation,
                      QTextStream &str) const;
 
@@ -30,6 +38,7 @@ private:
 
   void exportAllPerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
                                            const Document &document,
+                                           const MainWindowModel &modelMainWindow,
                                            const QStringList &curvesIncluded,
                                            const ExportValuesXOrY &xThetaValues,
                                            const QString &delimiter,
@@ -37,6 +46,7 @@ private:
                                            QTextStream &str) const;
   void exportOnePerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
                                            const Document &document,
+                                           const MainWindowModel &modelMainWindow,
                                            const QStringList &curvesIncluded,
                                            const ExportValuesXOrY &xThetaValues,
                                            const QString &delimiter,
@@ -55,21 +65,25 @@ private:
                               const Transformation &transformation) const;
   void loadYRadiusValues (const DocumentModelExportFormat &modelExport,
                           const Document &document,
+                          const MainWindowModel &modelMainWindow,
                           const QStringList &curvesIncluded,
                           const Transformation &transformation,
                           const ExportValuesXOrY &xThetaValues,
                           QVector<QVector<QString*> > &yRadiusValues) const;
   void loadYRadiusValuesForCurveInterpolatedSmooth (const DocumentModelCoords &modelCoords,
+                                                    const MainWindowModel &modelMainWindow,
                                                     const Points &points,
                                                     const ExportValuesXOrY &xThetaValues,
                                                     const Transformation &transformation,
                                                     QVector<QString*> &yRadiusValues) const;
   void loadYRadiusValuesForCurveInterpolatedStraight (const DocumentModelCoords &modelCoords,
+                                                      const MainWindowModel &modelMainWindow,
                                                       const Points &points,
                                                       const ExportValuesXOrY &xThetaValues,
                                                       const Transformation &transformation,
                                                       QVector<QString*> &yRadiusValues) const;
   void loadYRadiusValuesForCurveRaw (const DocumentModelCoords &modelCoords,
+                                     const MainWindowModel &modelMainWindow,
                                      const Points &points,
                                      const ExportValuesXOrY &xThetaValues,
                                      const Transformation &transformation,
@@ -78,6 +92,7 @@ private:
   /// Output 2D y/radius array along with x/theta vector in first column
   void outputXThetaYRadiusValues (const DocumentModelExportFormat &modelExportOverride,
                                   const DocumentModelCoords &modelCoords,
+                                  const MainWindowModel &modelMainWindow,
                                   const QStringList &curvesIncluded,
                                   const ExportValuesXOrY &xThetaValuesMerged,
                                   const Transformation &transformation,

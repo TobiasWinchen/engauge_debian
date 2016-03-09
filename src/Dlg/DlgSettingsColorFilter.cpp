@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
 #include "CmdSettingsColorFilter.h"
 #include "ColorFilter.h"
@@ -25,7 +31,7 @@
 #include "ViewProfileScale.h"
 
 DlgSettingsColorFilter::DlgSettingsColorFilter(MainWindow &mainWindow) :
-  DlgSettingsAbstractBase ("Filter",
+  DlgSettingsAbstractBase (tr ("Color Filter"),
                            "DlgSettingsColorFilter",
                            mainWindow),
   m_scenePreview (0),
@@ -49,7 +55,7 @@ void DlgSettingsColorFilter::createControls (QGridLayout *layout, int &row)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsColorFilter::createControls";
 
-  QLabel *labelCurve = new QLabel ("Curve Name:");
+  QLabel *labelCurve = new QLabel (tr ("Curve Name:"));
   layout->addWidget (labelCurve, row++, 1);
 
   m_cmbCurveName = new QComboBox ();
@@ -57,7 +63,7 @@ void DlgSettingsColorFilter::createControls (QGridLayout *layout, int &row)
   connect (m_cmbCurveName, SIGNAL (activated (const QString &)), this, SLOT (slotCurveName (const QString &))); // activated() ignores code changes
   layout->addWidget (m_cmbCurveName, row++, 1);
 
-  QLabel *labelProfile = new QLabel ("Filter mode:");
+  QLabel *labelProfile = new QLabel (tr ("Filter mode:"));
   layout->addWidget (labelProfile, row++, 1);
 
   m_btnIntensity = new QRadioButton (colorFilterModeToString (COLOR_FILTER_MODE_INTENSITY));
@@ -101,11 +107,15 @@ void DlgSettingsColorFilter::createControls (QGridLayout *layout, int &row)
   layout->addWidget (m_btnValue, row++, 1);
 }
 
+void DlgSettingsColorFilter::createOptionalSaveDefault (QHBoxLayout * /* layout */)
+{
+}
+
 void DlgSettingsColorFilter::createPreview (QGridLayout *layout, int &row)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsColorFilter::createPreview";
 
-  QLabel *labelPreview = new QLabel ("Preview");
+  QLabel *labelPreview = new QLabel (tr ("Preview"));
   layout->addWidget (labelPreview, row++, 0, 1, 5);
 
   m_scenePreview = new QGraphicsScene (this);
@@ -127,7 +137,7 @@ void DlgSettingsColorFilter::createProfileAndScale (QGridLayout *layout, int &ro
 
   const int MINIMUM_VIEW_PROFILE_WIDTH = 70;
 
-  QLabel *labelProfile = new QLabel ("Filter Parameter Histogram Profile");
+  QLabel *labelProfile = new QLabel (tr ("Filter Parameter Histogram Profile"));
   layout->addWidget (labelProfile, row++, 3);
 
   m_sceneProfile = new QGraphicsScene;
@@ -226,8 +236,8 @@ void DlgSettingsColorFilter::load (CmdMediator &cmdMediator)
   }
 
   // Save new data
-  m_modelColorFilterBefore = new DocumentModelColorFilter (cmdMediator.document());
-  m_modelColorFilterAfter = new DocumentModelColorFilter (cmdMediator.document());
+  m_modelColorFilterBefore = new DocumentModelColorFilter (cmdMediator.document().modelColorFilter());
+  m_modelColorFilterAfter = new DocumentModelColorFilter (cmdMediator.document().modelColorFilter());
 
   // Populate controls. First load curve name combobox. The curve-specific controls get loaded in slotCurveName
   m_cmbCurveName->clear ();
@@ -287,14 +297,14 @@ void DlgSettingsColorFilter::slotCurveName(const QString & /* curveName */)
 void DlgSettingsColorFilter::slotDividerHigh (double xCenter)
 {
   m_modelColorFilterAfter->setHigh (m_cmbCurveName->currentText(),
-                               xCenter / (double) PROFILE_SCENE_WIDTH ());
+                                    xCenter / (double) PROFILE_SCENE_WIDTH ());
   updatePreview();
 }
 
 void DlgSettingsColorFilter::slotDividerLow (double xCenter)
 {
   m_modelColorFilterAfter->setLow (m_cmbCurveName->currentText(),
-                              xCenter / (double) PROFILE_SCENE_WIDTH ());
+                                   xCenter / (double) PROFILE_SCENE_WIDTH ());
   updatePreview();
 }
 
@@ -303,7 +313,7 @@ void DlgSettingsColorFilter::slotForeground ()
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsColorFilter::slotForeground";
 
   m_modelColorFilterAfter->setColorFilterMode(m_cmbCurveName->currentText(),
-                                         COLOR_FILTER_MODE_FOREGROUND);
+                                              COLOR_FILTER_MODE_FOREGROUND);
   updateHistogram();
   updatePreview();
 }
@@ -313,7 +323,7 @@ void DlgSettingsColorFilter::slotHue ()
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsColorFilter::slotHue";
 
   m_modelColorFilterAfter->setColorFilterMode(m_cmbCurveName->currentText(),
-                                         COLOR_FILTER_MODE_HUE);
+                                              COLOR_FILTER_MODE_HUE);
   updateHistogram();
   updatePreview();
 }
@@ -323,7 +333,7 @@ void DlgSettingsColorFilter::slotIntensity ()
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsColorFilter::slotIntensity";
 
   m_modelColorFilterAfter->setColorFilterMode(m_cmbCurveName->currentText(),
-                                         COLOR_FILTER_MODE_INTENSITY);
+                                              COLOR_FILTER_MODE_INTENSITY);
   updateHistogram();
   updatePreview();
 }
@@ -333,13 +343,13 @@ void DlgSettingsColorFilter::slotSaturation ()
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsColorFilter::slotSaturation";
 
   m_modelColorFilterAfter->setColorFilterMode(m_cmbCurveName->currentText(),
-                                         COLOR_FILTER_MODE_SATURATION);
+                                              COLOR_FILTER_MODE_SATURATION);
   updateHistogram();
   updatePreview();
 }
 
 void DlgSettingsColorFilter::slotTransferPiece (int xLeft,
-                                           QImage image)
+                                                QImage image)
 {
   // Overwrite one piece of the processed image. This approach is a bit slow because the entire QPixmap
   // in the QGraphicsScene gets exchanged as part of each update, but that seems to be the only possible

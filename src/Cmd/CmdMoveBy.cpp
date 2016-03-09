@@ -1,16 +1,22 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMoveBy.h"
 #include "DataKey.h"
 #include "Document.h"
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "GraphicsItemType.h"
-#include "GraphicsScene.h"
 #include "GraphicsView.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include <QGraphicsItem>
 #include <QtToString.h>
 #include <QXmlStreamReader>
+#include "Xml.h"
 
 CmdMoveBy::CmdMoveBy(MainWindow &mainWindow,
                      Document &document,
@@ -51,7 +57,12 @@ CmdMoveBy::CmdMoveBy (MainWindow &mainWindow,
 
   if (!attributes.hasAttribute(DOCUMENT_SERIALIZE_SCREEN_X_DELTA) ||
       !attributes.hasAttribute(DOCUMENT_SERIALIZE_SCREEN_Y_DELTA) ) {
-      ENGAUGE_ASSERT (false);
+    xmlExitWithError (reader,
+                      QString ("%1 %2 %3 %4")
+                      .arg (QObject::tr ("Missing attribute(s)"))
+                      .arg (DOCUMENT_SERIALIZE_SCREEN_X_DELTA)
+                      .arg (QObject::tr ("and/or"))
+                      .arg (DOCUMENT_SERIALIZE_SCREEN_Y_DELTA));
   }
 
   m_deltaScreen.setX(attributes.value(DOCUMENT_SERIALIZE_SCREEN_X_DELTA).toDouble());
@@ -71,6 +82,7 @@ void CmdMoveBy::cmdRedo ()
 
   moveBy (m_deltaScreen);
   mainWindow().updateAfterCommand();
+  resetSelection(m_movedPoints);
 }
 
 void CmdMoveBy::cmdUndo ()
@@ -81,6 +93,7 @@ void CmdMoveBy::cmdUndo ()
 
   moveBy (-1.0 * m_deltaScreen);
   mainWindow().updateAfterCommand();
+  resetSelection(m_movedPoints);
 }
 
 void CmdMoveBy::moveBy (const QPointF &deltaScreen)

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CurveNameListEntry.h"
 #include "CurveNameList.h"
 #include "DocumentSerialize.h"
@@ -33,6 +39,45 @@ bool CurveNameList::containsCurveNameCurrent (const QString &curveName) const
   }
 
   return false;
+}
+
+bool CurveNameList::curveNameIsAcceptable (const QString &curveNameNew,
+                                           int row) const
+{
+  // First test is to verify curve name is not empty
+  bool success = (!curveNameNew.isEmpty ());
+
+  if (success) {
+
+    // First test was passed. Second test is to check for duplication
+
+    for (int row1 = 0; row1 < m_modelCurvesEntries.count(); row1++) {
+
+      // Use table entry except for the one row that gets overridden
+      CurveNameListEntry curvesEntry1 (m_modelCurvesEntries [row1]); // Retrieve entry
+      QString curveNameCurrent1 = (row1 == row ?
+                                   curveNameNew :
+                                   curvesEntry1.curveNameCurrent());
+
+      for (int row2 = row1 + 1; row2 < m_modelCurvesEntries.count(); row2++) {
+
+        // Use table entry except for the one row that gets overridden
+        CurveNameListEntry curvesEntry2 (m_modelCurvesEntries [row2]); // Retrieve entry
+        QString curveNameCurrent2 = (row2 == row ?
+                                     curveNameNew :
+                                     curvesEntry2.curveNameCurrent());
+
+        if (curveNameCurrent1 == curveNameCurrent2) {
+
+          // Duplicate!
+          success = false;
+          break;
+        }
+      }
+    }
+  }
+
+  return success;
 }
 
 QVariant CurveNameList::data (const QModelIndex &index,
@@ -175,6 +220,8 @@ bool CurveNameList::setData (const QModelIndex &index,
   int row = index.row ();
   if (row < m_modelCurvesEntries.count ()) {
 
+    success = true; // This method will be successful except in the rare case when a curve name is a duplicate
+
     if (!value.isValid () && (role == Qt::EditRole)) {
 
       // Remove the entry
@@ -187,6 +234,8 @@ bool CurveNameList::setData (const QModelIndex &index,
 
       if (index.column () == 0) {
         curvesEntry.setCurveNameCurrent (value.toString ());
+        success = curveNameIsAcceptable (value.toString (),
+                                         row);
       } else if (index.column () == 1) {
         curvesEntry.setCurveNameOriginal (value.toString ());
       } else if (index.column () == 2) {
@@ -195,13 +244,15 @@ bool CurveNameList::setData (const QModelIndex &index,
         ENGAUGE_ASSERT (false);
       }
 
-      m_modelCurvesEntries [row] = curvesEntry.toString (); // Save update entry
+      if (success) {
+        m_modelCurvesEntries [row] = curvesEntry.toString (); // Save update entry
+      }
     }
 
-    emit dataChanged (index,
-                      index);
-
-    success = true;
+    if (success) {
+      emit dataChanged (index,
+                        index);
+    }
   }
 
   return success;

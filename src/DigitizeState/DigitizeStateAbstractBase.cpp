@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdEditPointAxis.h"
 #include "CmdMediator.h"
 #include "DigitizeStateAbstractBase.h"
@@ -34,26 +40,32 @@ const DigitizeStateContext &DigitizeStateAbstractBase::context() const
   return m_context;
 }
 
-void DigitizeStateAbstractBase::handleContextMenuEvent (const QString &pointIdentifier)
+void DigitizeStateAbstractBase::handleContextMenuEvent (CmdMediator *cmdMediator,
+                                                        const QString &pointIdentifier)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateAbstractBase::handleContextMenuEvent point=" << pointIdentifier.toLatin1 ().data ();
 
-  QPointF posScreen = context().cmdMediator().document().positionScreen (pointIdentifier);
-  QPointF posGraphBefore = context().cmdMediator().document().positionGraph (pointIdentifier);
+  QPointF posScreen = cmdMediator->document().positionScreen (pointIdentifier);
+  QPointF posGraphBefore = cmdMediator->document().positionGraph (pointIdentifier);
+  bool isXOnly = cmdMediator->document().isXOnly (pointIdentifier);
 
   // Ask user for coordinates
   double x = posGraphBefore.x();
   double y = posGraphBefore.y();
+
   DlgEditPoint *dlg = new DlgEditPoint(context().mainWindow(),
                                        *this,
-                                       context().cmdMediator().document().modelCoords(),
-                                       cursor (),
+                                       cmdMediator->document().modelCoords(),
+                                       context().mainWindow().modelMainWindow(),
+                                       cursor (cmdMediator),
                                        context().mainWindow().transformation(),
+                                       cmdMediator->document().documentAxesPointsRequired(),
+                                       isXOnly,
                                        &x,
                                        &y);
   int rtn = dlg->exec ();
 
-  QPointF posGraphAfter = dlg->posGraph ();
+  QPointF posGraphAfter = dlg->posGraph (isXOnly); // This call returns new values for isXOnly and the graph position
   delete dlg;
 
   if (rtn == QDialog::Accepted) {
@@ -63,11 +75,11 @@ void DigitizeStateAbstractBase::handleContextMenuEvent (const QString &pointIden
     bool isError;
     QString errorMessage;
 
-    context().mainWindow().cmdMediator().document().checkEditPointAxis(pointIdentifier,
-                                                                       posScreen,
-                                                                       posGraphAfter,
-                                                                       isError,
-                                                                       errorMessage);
+    context().mainWindow().cmdMediator()->document().checkEditPointAxis(pointIdentifier,
+                                                                        posScreen,
+                                                                        posGraphAfter,
+                                                                        isError,
+                                                                        errorMessage);
 
     if (isError) {
 
@@ -79,23 +91,26 @@ void DigitizeStateAbstractBase::handleContextMenuEvent (const QString &pointIden
 
       // Create a command to edit the point
       CmdEditPointAxis *cmd = new CmdEditPointAxis (context().mainWindow(),
-                                                    context().cmdMediator().document(),
+                                                    cmdMediator->document(),
                                                     pointIdentifier,
                                                     posGraphBefore,
-                                                    posGraphAfter);
-      context().appendNewCmd(cmd);
+                                                    posGraphAfter,
+                                                    isXOnly);
+      context().appendNewCmd(cmdMediator,
+                             cmd);
     }
   }
 }
 
-void DigitizeStateAbstractBase::handleLeave ()
+void DigitizeStateAbstractBase::handleLeave (CmdMediator * /* cmdMediator */)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "DigitizeStateAbstractBase::handleLeave";
 
   removeOverrideCursor ();
 }
 
-void DigitizeStateAbstractBase::handleSetOverrideCursor (const QCursor &cursor)
+void DigitizeStateAbstractBase::handleSetOverrideCursor (CmdMediator * /* cmdMediator */,
+                                                         const QCursor &cursor)
 {
   removeOverrideCursor ();
 
@@ -120,10 +135,10 @@ void DigitizeStateAbstractBase::removeOverrideCursor ()
   }
 }
 
-void DigitizeStateAbstractBase::setCursor()
+void DigitizeStateAbstractBase::setCursor(CmdMediator *cmdMediator)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "DigitizeStateAbstractBase::setCursor";
 
   removeOverrideCursor ();
-  context().view().setCursor (cursor ());
+  context().view().setCursor (cursor (cmdMediator));
 }

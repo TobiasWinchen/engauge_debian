@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "LoadImageFromUrl.h"
 #include "Logger.h"
 #include "MainWindow.h"
@@ -54,7 +60,7 @@ void LoadImageFromUrl::slotFinished ()
     QString message;
     QTextStream str (&message);
 
-    str << "Unable to download image from " << urlWithoutScheme;
+    str << tr ("Unable to download image from") << " " << urlWithoutScheme;
 
     QMessageBox::critical (&m_mainWindow,
                            engaugeWindowTitle(),
@@ -86,7 +92,7 @@ void LoadImageFromUrl::startLoadImage (const QUrl &url)
       QString message;
       QTextStream str (&message);
 
-      str << "Unable to load image from " << url.toLocalFile ();
+      str << tr ("Unable to load image from") << " " << url.toLocalFile ();
 
       QMessageBox::critical (&m_mainWindow,
                              engaugeWindowTitle(),

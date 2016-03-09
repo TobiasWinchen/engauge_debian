@@ -1,12 +1,23 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
 #include "BackgroundImage.h"
+#include "CoordSystemIndex.h"
 #include "DigitizeStateAbstractBase.h"
+#include "DocumentAxesPointsRequired.h"
+#include "MainWindowModel.h"
 #include <QCursor>
 #include <QMainWindow>
 #include <QUrl>
 #include "Transformation.h"
+#include "ZoomControl.h"
+#include "ZoomFactor.h"
 
 class BackgroundStateContext;
 class ChecklistGuide;
@@ -16,24 +27,28 @@ class CurveStyles;
 class DigitizeStateContext;
 class DlgSettingsAxesChecker;
 class DlgSettingsColorFilter;
-class DlgSettingsCommon;
 class DlgSettingsCoords;
 class DlgSettingsCurveAddRemove;
 class DlgSettingsCurveProperties;
 class DlgSettingsDigitizeCurve;
 class DlgSettingsExportFormat;
+class DlgSettingsGeneral;
 class DlgSettingsGridRemoval;
+class DlgSettingsMainWindow;
 class DlgSettingsPointMatch;
 class DlgSettingsSegments;
 class DocumentModelAxesChecker;
 class DocumentModelColorFilter;
-class DocumentModelCommon;
 class DocumentModelCoords;
 class DocumentModelDigitizeCurve;
 class DocumentModelExportFormat;
+class DocumentModelGeneral;
 class DocumentModelGridRemoval;
 class DocumentModelPointMatch;
 class DocumentModelSegments;
+class ExportToFile;
+class FileCmdScript;
+class Ghosts;
 class GraphicsScene;
 class GraphicsView;
 class HelpWindow;
@@ -46,8 +61,10 @@ class QComboBox;
 class QDomDocument;
 class QGraphicsLineItem;
 class QMenu;
+class QPushButton;
 class QSettings;
 class QTextStream;
+class QTimer;
 class QToolBar;
 class QVBoxLayout;
 class StatusBar;
@@ -63,13 +80,34 @@ class MainWindow : public QMainWindow
 
 public:
   /// Single constructor.
-  MainWindow(const QString &errorReportFile, // Empty if unused
+  /// \param errorReportFile Optional error report file to be read at startup. Empty if unused. Incompatible with fileCmdScript
+  /// \param fileCmdScriptFile Optional file command script file to be read at startup. Empty if unused. Incompatible with errorReportFile
+  /// \param isRegressionTest True if errorReportFile or fileCmdScript is for regression testing, in which case it is executed and the program exits
+  /// \param isGnuplot True if diagnostic gnuplot files are generated for math-intense sections of the code. Used for development and debugging
+  /// \param loadStartupFiles Zero or more Engauge document files to load at startup. A separate instance of Engauge is created for each file
+  /// \param parent Optional parent widget for this widget
+  MainWindow(const QString &errorReportFile,
+             const QString &fileCmdScriptFile,
+             bool isRegressionTest,
              bool isGnuplot,
+             QStringList loadStartupFiles,
              QWidget *parent = 0);
   ~MainWindow();
 
+  /// Close file. This is called from a file script command
+  void cmdFileClose();
+
+  /// Export file. This is called from a file script command
+  void cmdFileExport(const QString &fileName);
+
+  /// Import file. This is called from a file script command
+  void cmdFileImport(const QString &fileName);
+
+  /// Open file. This is called from a file script command
+  void cmdFileOpen(const QString &fileName);
+
   /// Accessor for commands to process the Document.
-  CmdMediator &cmdMediator();
+  CmdMediator *cmdMediator();
 
   /// Catch secret keypresses
   virtual bool eventFilter(QObject *, QEvent *);
@@ -79,6 +117,9 @@ public:
 
   /// Get method for gnuplot flag
   bool isGnuplot() const;
+
+  /// Get method for main window model
+  MainWindowModel modelMainWindow () const;
 
   /// Intercept resize event so graphics scene can be appropriately resized when in Fill mode.
   void resizeEvent (QResizeEvent *event);
@@ -99,6 +140,9 @@ public:
   /// Curve name that is currently selected in m_cmbCurve.
   QString selectedGraphCurve () const;
 
+  /// Processing performed after gui becomes available
+  virtual void showEvent(QShowEvent *);
+
   /// Show temporary message in status bar
   void showTemporaryMessage (const QString &temporaryMessage);
 
@@ -114,6 +158,9 @@ public:
   /// Call MainWindow::updateControls (which is private) after the very specific case - a mouse press/release.
   void updateAfterMouseRelease();
 
+  /// Select a different CoordSystem
+  void updateCoordSystem(CoordSystemIndex coordSystemIndex);
+
   /// After software-triggered state transition, this method manually triggers the action as if user had clicked on digitize button
   void updateDigitizeStateIfSoftwareTriggered (DigitizeState digitizeState);
 
@@ -126,9 +173,6 @@ public:
 
   /// Update with new color filter properties.
   void updateSettingsColorFilter(const DocumentModelColorFilter &modelColorFilter);
-
-  /// Update with new common properties.
-  void updateSettingsCommon(const DocumentModelCommon &modelCommon);
 
   /// Update with new coordinate properties.
   void updateSettingsCoords(const DocumentModelCoords &modelCoords);
@@ -145,8 +189,14 @@ public:
   /// Update with new export properties.
   void updateSettingsExportFormat(const DocumentModelExportFormat &modelExport);
 
+  /// Update with new general properties.
+  void updateSettingsGeneral(const DocumentModelGeneral &modelGeneral);
+
   /// Update with new grid removal properties.
   void updateSettingsGridRemoval(const DocumentModelGridRemoval &modelGridRemoval);
+
+  /// Update with new main window properties.
+  void updateSettingsMainWindow(const MainWindowModel &modelMainWindow);
 
   /// Update with new point match properties.
   void updateSettingsPointMatch(const DocumentModelPointMatch &modelPointMatch);
@@ -164,12 +214,16 @@ public:
   const GraphicsView &view () const;
 
 private slots:
+  void slotBtnPrintAll();
+  void slotBtnShowAllPressed();
+  void slotBtnShowAllReleased();
   void slotCanRedoChanged (bool);
   void slotCanUndoChanged (bool);
   void slotChecklistClosed ();
   void slotCleanChanged (bool);
   void slotCmbBackground(int);
-  void slotCmbCurve(int);  
+  void slotCmbCoordSystem(int);
+  void slotCmbCurve(int);
   void slotContextMenuEvent (QString);
   void slotDigitizeAxis ();
   void slotDigitizeColorPicker ();
@@ -180,10 +234,14 @@ private slots:
   void slotEditCopy ();
   void slotEditCut ();
   void slotEditDelete ();
+  void slotEditMenu ();
   void slotEditPaste ();
+  void slotEditPasteAsNew ();
+  void slotEditPasteAsNewAdvanced ();
   void slotFileClose ();
   void slotFileExport ();
   void slotFileImport();
+  void slotFileImportAdvanced();
   void slotFileImportDraggedImage(QImage);
   void slotFileImportDraggedImageUrl(QUrl);
   void slotFileImportImage(QString, QImage);
@@ -196,30 +254,36 @@ private slots:
   void slotHelpTutorial();
   void slotKeyPress (Qt::Key, bool);
   void slotLeave ();
+  void slotLoadStartupFiles ();
   void slotMouseMove (QPointF);
   void slotMousePress (QPointF);
   void slotMouseRelease (QPointF);
   void slotRecentFileAction ();
+  void slotRecentFileClear ();
   void slotRedoTextChanged (const QString &);
   void slotSetOverrideCursor (QCursor);
   void slotSettingsAxesChecker ();
   void slotSettingsColorFilter ();
-  void slotSettingsCommon ();
   void slotSettingsCoords ();
   void slotSettingsCurveAddRemove ();
   void slotSettingsCurveProperties ();
   void slotSettingsDigitizeCurve ();
   void slotSettingsExportFormat ();
+  void slotSettingsGeneral ();
   void slotSettingsGridRemoval ();
+  void slotSettingsMainWindow ();
   void slotSettingsPointMatch ();
   void slotSettingsSegments ();
+  void slotTimeoutRegressionErrorReport ();
+  void slotTimeoutRegressionFileCmdScript ();
   void slotUndoTextChanged (const QString &);
   void slotViewGroupBackground(QAction*);
   void slotViewGroupCurves(QAction*);
   void slotViewGroupStatus(QAction*);
   void slotViewToolBarBackground ();
-  void slotViewToolBarDigitize ();
   void slotViewToolBarChecklistGuide ();
+  void slotViewToolBarCoordSystem ();
+  void slotViewToolBarDigitize ();
   void slotViewToolBarSettingsViews ();
   void slotViewToolTips ();
   void slotViewZoom16To1 ();
@@ -234,7 +298,9 @@ private slots:
   void slotViewZoom (int);
   void slotViewZoomFill ();
   void slotViewZoomIn ();
+  void slotViewZoomInFromWheelEvent ();
   void slotViewZoomOut ();
+  void slotViewZoomOutFromWheelEvent ();
 
 signals:
   /// Send zoom selection, picked from menu or keystroke, to StatusBar.
@@ -243,6 +309,12 @@ signals:
 private:
   MainWindow();
 
+  enum ImportType {
+    IMPORT_TYPE_SIMPLE,
+    IMPORT_TYPE_ADVANCED
+  };
+
+  void applyZoomFactorAfterLoad();
   virtual void closeEvent(QCloseEvent *event);
   void createActions();
   void createActionsDigitize ();
@@ -266,23 +338,37 @@ private:
   void createStatusBar();
   void createToolBars();
   void createTutorial();
-  void fileImport (const QString &fileName);
+  ZoomFactor currentZoomFactor () const;
+  void exportAllCoordinateSystems();
+  QString exportFilenameFromInputFilename (const QString &fileName) const;
+  void fileExport(const QString &fileName,
+                  ExportToFile exportStrategy);
+  void fileImport (const QString &fileName,
+                   ImportType ImportType); /// Same steps as filePaste but with import from file
+  void fileImportWithPrompts (ImportType ImportType); /// Wrapper around fileImport that adds user prompt(s)
+  void filePaste (ImportType importType); /// Same steps as fileImport but with import from clipboard
+  void ghostsCreate (); /// Create the ghosts for seeing all coordinate systems at once
+  void ghostsDestroy (); /// Destroy the ghosts for seeing all coordinate systems at once
+  void loadCoordSystemListFromCmdMediator(); /// Update the combobox that has the CoordSystem list
   void loadCurveListFromCmdMediator(); /// Update the combobox that has the curve names.
   void loadDocumentFile (const QString &fileName);
   void loadErrorReportFile(const QString &initialPath,
                            const QString &errorReportFile);
-  void loadImage (const QString &fileName,
-                  const QImage &image);
+  bool loadImage (const QString &fileName,
+                  const QImage &image,
+                  ImportType ImportType);
   void loadInputFileForErrorReport(QDomDocument &domInputFile) const;
   void loadToolTips ();
   bool maybeSave();
+  DocumentModelExportFormat modelExportOverride (const DocumentModelExportFormat &modelExportFormatBefore,
+                                                 const ExportToFile &exportStrategy,
+                                                 const QString &selectedNameFilter) const;
   void rebuildRecentFileListForCurrentFile(const QString &filePath);
   bool saveDocumentFile(const QString &fileName);
   QString saveErrorReportFileAndExitXml (const char *comment,
                                          const char *file,
                                          int line,
-                                         const char *context,
-                                         bool includeDocument) const;
+                                         const char *context) const;
   void saveStartingDocumentSnapshot();
   void setCurrentFile(const QString &fileName);
   void setCurrentPathFromFile (const QString &fileName);
@@ -291,24 +377,32 @@ private:
   void settingsReadEnvironment (QSettings &settings);
   void settingsReadMainWindow (QSettings &settings);
   void settingsWrite ();
-  void setupAfterLoad (const QString &fileName,
-                       const QString &temporaryMessage);
+  bool setupAfterLoad (const QString &fileName,
+                       const QString &temporaryMessage,
+                       ImportType ImportType);
+  void startRegressionTestErrorReport (const QString &regressionInputFile);
+  void startRegressionTestFileCmdScript ();
   void updateAfterCommandStatusBarCoords ();
   void updateControls (); // Update the widgets (typically in terms of show/hide state) depending on the application state.
   void updateRecentFileList();
+  void updateSettingsMainWindow();
   void updateTransformationAndItsDependencies();
   void updateViewedCurves ();
   void updateViewsOfSettings (); // Private version gets active curve name from DigitizeContext
+  void updateWindowTitle ();
   void writeCheckpointToLogFile();
 
   QString m_originalFile; // Original filename for error report
   bool m_originalFileWasImported; // True/false for imported/opened
   bool m_isDocumentExported;
   QString m_engaugeFile; // Not empty when a Document is currently loaded AND it was loaded and/or saved as an Engauge file
-  QString m_currentFile; // Not empty when a Document is currently loaded
+  QString m_currentFile; // Not empty when a Document is currently loaded. No path or file extension
+  QString m_currentFileWithPathAndFileExtension; // Adds path and file extension to m_currentFile. For display
+  MainTitleBarFormat m_titleBarFormat;
 
   QMenu *m_menuFile;
   QAction *m_actionImport;
+  QAction *m_actionImportAdvanced;
   QAction *m_actionOpen;
   QMenu *m_menuFileOpenRecent;
   QList<QAction*> m_actionRecentFiles;
@@ -326,6 +420,8 @@ private:
   QAction *m_actionEditCopy;
   QAction *m_actionEditPaste;
   QAction *m_actionEditDelete;
+  QAction *m_actionEditPasteAsNew;
+  QAction *m_actionEditPasteAsNewAdvanced;
 
   QMenu *m_menuDigitize;
   QActionGroup *m_groupDigitize;
@@ -339,6 +435,7 @@ private:
   QMenu *m_menuView;
   QAction *m_actionViewBackground;
   QAction *m_actionViewChecklistGuide;
+  QAction *m_actionViewCoordSystem;
   QAction *m_actionViewDigitize;
   QAction *m_actionViewSettingsViews;
   QAction *m_actionViewToolTips;
@@ -375,13 +472,14 @@ private:
   QMenu *m_menuSettings;
   QAction *m_actionSettingsAxesChecker;
   QAction *m_actionSettingsColorFilter;
-  QAction *m_actionSettingsCommon;
   QAction *m_actionSettingsCoords;
   QAction *m_actionSettingsCurveAddRemove;
   QAction *m_actionSettingsCurveProperties;
   QAction *m_actionSettingsDigitizeCurve;
   QAction *m_actionSettingsExport;
+  QAction *m_actionSettingsGeneral;
   QAction *m_actionSettingsGridRemoval;
+  QAction *m_actionSettingsMainWindow;
   QAction *m_actionSettingsPointMatch;
   QAction *m_actionSettingsSegments;
 
@@ -411,6 +509,11 @@ private:
   QToolBar *m_toolSettingsViews;
   ChecklistGuide *m_dockChecklistGuide;
 
+  QComboBox *m_cmbCoordSystem;
+  QPushButton *m_btnPrintAll;
+  QPushButton *m_btnShowAll;
+  QToolBar *m_toolCoordSystem;
+
   HelpWindow *m_helpWindow;
   TutorialDlg *m_tutorialDlg;
 
@@ -428,13 +531,14 @@ private:
 
   DlgSettingsAxesChecker *m_dlgSettingsAxesChecker;
   DlgSettingsColorFilter *m_dlgSettingsColorFilter;
-  DlgSettingsCommon *m_dlgSettingsCommon;
   DlgSettingsCoords *m_dlgSettingsCoords;
   DlgSettingsCurveAddRemove *m_dlgSettingsCurveAddRemove;
   DlgSettingsCurveProperties *m_dlgSettingsCurveProperties;
   DlgSettingsDigitizeCurve * m_dlgSettingsDigitizeCurve;
   DlgSettingsExportFormat *m_dlgSettingsExportFormat;
+  DlgSettingsGeneral *m_dlgSettingsGeneral;
   DlgSettingsGridRemoval *m_dlgSettingsGridRemoval;
+  DlgSettingsMainWindow *m_dlgSettingsMainWindow;
   DlgSettingsPointMatch *m_dlgSettingsPointMatch;
   DlgSettingsSegments *m_dlgSettingsSegments;
 
@@ -442,7 +546,24 @@ private:
   QString m_startingDocumentSnapshot; // Serialized snapshot of document at startup. Included in error report if user approves
   NetworkClient *m_networkClient;
 
-  bool m_isGnuplot;
+  // Main window settings
+  bool m_isGnuplot; // From command line
+  MainWindowModel m_modelMainWindow; // From settings file or DlgSettingsMainWindow
+
+  // File names to be loaded at startup. Only one is loaded into the current instance, with external instances created for the other files
+  QTimer *m_timerLoadStartupFiles;
+  QStringList m_loadStartupFiles;
+
+  // Ghosts that are created for seeing all coordinate systems at once, when there are multiple coordinate systems
+  Ghosts *m_ghosts;
+
+  // Timers for regression testing. Neither or one is first started by the constructor for this class, but the first timeout
+  // (and all succeeding timeouts) will be from after QMainWindow::exec is called. Each timeout results in one command
+  // from the command stack getting executed
+  QTimer *m_timerRegressionErrorReport;
+  FileCmdScript *m_fileCmdScript;
+  QTimer *m_timerRegressionFileCmdScript;
+  QString m_regressionFile;
 };
 
 #endif // MAIN_WINDOW_H

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "BackgroundStateAbstractBase.h"
 #include "DataKey.h"
 #include "EngaugeAssert.h"
@@ -63,7 +69,7 @@ void BackgroundStateAbstractBase::setProcessedPixmap (const QPixmap &pixmap)
   LOG4CPP_INFO_S ((*mainCat)) << "BackgroundStateAbstractBase::setProcessedPixmap"
                               << " map=(" << pixmap.width() << "x" << pixmap.height() << ")";
 
-  ENGAUGE_CHECK_PTR (m_imageItem);
+  ENGAUGE_CHECK_PTR(m_imageItem);
 
   m_imageItem->setPixmap (pixmap);
 

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef POINT_H
 #define POINT_H
 
@@ -29,20 +35,23 @@ public:
   /// in screen coordinates, applies to the center of the Point
   Point (const QString &curveName,
          const QPointF &posScreen,
-         const QPointF &posGraph);
+         const QPointF &posGraph,
+         bool isXOnly);
 
   /// Constructor for axis points with identifier (after redo). The position, in screen coordinates, applies to the center of the Point
   Point (const QString &curveName,
          const QString &identifier,
          const QPointF &posScreen,
          const QPointF &posGraph,
-         double ordinal);
+         double ordinal,
+         bool isXOnly);
 
   /// Constructor for axis points without identifier (after redo). The position, in screen coordinates, applies to the center of the Point
   Point (const QString &curveName,
          const QPointF &posScreen,
          const QPointF &posGraph,
-         double ordinal);
+         double ordinal,
+         bool isXOnly);
 
   /// Constructor for graph points with identifier (after redo)
   Point (const QString &curveName,
@@ -76,6 +85,9 @@ public:
   /// Unique identifier for a specific Point.
   QString identifier () const;
 
+  /// In DOCUMENT_AXES_POINTS_REQUIRED_4 modes, this is true/false if y/x coordinate is undefined
+  bool isXOnly() const;
+
   /// Return the current index for storage in case we need to reset it later while performing a Redo.
   static unsigned int identifierIndex ();
 
@@ -97,6 +109,9 @@ public:
 
   /// Serialize to stream
   void saveXml(QXmlStreamWriter &writer) const;
+
+  /// Update the point identifer to match the specified curve name
+  void setCurveName (const QString &curveName);
 
   /// Reset the current index while performing a Redo.
   static void setIdentifierIndex (unsigned int identifierIndex);
@@ -135,6 +150,7 @@ private:
   QPointF m_posGraph;
   bool m_hasOrdinal;
   double m_ordinal;
+  bool m_isXOnly; // For DOCUMENT_AXES_POINTS_REQUIRED_4, true/false when x/y coordinate is undefed
 
   static unsigned int m_identifierIndex; // For generating unique identifiers
 };

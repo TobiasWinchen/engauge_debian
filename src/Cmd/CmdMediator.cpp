@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdAbstract.h"
 #include "CmdFactory.h"
 #include "CmdMediator.h"
@@ -41,6 +47,11 @@ CmdMediator::~CmdMediator()
 void CmdMediator::connectSignals (MainWindow &mainWindow)
 {
   connect (this, SIGNAL (cleanChanged (bool)), &mainWindow, SLOT (slotCleanChanged (bool)));
+}
+
+const CoordSystem &CmdMediator::coordSystem() const
+{
+  return m_document.coordSystem();
 }
 
 const Curve &CmdMediator::curveAxes () const
@@ -111,6 +122,11 @@ void CmdMediator::saveXml(QXmlStreamWriter &writer) const
   }
 
   writer.writeEndElement();
+}
+
+void CmdMediator::setDocumentAxesPointsRequired (DocumentAxesPointsRequired documentAxesPointsRequired)
+{
+  m_document.setDocumentAxesPointsRequired (documentAxesPointsRequired);
 }
 
 bool CmdMediator::successfulRead () const

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdAddPointsGraph.h"
 #include "DigitizeStateContext.h"
 #include "DigitizeStateSegment.h"
@@ -25,18 +31,21 @@ QString DigitizeStateSegment::activeCurve () const
   return context().mainWindow().selectedGraphCurve();
 }
 
-void DigitizeStateSegment::begin (DigitizeState /* previousState */)
+void DigitizeStateSegment::begin (CmdMediator *cmdMediator,
+                                  DigitizeState /* previousState */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSegment::begin";
 
-  setCursor();
+  m_cmdMediator = cmdMediator; // Save for slotMouseClickOnSegment
+
+  setCursor(cmdMediator);
   context().setDragMode(QGraphicsView::NoDrag);
   context().mainWindow().updateViewsOfSettings(activeCurve ());
 
-  handleCurveChange();
+  handleCurveChange(cmdMediator);
 }
 
-QCursor DigitizeStateSegment::cursor() const
+QCursor DigitizeStateSegment::cursor(CmdMediator * /* cmdMediator */) const
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "DigitizeStateSegment::cursor";
 
@@ -54,7 +63,7 @@ void DigitizeStateSegment::end ()
   segmentFactory.clearSegments(m_segments);
 }
 
-void DigitizeStateSegment::handleCurveChange()
+void DigitizeStateSegment::handleCurveChange(CmdMediator *cmdMediator)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSegment::handleCurveChange";
 
@@ -68,7 +77,7 @@ void DigitizeStateSegment::handleCurveChange()
 
   // Create new segments
   segmentFactory.makeSegments (img,
-                               context().cmdMediator().document().modelSegments(),
+                               cmdMediator->document().modelSegments(),
                                m_segments);
 
   // Connect signals of the new segments
@@ -83,24 +92,28 @@ void DigitizeStateSegment::handleCurveChange()
   }
 }
 
-void DigitizeStateSegment::handleKeyPress (Qt::Key key,
+void DigitizeStateSegment::handleKeyPress (CmdMediator * /* cmdMediator */,
+                                           Qt::Key key,
                                            bool /* atLeastOneSelectedItem */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSegment::handleKeyPress"
                               << " key=" << QKeySequence (key).toString ().toLatin1 ().data ();
 }
 
-void DigitizeStateSegment::handleMouseMove (QPointF /* posScreen */)
+void DigitizeStateSegment::handleMouseMove (CmdMediator * /* cmdMediator */,
+                                            QPointF /* posScreen */)
 {
 //  LOG4CPP_DEBUG_S ((*mainCat)) << "DigitizeStateSegment::handleMouseMove";
 }
 
-void DigitizeStateSegment::handleMousePress (QPointF /* posScreen */)
+void DigitizeStateSegment::handleMousePress (CmdMediator * /* cmdMediator */,
+                                             QPointF /* posScreen */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSegment::handleMousePress";
 }
 
-void DigitizeStateSegment::handleMouseRelease (QPointF /* posScreen */)
+void DigitizeStateSegment::handleMouseRelease (CmdMediator * /* cmdMediator */,
+                                               QPointF /* posScreen */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSegment::handleMouseRelease";
 }
@@ -140,12 +153,12 @@ void DigitizeStateSegment::slotMouseClickOnSegment(QPointF posSegmentStart)
   SegmentFactory segmentFactory ((QGraphicsScene &) scene,
                                  context().isGnuplot());
 
-  QList<QPoint> points = segmentFactory.fillPoints (context().cmdMediator().document().modelSegments(),
+  QList<QPoint> points = segmentFactory.fillPoints (m_cmdMediator->document().modelSegments(),
                                                     segments);
 
   // Create one ordinal for each point
   OrdinalGenerator ordinalGenerator;
-  Document &document = context ().cmdMediator ().document ();
+  Document &document = m_cmdMediator->document ();
   const Transformation &transformation = context ().mainWindow ().transformation();
   QList<double> ordinals;
   QList<QPoint>::iterator itr;
@@ -164,7 +177,8 @@ void DigitizeStateSegment::slotMouseClickOnSegment(QPointF posSegmentStart)
                                              context ().mainWindow().selectedGraphCurve(),
                                              points,
                                              ordinals);
-  context().appendNewCmd(cmd);
+  context().appendNewCmd(m_cmdMediator,
+                         cmd);
 }
 
 QString DigitizeStateSegment::state() const
@@ -172,7 +186,8 @@ QString DigitizeStateSegment::state() const
   return "DigitizeStateSegment";
 }
 
-void DigitizeStateSegment::updateModelDigitizeCurve (const DocumentModelDigitizeCurve & /*modelDigitizeCurve */)
+void DigitizeStateSegment::updateModelDigitizeCurve (CmdMediator * /* cmdMediator */,
+                                                     const DocumentModelDigitizeCurve & /*modelDigitizeCurve */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSegment::updateModelDigitizeCurve";
 }

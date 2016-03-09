@@ -1,7 +1,14 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CHECKER_H
 #define CHECKER_H
 
 #include "CheckerMode.h"
+#include "DocumentAxesPointsRequired.h"
 #include <QColor>
 #include <QList>
 #include <QPainterPath>
@@ -37,7 +44,8 @@ public:
   void prepareForDisplay (const QPolygonF &polygon,
                           int pointRadius,
                           const DocumentModelAxesChecker &modelAxesChecker,
-                          const DocumentModelCoords &modelCoords);
+                          const DocumentModelCoords &modelCoords,
+                          DocumentAxesPointsRequired documentAxesPointsRequired);
 
   /// Create the polygon from current information, including pixel and graph coordinates, just prior to display. This is for
   /// TransformationStateDefined. The point radius is used to exclude the lines from the axes points for clarity
@@ -45,7 +53,8 @@ public:
                           int pointRadius,
                           const DocumentModelAxesChecker &modelAxesChecker,
                           const DocumentModelCoords &modelCoords,
-                          const Transformation &transformation);
+                          const Transformation &transformation,
+                          DocumentAxesPointsRequired documentAxesPointsRequired);
 
   /// Show/hide this axes checker.
   void setVisible (bool visible);

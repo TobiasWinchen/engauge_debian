@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "ChecklistGuide.h"
 #include "ChecklistGuideBrowser.h"
 #include "CmdMediator.h"
@@ -11,7 +17,7 @@ ChecklistGuide::ChecklistGuide (QWidget *parent) :
 {
   setVisible (false);
   setAllowedAreas (Qt::AllDockWidgetAreas);
-  setWindowTitle ("Checklist Guide"); // Appears in title bar when undocked
+  setWindowTitle (tr ("Checklist Guide")); // Appears in title bar when undocked
   setStatusTip (tr ("Checklist Guide"));
   setWhatsThis (tr ("Checklist Guide\n\n"
                     "This box contains a checklist of step suggested by the Checklist Guide Wizard. Following "

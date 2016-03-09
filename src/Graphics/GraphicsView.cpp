@@ -1,7 +1,13 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "DataKey.h"
-#include "Document.h"
 #include "GraphicsItemType.h"
 #include "GraphicsView.h"
+#include "LoadFileInfo.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include "Point.h"
@@ -31,6 +37,8 @@ GraphicsView::GraphicsView(QGraphicsScene *scene,
   connect (this, SIGNAL (signalMouseMove(QPointF)), &mainWindow, SLOT (slotMouseMove (QPointF)));
   connect (this, SIGNAL (signalMousePress (QPointF)), &mainWindow, SLOT (slotMousePress (QPointF)));
   connect (this, SIGNAL (signalMouseRelease (QPointF)), &mainWindow, SLOT (slotMouseRelease (QPointF)));
+  connect (this, SIGNAL (signalViewZoomIn ()), &mainWindow, SLOT (slotViewZoomInFromWheelEvent ()));
+  connect (this, SIGNAL (signalViewZoomOut ()), &mainWindow, SLOT (slotViewZoomOutFromWheelEvent ()));
 
   setMouseTracking (true);
   setAcceptDrops (true);
@@ -41,14 +49,18 @@ GraphicsView::GraphicsView(QGraphicsScene *scene,
   horizontalScrollBar()->setCursor (QCursor (Qt::ArrowCursor));
 
   // Skip setStatusTip here since that will overwrite much more important messages, and trigger gratuitous showing of status bar
-  setWhatsThis (tr ("Document\n\n"
+  setWhatsThis (tr ("Main Window\n\n"
                     "After an image file is imported, or an Engauge Document opened, an image appears in this area. "
                     "Points are added to the image.\n\n"
                     "If the image is a graph with two axes and one or more curves, then three axis points must be "
                     "created along those axes. Just put two axis points on one axis and a third axis point on the other "
                     "axis, as far apart as possible for higher accuracy. Then curve points can be added along the curves.\n\n"
                     "If the image is a map with a scale to define length, then two axis points must be "
-                    "created at either end of the scale. Then curve points can be added."));
+                    "created at either end of the scale. Then curve points can be added.\n\n"
+                    "Zooming the image in or out is performed using any of several methods:\n"
+                    "1) rotating the mouse wheel when the cursor is outside of the image\n"
+                    "2) pressing the minus or plus keys\n"
+                    "3) selecting a new zoom setting from the View/Zoom menu"));
 }
 
 GraphicsView::~GraphicsView()
@@ -104,12 +116,7 @@ void GraphicsView::dragMoveEvent (QDragMoveEvent *event)
 
 void GraphicsView::dropEvent (QDropEvent *event)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsView::dropEvent"
-                              << " formats=" << event->mimeData()->formats().join (", ").toLatin1().data();
-
   const QString MIME_FORMAT_TEXT_PLAIN ("text/plain");
-
-  // This code is not specific to a digitizing state so it is implemented here
 
   // Urls from text/uri-list
   QList<QUrl> urlList = event->mimeData ()->urls ();
@@ -121,10 +128,21 @@ void GraphicsView::dropEvent (QDropEvent *event)
     str << " url=" << url.toString () << " ";
   }
 
-  if (loadsAsDigFile (event->mimeData()->data (MIME_FORMAT_TEXT_PLAIN))) {
+  QString textPlain (event->mimeData()->data (MIME_FORMAT_TEXT_PLAIN));
+
+  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsView::dropEvent"
+                              << " formats=(" << event->mimeData()->formats().join (", ").toLatin1().data() << ")"
+                              << " hasUrls=" << (event->mimeData()->hasUrls() ? "yes" : "no")
+                              << " urlCount=" << urlList.count()
+                              << " urls=(" << urls.toLatin1().data() << ")"
+                              << " text=" << textPlain.toLatin1().data()
+                              << " hasImage=" << (event->mimeData()->hasImage() ? "yes" : "no");
+
+  LoadFileInfo loadFileInfo;
+  if (loadFileInfo.loadsAsDigFile (textPlain)) {
 
     LOG4CPP_INFO_S ((*mainCat)) << "QGraphicsView::dropEvent dig file";
-    QUrl url (event->mimeData()->data(MIME_FORMAT_TEXT_PLAIN));
+    QUrl url (textPlain);
     emit signalDraggedDigFile (url.toLocalFile());
     event->acceptProposedAction();
 
@@ -136,7 +154,7 @@ void GraphicsView::dropEvent (QDropEvent *event)
     emit signalDraggedImage (image);
 
   } else if (event->mimeData ()->hasUrls () &&
-             event->mimeData ()->urls().count () > 0) {
+             urlList.count () > 0) {
 
     // Sometimes images can be dragged in, but sometimes the url points to an html page that
     // contains just the image, in which case importing will fail
@@ -196,16 +214,6 @@ void GraphicsView::leaveEvent (QEvent *event)
   QGraphicsView::leaveEvent (event);
 }
 
-bool GraphicsView::loadsAsDigFile (const QString &urlString) const
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsView::loadsAsDigFile";
-
-  QUrl url (urlString);
-  Document document (url.toLocalFile());
-
-  return document.successfulRead();
-}
-
 void GraphicsView::mouseMoveEvent (QMouseEvent *event)
 {
 //  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsView::mouseMoveEvent cursor="
@@ -230,33 +238,81 @@ void GraphicsView::mousePressEvent (QMouseEvent *event)
 
   QPointF posScreen = mapToScene (event->pos ());
 
-  if (inBounds (posScreen)) {
+  if (!inBounds (posScreen)) {
 
-    emit signalMousePress (posScreen);
-
+    // Set to out-of-bounds value
+    posScreen = QPointF (-1.0, -1.0);
   }
+
+  emit signalMousePress (posScreen);
 
   QGraphicsView::mousePressEvent (event);
 }
 
 void GraphicsView::mouseReleaseEvent (QMouseEvent *event)
 {
-  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsView::mouseReleaseEvent";
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsView::mouseReleaseEvent signalMouseRelease";
 
   QPointF posScreen = mapToScene (event->pos ());
 
-  // Skip if any of the following is true:
-  // 1) Out of bounds
-  // 2) Right click
+  if (!inBounds (posScreen)) {
+
+    // Set to out-of-bounds value
+    posScreen = QPointF (-1.0, -1.0);
+  }
+
+  // Send a signal, unless this is a right click. We still send if out of bounds since
+  // a click-and-drag often ends out of bounds (and user is unlikely to expect different
+  // behavior when endpoint is outside, versus inside, the image boundary)
   int bitFlag = (event->buttons () & Qt::RightButton);
   bool isRightClick = (bitFlag != 0);
 
-  if (inBounds (posScreen) &&
-      !isRightClick) {
+  if (!isRightClick) {
+
 
     emit signalMouseRelease (posScreen);
 
   }
 
   QGraphicsView::mouseReleaseEvent (event);
+}
+
+void GraphicsView::wheelEvent(QWheelEvent *event)
+{
+  const int ANGLE_THRESHOLD = 15; // From QWheelEvent documentation
+  const int DELTAS_PER_DEGREE = 8; // From QWheelEvent documentation
+
+  QPoint numDegrees = event->angleDelta() / DELTAS_PER_DEGREE;
+
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::wheelEvent"
+                              << " degrees=" << numDegrees.y()
+                              << " phase=" << event->phase();
+
+  // Criteria:
+  // 1) User has enabled wheel zoom control (but that is not known here so MainWindow will handle that part)
+  //    in slotViewZoomInFromWheelEvent and slotViewZoomOutFromWheelEvent
+  // 2) Angle is over a threshold to eliminate false events from just touching wheel
+  if ((event->modifiers() & Qt::ControlModifier) != 0) {
+
+    if (numDegrees.y() >= ANGLE_THRESHOLD) {
+
+      // Rotated backwards towards the user, which means zoom in
+      emit signalViewZoomIn();
+
+    } else if (numDegrees.y() <= -ANGLE_THRESHOLD) {
+
+      // Rotated forwards away from the user, which means zoom out
+      emit signalViewZoomOut();
+
+    }
+
+    // Accept the event as long as Control key was used and we are capturing wheel event
+    event->accept();
+
+  } else {
+
+    // Let non-Control events manage scrolling
+    QGraphicsView::wheelEvent (event);
+
+  }
 }

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CallbackUpdateTransform.h"
 #include "Document.h"
 #include "EngaugeAssert.h"
@@ -191,6 +197,7 @@ void Transformation::coordTextForStatusBar (QPointF cursorScreen,
       format.unformattedToFormatted (pointGraph.x(),
                                      pointGraph.y(),
                                      m_modelCoords,
+                                     m_modelMainWindow,
                                      xThetaFormatted,
                                      yRadiusFormatted,
                                      *this);
@@ -286,9 +293,16 @@ double Transformation::roundOffSmallValues (double value, double range)
   return value;
 }
 
-void Transformation::setModelCoords (const DocumentModelCoords &modelCoords)
+void Transformation::setModelCoords (const DocumentModelCoords &modelCoords,
+                                     const MainWindowModel &modelMainWindow)
 {
   m_modelCoords = modelCoords;
+  m_modelMainWindow = modelMainWindow;
+}
+
+bool Transformation::transformIsDefined() const
+{
+  return m_transformIsDefined;
 }
 
 void Transformation::transformLinearCartesianGraphToRawGraph (const QPointF &pointLinearCartesianGraph,
@@ -415,7 +429,8 @@ void Transformation::transformScreenToRawGraph (const QPointF &coordScreen,
 }
 
 void Transformation::update (bool fileIsLoaded,
-                             const CmdMediator &cmdMediator)
+                             const CmdMediator &cmdMediator,
+                             const MainWindowModel &modelMainWindow)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "Transformation::update";
 
@@ -425,9 +440,11 @@ void Transformation::update (bool fileIsLoaded,
 
   } else {
 
-    setModelCoords (cmdMediator.document().modelCoords());
+    setModelCoords (cmdMediator.document().modelCoords(),
+                    modelMainWindow);
 
-    CallbackUpdateTransform ftor (m_modelCoords);
+    CallbackUpdateTransform ftor (m_modelCoords,
+                                  cmdMediator.document().documentAxesPointsRequired());
 
     Functor2wRet<const QString &, const Point&, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
                                                                                                       &CallbackUpdateTransform::callback);

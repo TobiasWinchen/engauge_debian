@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef EXPORT_FILE_RELATIONS_H
 #define EXPORT_FILE_RELATIONS_H
 
@@ -10,6 +16,7 @@
 class Document;
 class DocumentModelCoords;
 class DocumentModelExportFormat;
+class MainWindowModel;
 class QTextStream;
 class Transformation;
 
@@ -24,18 +31,21 @@ public:
   /// DlgSettingsExport can supply its own DocumentModelExportFormat when previewing what would be exported.
   void exportToFile (const DocumentModelExportFormat &modelExportOverride,
                      const Document &document,
+                     const MainWindowModel &modelMainWindow,
                      const Transformation &transformation,
                      QTextStream &str) const;
 
 private:
   void exportAllPerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
                                            const Document &document,
+                                           const MainWindowModel &modelMainWindow,
                                            const QStringList &curvesIncluded,
                                            const QString &delimiter,
                                            const Transformation &transformation,
                                            QTextStream &str) const;
   void exportOnePerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
                                            const Document &document,
+                                           const MainWindowModel &modelMainWindow,
                                            const QStringList &curvesIncluded,
                                            const QString &delimiter,
                                            const Transformation &transformation,
@@ -47,22 +57,26 @@ private:
                                const Transformation &transformation) const;
   void loadXThetaYRadiusValues (const DocumentModelExportFormat &modelExportOverride,
                                 const Document &document,
+                                const MainWindowModel &modelMainWindow,
                                 const QStringList &curvesIncluded,
                                 const Transformation &transformation,
                                 QVector<QVector<QString*> > &xThetaYRadiusValues) const;
   void loadXThetaYRadiusValuesForCurveInterpolatedSmooth (const DocumentModelCoords &modelCoords,
+                                                          const MainWindowModel &modelMainWindow,
                                                           const Points &points,
                                                           const ExportValuesOrdinal &ordinals,
                                                           QVector<QString*> &xThetaValues,
                                                           QVector<QString*> &yRadiusValues,
                                                           const Transformation &transformation) const;
   void loadXThetaYRadiusValuesForCurveInterpolatedStraight (const DocumentModelCoords &modelCoords,
+                                                            const MainWindowModel &modelMainWindow,
                                                             const Points &points,
                                                             const ExportValuesOrdinal &ordinals,
                                                             QVector<QString*> &xThetaValues,
                                                             QVector<QString*> &yRadiusValues,
                                                             const Transformation &transformation) const;
   void loadXThetaYRadiusValuesForCurveRaw (const DocumentModelCoords &modelCoords,
+                                           const MainWindowModel &modelMainWindow,
                                            const Points &points,
                                            QVector<QString*> &xThetaValues,
                                            QVector<QString*> &yRadiusValues,

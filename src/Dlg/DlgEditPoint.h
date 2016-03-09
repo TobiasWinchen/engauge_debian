@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DLG_EDIT_POINT_H
 #define DLG_EDIT_POINT_H
 
@@ -5,6 +11,7 @@
 #include "CoordUnitsNonPolarTheta.h"
 #include "CoordUnitsPolarTheta.h"
 #include "CoordUnitsTime.h"
+#include "DocumentAxesPointsRequired.h"
 #include <QCursor>
 #include <QDialog>
 #include <QLineEdit>
@@ -14,6 +21,7 @@ class DigitizeStateAbstractBase;
 class DlgValidatorAbstract;
 class DocumentModelCoords;
 class MainWindow;
+class MainWindowModel;
 class QDoubleValidator;
 class QVBoxLayout;
 class Transformation;
@@ -29,14 +37,17 @@ public:
   DlgEditPoint (MainWindow &mainWindow,
                 DigitizeStateAbstractBase &digitizeState,
                 const DocumentModelCoords &modelCoords,
+                const MainWindowModel &modelMainWindow,
                 const QCursor &cursorShape,
                 const Transformation &transformation,
+                DocumentAxesPointsRequired documentAxesPointsRequired,
+                bool isXOnly = false,
                 const double *xInitialValue = 0,
                 const double *yInitialValue = 0);
   ~DlgEditPoint ();
 
   /// Return the graph coordinates position specified by the user. Only applies if dialog was accepted
-  QPointF posGraph () const;
+  QPointF posGraph (bool &isXOnly) const;
 
 signals:
   /// Send a signal to trigger the setting of the override cursor.
@@ -50,7 +61,9 @@ private:
   void createOkCancel (QVBoxLayout *layoutOuter);
   void initializeGraphCoordinates (const double *xInitialValue,
                                    const double *yInitialValue,
-                                   const Transformation &transformation);
+                                   const Transformation &transformation,
+                                   bool isX,
+                                   bool isY);
   bool isCartesian () const;
   QChar nameXTheta () const;
   QChar nameYRadius () const;
@@ -65,7 +78,10 @@ private:
   QPushButton *m_btnOk;
   QPushButton *m_btnCancel;
 
+  DocumentAxesPointsRequired m_documentAxesPointsRequired;
+
   const DocumentModelCoords &m_modelCoords;
+  const MainWindowModel &m_modelMainWindow;
 };
 
 #endif // DLG_EDIT_POINT_H

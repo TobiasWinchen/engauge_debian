@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DLG_SETTINGS_COORDS_H
 #define DLG_SETTINGS_COORDS_H
 
@@ -27,6 +33,7 @@ public:
   DlgSettingsCoords(MainWindow &mainWindow);
   virtual ~DlgSettingsCoords();
 
+  virtual void createOptionalSaveDefault (QHBoxLayout *layout);
   virtual QWidget *createSubPanel ();
   virtual void load (CmdMediator &cmdMediator);
 
@@ -76,6 +83,7 @@ private:
                                CoordUnitsPolarTheta coordUnits);
   void resetSceneRectangle();
   void updateControls();
+  void updateCoordUnits();
   void updatePreview();
 
   QGroupBox *m_boxCoordsType;

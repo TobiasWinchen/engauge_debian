@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "Curve.h"
 #include "CurvesGraphs.h"
 #include "CurveStyle.h"
@@ -17,7 +23,6 @@
 #include "Xml.h"
 
 const QString AXIS_CURVE_NAME ("Axes");
-const int AXIS_CURVE_ORDINAL = 0;
 const QString DEFAULT_GRAPH_CURVE_NAME ("Curve1");
 const QString DUMMY_CURVE_NAME ("dummy");
 const QString TAB_DELIMITER ("\t");
@@ -84,7 +89,8 @@ Curve::Curve (QDataStream &str)
       Point point (m_curveName,
                    QPointF (xScreen, yScreen),
                    QPointF (xGraph, yGraph),
-                   ordinal++);
+                   ordinal++,
+                   false);
 
       addPoint(point);
     } else {
@@ -216,6 +222,23 @@ void Curve::exportToClipboard (const QHash<QString, bool> &selectedHash,
   }
 }
 
+bool Curve::isXOnly(const QString &pointIdentifier) const
+{
+  // Search for point with matching identifier
+  Points::const_iterator itr;
+  for (itr = m_points.begin (); itr != m_points.end (); itr++) {
+    const Point &point = *itr;
+    if (pointIdentifier == point.identifier ()) {
+      return point.isXOnly();
+      break;
+    }
+  }
+
+  ENGAUGE_ASSERT (false);
+
+  return false;
+}
+
 void Curve::iterateThroughCurvePoints (const Functor2wRet<const QString &, const Point&, CallbackSearchReturn> &ftorWithCallback) const
 {
   QList<Point>::const_iterator itr;
@@ -282,7 +305,7 @@ void Curve::loadCurvePoints(QXmlStreamReader &reader)
   }
 
   if (!success) {
-    reader.raiseError("Cannot read curve data");
+    reader.raiseError(QObject::tr ("Cannot read curve data"));
   }
 }
 
@@ -334,7 +357,7 @@ void Curve::loadXml(QXmlStreamReader &reader)
   }
 
   if (!success) {
-    reader.raiseError ("Cannot read curve data");
+    reader.raiseError (QObject::tr ("Cannot read curve data"));
   }
 }
 
@@ -444,7 +467,8 @@ void Curve::saveXml(QXmlStreamWriter &writer) const
 
   writer.writeStartElement(DOCUMENT_SERIALIZE_CURVE);
   writer.writeAttribute(DOCUMENT_SERIALIZE_CURVE_NAME, m_curveName);
-  m_colorFilterSettings.saveXml (writer);
+  m_colorFilterSettings.saveXml (writer,
+                                 m_curveName);
   m_curveStyle.saveXml (writer,
                         m_curveName);
 
@@ -468,6 +492,13 @@ void Curve::setColorFilterSettings (const ColorFilterSettings &colorFilterSettin
 void Curve::setCurveName (const QString &curveName)
 {
   m_curveName = curveName;
+
+  // Pass to member objects
+  QList<Point>::iterator itr;
+  for (itr = m_points.begin(); itr != m_points.end(); itr++) {
+    Point &point = *itr;
+    point.setCurveName (curveName);
+  }
 }
 
 void Curve::setCurveStyle (const CurveStyle &curveStyle)

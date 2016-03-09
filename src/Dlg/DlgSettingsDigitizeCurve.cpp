@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
 #include "CmdSettingsDigitizeCurve.h"
 #include "CursorFactory.h"
@@ -32,7 +38,7 @@ const int LINE_WIDTH_MAX = 32;
 const int LINE_WIDTH_MIN = 1;
 
 DlgSettingsDigitizeCurve::DlgSettingsDigitizeCurve(MainWindow &mainWindow) :
-  DlgSettingsAbstractBase ("Digitize Curve",
+  DlgSettingsAbstractBase (tr ("Digitize Curve"),
                            "DlgSettingsDigitizeCurve",
                            mainWindow),
   m_scenePreview (0),
@@ -56,7 +62,7 @@ void DlgSettingsDigitizeCurve::createControls (QGridLayout *layout,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsDigitizeCurve::createControls";
 
-  m_boxCursor = new QGroupBox ("Cursor");
+  m_boxCursor = new QGroupBox (tr ("Cursor"));
   layout->addWidget (m_boxCursor, row++, 1, 1, 2);
 
   // Layout inside cursor group box
@@ -64,20 +70,20 @@ void DlgSettingsDigitizeCurve::createControls (QGridLayout *layout,
   m_boxCursor->setLayout (layoutCursor);
   int rowCursor = 0;
 
-  QLabel *labelCursorType = new QLabel("Type:");
+  QLabel *labelCursorType = new QLabel(tr ("Type:"));
   layoutCursor->addWidget (labelCursorType, rowCursor, 0);
 
-  m_btnStandard = new QRadioButton ("Standard cross");
+  m_btnStandard = new QRadioButton (tr ("Standard cross"));
   m_btnStandard->setWhatsThis (tr ("Selects the standard cross cursor"));
   layoutCursor->addWidget (m_btnStandard, rowCursor++, 1);
   connect (m_btnStandard, SIGNAL (toggled (bool)), this, SLOT (slotCursorStandard(bool)));
 
-  m_btnCustom = new QRadioButton ("Custom cross");
+  m_btnCustom = new QRadioButton (tr ("Custom cross"));
   m_btnCustom->setWhatsThis (tr ("Selects a custom cursor based on the settings selected below"));
   layoutCursor->addWidget (m_btnCustom, rowCursor++, 1);
   connect (m_btnCustom, SIGNAL (toggled (bool)), this, SLOT (slotCursorCustom(bool)));
 
-  QLabel *labelSize = new QLabel("Size (pixels):");
+  QLabel *labelSize = new QLabel(tr ("Size (pixels):"));
   layoutCursor->addWidget (labelSize, rowCursor, 0);
 
   m_cmbSize = new QComboBox;
@@ -90,7 +96,7 @@ void DlgSettingsDigitizeCurve::createControls (QGridLayout *layout,
   layoutCursor->addWidget (m_cmbSize, rowCursor++, 1);
   connect (m_cmbSize, SIGNAL (currentIndexChanged (const QString &)), this, SLOT (slotCursorSize (const QString &)));
 
-  QLabel *labelInnerRadius = new QLabel("Inner radius (pixels):");
+  QLabel *labelInnerRadius = new QLabel(tr ("Inner radius (pixels):"));
   layoutCursor->addWidget (labelInnerRadius, rowCursor, 0);
 
   m_spinInnerRadius = new QSpinBox;
@@ -99,7 +105,7 @@ void DlgSettingsDigitizeCurve::createControls (QGridLayout *layout,
   layoutCursor->addWidget (m_spinInnerRadius, rowCursor++, 1);
   connect (m_spinInnerRadius, SIGNAL (valueChanged(const QString &)), this, SLOT (slotCursorInnerRadius (const QString &)));
 
-  QLabel *labelLineWidth = new QLabel("Line width (pixels):");
+  QLabel *labelLineWidth = new QLabel(tr ("Line width (pixels):"));
   layoutCursor->addWidget (labelLineWidth, rowCursor, 0);
 
   m_spinLineWidth = new QSpinBox;
@@ -109,12 +115,16 @@ void DlgSettingsDigitizeCurve::createControls (QGridLayout *layout,
   connect (m_spinLineWidth, SIGNAL (valueChanged(const QString &)), this, SLOT (slotCursorLineWidth (const QString &)));
 }
 
+void DlgSettingsDigitizeCurve::createOptionalSaveDefault (QHBoxLayout * /* layout */)
+{
+}
+
 void DlgSettingsDigitizeCurve::createPreview (QGridLayout *layout,
                                          int &row)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsDigitizeCurve::createPreview";
 
-  QLabel *labelPreview = new QLabel ("Preview");
+  QLabel *labelPreview = new QLabel (tr ("Preview"));
   layout->addWidget (labelPreview, row++, 0, 1, 4);
 
   m_scenePreview = new QGraphicsScene (this);

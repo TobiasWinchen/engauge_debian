@@ -1,0 +1,8 @@
+digit*.msi
+digit*.zip
+*.wixobj
+digit*.wixpdb
+engauge*.wixpdb
+staging
+Engauge Digitizer
+build_msi_and_zip~

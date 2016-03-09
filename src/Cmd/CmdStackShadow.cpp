@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdAbstract.h"
 #include "CmdFactory.h"
 #include "CmdMediator.h"
@@ -60,7 +66,7 @@ void CmdStackShadow::slotRedo ()
     m_cmdList.pop_front();
 
     if (m_mainWindow != 0) {
-       m_mainWindow->cmdMediator().push(cmd);
+       m_mainWindow->cmdMediator()->push(cmd);
     }
   }
 }

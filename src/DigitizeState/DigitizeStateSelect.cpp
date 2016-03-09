@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
 #include "CmdMoveBy.h"
 #include "DataKey.h"
@@ -12,12 +18,13 @@
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QImage>
+#include <QObject>
 #include <QtToString.h>
 
-const QString MOVE_TEXT_DOWN ("Move down");
-const QString MOVE_TEXT_LEFT ("Move left");
-const QString MOVE_TEXT_RIGHT ("Move right");
-const QString MOVE_TEXT_UP ("Move up");
+const QString MOVE_TEXT_DOWN (QObject::tr ("Move down"));
+const QString MOVE_TEXT_LEFT (QObject::tr ("Move left"));
+const QString MOVE_TEXT_RIGHT (QObject::tr ("Move right"));
+const QString MOVE_TEXT_UP (QObject::tr ("Move up"));
 
 DigitizeStateSelect::DigitizeStateSelect (DigitizeStateContext &context) :
   DigitizeStateAbstractBase (context)
@@ -33,18 +40,19 @@ QString DigitizeStateSelect::activeCurve () const
   return context().mainWindow().selectedGraphCurve();
 }
 
-void DigitizeStateSelect::begin (DigitizeState /* previousState */)
+void DigitizeStateSelect::begin (CmdMediator *cmdMediator,
+                                 DigitizeState /* previousState */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::begin";
 
-  setCursor();
+  setCursor(cmdMediator);
   context().setDragMode(QGraphicsView::RubberBandDrag);
 
   setCursorForPoints ();
   context().mainWindow().updateViewsOfSettings(activeCurve ());
 }
 
-QCursor DigitizeStateSelect::cursor() const
+QCursor DigitizeStateSelect::cursor(CmdMediator * /* cmdMediator */) const
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "DigitizeStateSelect::cursor";
 
@@ -58,12 +66,13 @@ void DigitizeStateSelect::end ()
   unsetCursorForPoints ();
 }
 
-void DigitizeStateSelect::handleCurveChange()
+void DigitizeStateSelect::handleCurveChange(CmdMediator * /* cmdMediator */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::handleCurveChange";
 }
 
-void DigitizeStateSelect::handleKeyPress (Qt::Key key,
+void DigitizeStateSelect::handleKeyPress (CmdMediator *cmdMediator,
+                                          Qt::Key key,
                                           bool atLeastOneSelectedItem)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::handleKeyPress"
@@ -76,18 +85,21 @@ void DigitizeStateSelect::handleKeyPress (Qt::Key key,
       key == Qt::Key_Left ||
       key == Qt::Key_Right) {
 
-      keyPressArrow (key);
+      keyPressArrow (cmdMediator,
+                     key);
 
     }
   }
 }
 
-void DigitizeStateSelect::handleMouseMove (QPointF /* posScreen */)
+void DigitizeStateSelect::handleMouseMove (CmdMediator * /* cmdMediator */,
+                                           QPointF /* posScreen */)
 {
 //  LOG4CPP_DEBUG_S ((*mainCat)) << "DigitizeStateSelect::handleMouseMove";
 }
 
-void DigitizeStateSelect::handleMousePress (QPointF posScreen)
+void DigitizeStateSelect::handleMousePress (CmdMediator * /* cmdMediator */,
+                                            QPointF posScreen)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::handleMousePress"
                               << " posScreen=" << QPointFToString (posScreen).toLatin1 ().data ();
@@ -97,7 +109,8 @@ void DigitizeStateSelect::handleMousePress (QPointF posScreen)
   m_movingStart = posScreen;
 }
 
-void DigitizeStateSelect::handleMouseRelease (QPointF posScreen)
+void DigitizeStateSelect::handleMouseRelease (CmdMediator *cmdMediator,
+                                              QPointF posScreen)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::handleMouseRelease"
                               << " posScreen=" << QPointFToString (posScreen).toLatin1 ().data ();
@@ -115,11 +128,12 @@ void DigitizeStateSelect::handleMouseRelease (QPointF posScreen)
 
     // Create command to move points
     CmdMoveBy *cmd = new CmdMoveBy (context().mainWindow(),
-                                    context().cmdMediator().document(),
+                                    cmdMediator->document(),
                                     deltaScreen,
                                     moveText,
                                     positionHasChangedIdentifers);
-    context().appendNewCmd (cmd);
+    context().appendNewCmd (cmdMediator,
+                            cmd);
 
    } else {
 
@@ -129,7 +143,8 @@ void DigitizeStateSelect::handleMouseRelease (QPointF posScreen)
   }
 }
 
-void DigitizeStateSelect::keyPressArrow (Qt::Key key)
+void DigitizeStateSelect::keyPressArrow (CmdMediator *cmdMediator,
+                                         Qt::Key key)
 {
   QPointF deltaScreen;
   QString moveText;
@@ -160,11 +175,12 @@ void DigitizeStateSelect::keyPressArrow (Qt::Key key)
 
   // Create command to move points
   CmdMoveBy *cmd = new CmdMoveBy (context().mainWindow(),
-                                  context().cmdMediator ().document(),
+                                  cmdMediator->document(),
                                   deltaScreen,
                                   moveText,
                                   context().mainWindow().scene ().selectedPointIdentifiers ());
-  context().appendNewCmd (cmd);
+  context().appendNewCmd (cmdMediator,
+                          cmd);
 }
 
 QString DigitizeStateSelect::moveTextFromDeltaScreen (const QPointF &deltaScreen)
@@ -224,7 +240,8 @@ void DigitizeStateSelect::unsetCursorForPoints()
   }
 }
 
-void DigitizeStateSelect::updateModelDigitizeCurve (const DocumentModelDigitizeCurve & /*modelDigitizeCurve */)
+void DigitizeStateSelect::updateModelDigitizeCurve (CmdMediator * /* cmdMediator */,
+                                                    const DocumentModelDigitizeCurve & /*modelDigitizeCurve */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::updateModelDigitizeCurve";
 }

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DLG_SETTINGS_EXPORT_FORMAT_H
 #define DLG_SETTINGS_EXPORT_FORMAT_H
 
@@ -27,6 +33,7 @@ public:
   DlgSettingsExportFormat(MainWindow &mainWindow);
   virtual ~DlgSettingsExportFormat();
 
+  virtual void createOptionalSaveDefault (QHBoxLayout *layout);
   virtual QWidget *createSubPanel ();
   virtual void load (CmdMediator &cmdMediator);
 
@@ -53,6 +60,7 @@ private slots:
   void slotRelationsPointsEvenlySpacedInterval(const QString &);
   void slotRelationsPointsEvenlySpacedIntervalUnits(const QString &);
   void slotRelationsPointsRaw();
+  void slotSaveDefault();
   void slotTabChanged (int);
   void slotXLabel (const QString &);
 
@@ -115,6 +123,8 @@ private:
   QLineEdit *m_editXLabel;
 
   QTextEdit *m_editPreview;
+
+  QPushButton *m_btnSaveDefault;
 
   DocumentModelExportFormat *m_modelExportBefore;
   DocumentModelExportFormat *m_modelExportAfter;

@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CmdMediator.h"
 #include "CmdSettingsPointMatch.h"
 #include "DlgSettingsPointMatch.h"
@@ -20,7 +26,7 @@ const int POINT_SIZE_MAX = 1024;
 const int POINT_SIZE_MIN = 5;
 
 DlgSettingsPointMatch::DlgSettingsPointMatch(MainWindow &mainWindow) :
-  DlgSettingsAbstractBase ("Point Match",
+  DlgSettingsAbstractBase (tr ("Point Match"),
                            "DlgSettingsPointMatch",
                            mainWindow),
   m_scenePreview (0),
@@ -73,7 +79,7 @@ void DlgSettingsPointMatch::createControls (QGridLayout *layout,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsPointMatch::createControls";
 
-  QLabel *labelPointSize = new QLabel ("Maximum point size (pixels):");
+  QLabel *labelPointSize = new QLabel (tr ("Maximum point size (pixels):"));
   layout->addWidget (labelPointSize, row, 1);
 
   m_spinPointSize = new QSpinBox;
@@ -88,7 +94,7 @@ void DlgSettingsPointMatch::createControls (QGridLayout *layout,
   connect (m_spinPointSize, SIGNAL (valueChanged (int)), this, SLOT (slotMaxPointSize (int)));
   layout->addWidget (m_spinPointSize, row++, 2);
 
-  QLabel *labelAcceptedPointColor = new QLabel ("Accepted point color:");
+  QLabel *labelAcceptedPointColor = new QLabel (tr ("Accepted point color:"));
   layout->addWidget (labelAcceptedPointColor, row, 1);
 
   m_cmbAcceptedPointColor = new QComboBox;
@@ -97,7 +103,7 @@ void DlgSettingsPointMatch::createControls (QGridLayout *layout,
   connect (m_cmbAcceptedPointColor, SIGNAL (activated (const QString &)), this, SLOT (slotAcceptedPointColor (const QString &))); // activated() ignores code changes
   layout->addWidget (m_cmbAcceptedPointColor, row++, 2);
 
-  QLabel *labelRejectedPointColor = new QLabel ("Rejected point color:");
+  QLabel *labelRejectedPointColor = new QLabel (tr ("Rejected point color:"));
   layout->addWidget (labelRejectedPointColor, row, 1);
 
   m_cmbRejectedPointColor = new QComboBox;
@@ -106,7 +112,7 @@ void DlgSettingsPointMatch::createControls (QGridLayout *layout,
   connect (m_cmbRejectedPointColor, SIGNAL (activated (const QString &)), this, SLOT (slotRejectedPointColor (const QString &))); // activated() ignores code changes
   layout->addWidget (m_cmbRejectedPointColor, row++, 2);
 
-  QLabel *labelCandidatePointColor = new QLabel ("Candidate point color:");
+  QLabel *labelCandidatePointColor = new QLabel (tr ("Candidate point color:"));
   layout->addWidget (labelCandidatePointColor, row, 1);
 
   m_cmbCandidatePointColor = new QComboBox;
@@ -116,12 +122,16 @@ void DlgSettingsPointMatch::createControls (QGridLayout *layout,
   layout->addWidget (m_cmbCandidatePointColor, row++, 2);
 }
 
+void DlgSettingsPointMatch::createOptionalSaveDefault (QHBoxLayout * /* layout */)
+{
+}
+
 void DlgSettingsPointMatch::createPreview (QGridLayout *layout,
                                            int &row)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsPointMatch::createPreview";
 
-  QLabel *labelPreview = new QLabel ("Preview");
+  QLabel *labelPreview = new QLabel (tr ("Preview"));
   layout->addWidget (labelPreview, row++, 0, 1, 4);
 
   m_scenePreview = new QGraphicsScene (this);

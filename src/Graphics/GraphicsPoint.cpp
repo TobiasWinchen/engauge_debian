@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "CurveStyle.h"
 #include "DataKey.h"
 #include "EnumsToQt.h"
@@ -220,9 +226,9 @@ void GraphicsPoint::reset ()
 
 void GraphicsPoint::setData (int key, const QVariant &data)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsPoint::setData"
-                              << " key=" << dataKeyToString ((DataKey) key).toLatin1().data()
-                              << " data=" << data.toString().toLatin1().data();
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::setData"
+                               << " key=" << dataKeyToString ((DataKey) key).toLatin1().data()
+                               << " data=" << data.toString().toLatin1().data();
 
   if (m_graphicsItemEllipse == 0) {
     m_graphicsItemPolygon->setData (key, data);

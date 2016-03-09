@@ -1,7 +1,14 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "Logger.h"
 #include "Point.h"
+#include <QObject>
 #include <QStringList>
 #include <QTextStream>
 #include "QtToString.h"
@@ -13,7 +20,8 @@ unsigned int Point::m_identifierIndex = 0;
 
 extern const QString AXIS_CURVE_NAME;
 extern const QString DUMMY_CURVE_NAME;
-const QString POINT_IDENTIFIER_DELIMITER ("_");
+const QString POINT_IDENTIFIER_DELIMITER_SAFE ("\t"); // Character that could never be entered when editing curve names
+const QString POINT_IDENTIFIER_DELIMITER_XML ("_"); // From incoming xml that does not like tabs
 
 const double MISSING_ORDINAL_VALUE = 0;
 const double MISSING_POSGRAPH_VALUE = 0;
@@ -30,7 +38,8 @@ Point::Point(const QString &curveName,
   m_hasPosGraph (false),
   m_posGraph (MISSING_POSGRAPH_VALUE, MISSING_POSGRAPH_VALUE),
   m_hasOrdinal (false),
-  m_ordinal (MISSING_ORDINAL_VALUE)
+  m_ordinal (MISSING_ORDINAL_VALUE),
+  m_isXOnly (false)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Point::Point"
                               << " curveName=" << curveName.toLatin1().data()
@@ -42,14 +51,16 @@ Point::Point(const QString &curveName,
 
 Point::Point(const QString &curveName,
              const QPointF &posScreen,
-             const QPointF &posGraph) :
+             const QPointF &posGraph,
+             bool isXOnly) :
   m_isAxisPoint (true),
   m_identifier (uniqueIdentifierGenerator(curveName)),
   m_posScreen (posScreen),
   m_hasPosGraph (true),
   m_posGraph (posGraph),
   m_hasOrdinal (false),
-  m_ordinal (MISSING_ORDINAL_VALUE)
+  m_ordinal (MISSING_ORDINAL_VALUE),
+  m_isXOnly (isXOnly)
 {
   ENGAUGE_ASSERT (curveName == AXIS_CURVE_NAME ||
                   curveName == DUMMY_CURVE_NAME);
@@ -58,7 +69,8 @@ Point::Point(const QString &curveName,
                               << " curveName=" << curveName.toLatin1().data()
                               << " identifierGenerated=" << m_identifier.toLatin1().data()
                               << " posScreen=" << QPointFToString (posScreen).toLatin1().data()
-                              << " posGraph=" << QPointFToString (posGraph).toLatin1().data();
+                              << " posGraph=" << QPointFToString (posGraph).toLatin1().data()
+                              << " isXOnly=" << (isXOnly ? "true" : "false");
 
   ENGAUGE_ASSERT (!curveName.isEmpty ());
 }
@@ -67,14 +79,16 @@ Point::Point(const QString &curveName,
              const QString &identifier,
              const QPointF &posScreen,
              const QPointF &posGraph,
-             double ordinal) :
+             double ordinal,
+             bool isXOnly) :
   m_isAxisPoint (true),
   m_identifier (identifier),
   m_posScreen (posScreen),
   m_hasPosGraph (true),
   m_posGraph (posGraph),
   m_hasOrdinal (true),
-  m_ordinal (ordinal)
+  m_ordinal (ordinal),
+  m_isXOnly (isXOnly)
 {
   ENGAUGE_ASSERT (curveName == AXIS_CURVE_NAME);
 
@@ -83,7 +97,8 @@ Point::Point(const QString &curveName,
                               << " identifier=" << m_identifier.toLatin1().data()
                               << " posScreen=" << QPointFToString (posScreen).toLatin1().data()
                               << " posGraph=" << QPointFToString (posGraph).toLatin1().data()
-                              << " ordinal=" << ordinal;
+                              << " ordinal=" << ordinal
+                              << " isXOnly=" << (isXOnly ? "true" : "false");
 
   ENGAUGE_ASSERT (!curveName.isEmpty ());
 }
@@ -91,14 +106,16 @@ Point::Point(const QString &curveName,
 Point::Point(const QString &curveName,
              const QPointF &posScreen,
              const QPointF &posGraph,
-             double ordinal) :
+             double ordinal,
+             bool isXOnly) :
   m_isAxisPoint (true),
   m_identifier (uniqueIdentifierGenerator(curveName)),
   m_posScreen (posScreen),
   m_hasPosGraph (true),
   m_posGraph (posGraph),
   m_hasOrdinal (true),
-  m_ordinal (ordinal)
+  m_ordinal (ordinal),
+  m_isXOnly (isXOnly)
 {
   ENGAUGE_ASSERT (curveName == AXIS_CURVE_NAME);
 
@@ -107,7 +124,8 @@ Point::Point(const QString &curveName,
                               << " identifierGenerated=" << m_identifier.toLatin1().data()
                               << " posScreen=" << QPointFToString (posScreen).toLatin1().data()
                               << " posGraph=" << QPointFToString (posGraph).toLatin1().data()
-                              << " ordinal=" << ordinal;
+                              << " ordinal=" << ordinal
+                              << " isXOnly=" << (isXOnly ? "true" : "false");
 
   ENGAUGE_ASSERT (!curveName.isEmpty ());
 }
@@ -122,7 +140,8 @@ Point::Point(const QString &curveName,
   m_hasPosGraph (false),
   m_posGraph (MISSING_POSGRAPH_VALUE, MISSING_POSGRAPH_VALUE),
   m_hasOrdinal (true),
-  m_ordinal (ordinal)
+  m_ordinal (ordinal),
+  m_isXOnly (false)
 {
   ENGAUGE_ASSERT (curveName != AXIS_CURVE_NAME);
 
@@ -144,7 +163,8 @@ Point::Point (const QString &curveName,
   m_hasPosGraph (false),
   m_posGraph (MISSING_POSGRAPH_VALUE, MISSING_POSGRAPH_VALUE),
   m_hasOrdinal (true),
-  m_ordinal (ordinal)
+  m_ordinal (ordinal),
+  m_isXOnly (false)
 {
   ENGAUGE_ASSERT (curveName != AXIS_CURVE_NAME);
 
@@ -159,28 +179,6 @@ Point::Point (QXmlStreamReader &reader)
   loadXml(reader);
 }
 
-Point &Point::operator=(const Point &point)
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "Point::operator="
-                              << " isAxisPoint=" << (point.isAxisPoint() ? "true" : "false")
-                              << " identifier=" << point.identifier ().toLatin1().data()
-                              << " posScreen=" << QPointFToString (point.posScreen ()).toLatin1().data()
-                              << " hasPosGraph=" << (point.hasPosGraph() ? "true" : "false")
-                              << " posGraph=" << QPointFToString (point.posGraph (SKIP_HAS_CHECK)).toLatin1().data()
-                              << " hasOrdinal=" << (point.hasOrdinal() ? "true" : "false")
-                              << " ordinal=" << point.ordinal (SKIP_HAS_CHECK);
-
-  m_isAxisPoint = point.isAxisPoint ();
-  m_identifier = point.identifier ();
-  m_posScreen = point.posScreen ();
-  m_hasPosGraph = point.hasPosGraph ();
-  m_posGraph = point.posGraph (SKIP_HAS_CHECK);
-  m_hasOrdinal = point.hasOrdinal ();
-  m_ordinal = point.ordinal (SKIP_HAS_CHECK);
-
-  return *this;
-}
-
 Point::Point (const Point &other)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Point::Point(const Point &other)"
@@ -190,7 +188,8 @@ Point::Point (const Point &other)
                               << " hasPosGraph=" << (other.hasPosGraph() ? "true" : "false")
                               << " posGraph=" << QPointFToString (other.posGraph (SKIP_HAS_CHECK)).toLatin1().data()
                               << " hasOrdinal=" << (other.hasOrdinal() ? "true" : "false")
-                              << " ordinal=" << other.ordinal (SKIP_HAS_CHECK);
+                              << " ordinal=" << other.ordinal (SKIP_HAS_CHECK)
+                              << " isXOnly=" << other.isXOnly ();
 
   m_isAxisPoint = other.isAxisPoint ();
   m_identifier = other.identifier ();
@@ -199,11 +198,48 @@ Point::Point (const Point &other)
   m_posGraph = other.posGraph (SKIP_HAS_CHECK);
   m_hasOrdinal = other.hasOrdinal ();
   m_ordinal = other.ordinal (SKIP_HAS_CHECK);
+  m_isXOnly = other.isXOnly ();
+}
+
+Point &Point::operator=(const Point &point)
+{
+  LOG4CPP_DEBUG_S ((*mainCat)) << "Point::operator="
+                               << " isAxisPoint=" << (point.isAxisPoint() ? "true" : "false")
+                               << " identifier=" << point.identifier ().toLatin1().data()
+                               << " posScreen=" << QPointFToString (point.posScreen ()).toLatin1().data()
+                               << " hasPosGraph=" << (point.hasPosGraph() ? "true" : "false")
+                               << " posGraph=" << QPointFToString (point.posGraph (SKIP_HAS_CHECK)).toLatin1().data()
+                               << " hasOrdinal=" << (point.hasOrdinal() ? "true" : "false")
+                               << " ordinal=" << point.ordinal (SKIP_HAS_CHECK);
+
+  m_isAxisPoint = point.isAxisPoint ();
+  m_identifier = point.identifier ();
+  m_posScreen = point.posScreen ();
+  m_hasPosGraph = point.hasPosGraph ();
+  m_posGraph = point.posGraph (SKIP_HAS_CHECK);
+  m_hasOrdinal = point.hasOrdinal ();
+  m_ordinal = point.ordinal (SKIP_HAS_CHECK);
+  m_isXOnly = point.isXOnly ();
+
+  return *this;
 }
 
 QString Point::curveNameFromPointIdentifier (const QString &pointIdentifier)
 {
-  QStringList tokens = pointIdentifier.split (POINT_IDENTIFIER_DELIMITER);
+  QStringList tokens;
+
+  if (pointIdentifier.contains (POINT_IDENTIFIER_DELIMITER_SAFE)) {
+
+    tokens = pointIdentifier.split (POINT_IDENTIFIER_DELIMITER_SAFE);
+
+  } else {
+
+    // Yes, this is a hack - underscores could have been inserted by user (in the curve name) and/or this source code,
+    // but there are many dig files laying around that have underscores so we need to support them
+    tokens = pointIdentifier.split (POINT_IDENTIFIER_DELIMITER_XML);
+
+  }
+
   return tokens.value (0);
 }
 
@@ -235,6 +271,11 @@ bool Point::isAxisPoint() const
   return m_isAxisPoint;
 }
 
+bool Point::isXOnly() const
+{
+  return m_isXOnly;
+}
+
 void Point::loadXml(QXmlStreamReader &reader)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Point::loadXml";
@@ -243,6 +284,8 @@ void Point::loadXml(QXmlStreamReader &reader)
 
   QXmlStreamAttributes attributes = reader.attributes();
 
+  // Note that DOCUMENT_SERIALIZE_POINT_IS_X_ONLY is optional since it is not used in Version 6
+  // but is used in Version 7
   if (attributes.hasAttribute(DOCUMENT_SERIALIZE_POINT_IDENTIFIER) &&
       attributes.hasAttribute(DOCUMENT_SERIALIZE_POINT_IDENTIFIER_INDEX) &&
       attributes.hasAttribute(DOCUMENT_SERIALIZE_POINT_IS_AXIS_POINT)) {
@@ -255,6 +298,10 @@ void Point::loadXml(QXmlStreamReader &reader)
     }
 
     QString isAxisPoint = attributes.value(DOCUMENT_SERIALIZE_POINT_IS_AXIS_POINT).toString();
+    QString isXOnly; // Default is anything but DOCUMENT_SERIALIZE_BOOL_TRUE
+    if (attributes.hasAttribute (DOCUMENT_SERIALIZE_POINT_IS_X_ONLY)) {
+      isXOnly = attributes.value(DOCUMENT_SERIALIZE_POINT_IS_X_ONLY).toString();
+    }
 
     m_identifier = attributes.value(DOCUMENT_SERIALIZE_POINT_IDENTIFIER).toString();
     m_identifierIndex = attributes.value(DOCUMENT_SERIALIZE_POINT_IDENTIFIER_INDEX).toInt();
@@ -262,6 +309,7 @@ void Point::loadXml(QXmlStreamReader &reader)
     m_hasPosGraph = false;
     m_posGraph.setX (MISSING_POSGRAPH_VALUE);
     m_posGraph.setY (MISSING_POSGRAPH_VALUE);
+    m_isXOnly = (isXOnly == DOCUMENT_SERIALIZE_BOOL_TRUE);
 
     while ((reader.tokenType() != QXmlStreamReader::EndElement) ||
            (reader.name () != DOCUMENT_SERIALIZE_POINT)) {
@@ -319,7 +367,7 @@ void Point::loadXml(QXmlStreamReader &reader)
   }
 
   if (!success) {
-    reader.raiseError("Cannot read point data");
+    reader.raiseError(QObject::tr ("Cannot read point data"));
   }
 }
 
@@ -380,6 +428,8 @@ void Point::saveXml(QXmlStreamWriter &writer) const
   }
   writer.writeAttribute(DOCUMENT_SERIALIZE_POINT_IS_AXIS_POINT,
                         m_isAxisPoint ? DOCUMENT_SERIALIZE_BOOL_TRUE : DOCUMENT_SERIALIZE_BOOL_FALSE);
+  writer.writeAttribute(DOCUMENT_SERIALIZE_POINT_IS_X_ONLY,
+                        m_isXOnly ? DOCUMENT_SERIALIZE_BOOL_TRUE : DOCUMENT_SERIALIZE_BOOL_FALSE);
 
   // Variable m_identifierIndex is static, but for simplicity this is handled like other values. Those values are all
   // the same, but simplicity wins over a few extra bytes of storage
@@ -398,6 +448,13 @@ void Point::saveXml(QXmlStreamWriter &writer) const
   }
 
   writer.writeEndElement();
+}
+
+void Point::setCurveName(const QString &curveNameNew)
+{
+  // Replace the old curve name at the start of the string
+  QString curveNameOld = Point::curveNameFromPointIdentifier (m_identifier);
+  m_identifier = curveNameNew  + m_identifier.mid (curveNameOld.length());
 }
 
 void Point::setIdentifierIndex (unsigned int identifierIndex)
@@ -445,7 +502,7 @@ QString Point::temporaryPointIdentifier ()
 {
   return QString ("%1%2%3")
       .arg (AXIS_CURVE_NAME)
-      .arg (POINT_IDENTIFIER_DELIMITER)
+      .arg (POINT_IDENTIFIER_DELIMITER_SAFE)
       .arg (0);
 }
 
@@ -457,7 +514,7 @@ QString Point::uniqueIdentifierGenerator (const QString &curveName)
 
   return QString ("%1%2point%3%4")
       .arg (curveName)
-      .arg (POINT_IDENTIFIER_DELIMITER)
-      .arg (POINT_IDENTIFIER_DELIMITER)
+      .arg (POINT_IDENTIFIER_DELIMITER_SAFE)
+      .arg (POINT_IDENTIFIER_DELIMITER_SAFE)
       .arg (m_identifierIndex++);
 }

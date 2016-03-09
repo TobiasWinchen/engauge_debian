@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CMD_ADD_POINT_AXIS_H
 #define CMD_ADD_POINT_AXIS_H
 
@@ -15,7 +21,8 @@ class CmdAddPointAxis : public CmdAbstract
                   Document &document,
                   const QPointF &posScreen,
                   const QPointF &posGraph,
-                  double ordinal);
+                  double ordinal,
+                  bool isXOnly);
 
   /// Constructor for parsing error report file xml
   CmdAddPointAxis(MainWindow &mainWindow,
@@ -36,6 +43,7 @@ private:
   QPointF m_posGraph;
   QString m_identifierAdded; // Point that got added
   double m_ordinal;
+  bool m_isXOnly;
 };
 
 #endif // CMD_ADD_POINT_AXIS_H

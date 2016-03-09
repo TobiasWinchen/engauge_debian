@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef DOCUMENT_MODEL_COLOR_FILTER_H
 #define DOCUMENT_MODEL_COLOR_FILTER_H
 
@@ -8,7 +14,7 @@
 // Lookup-table by curve name
 typedef QHash<QString, ColorFilterSettings> ColorFilterSettingsList;
 
-class Document;
+class CoordSystem;
 class QTextStream;
 
 /// Model for DlgSettingsColorFilter and CmdSettingsColorFilter.
@@ -18,11 +24,11 @@ public:
   /// Default constructor.
   DocumentModelColorFilter();
 
-  /// Initial constructor from Document.
-  DocumentModelColorFilter(const Document &document);
-
   /// Copy constructor.
   DocumentModelColorFilter(const DocumentModelColorFilter &other);
+
+  /// Initial constructor from CoordSystem.
+  DocumentModelColorFilter(const CoordSystem &coordSystem);
 
   /// Assignment constructor.
   DocumentModelColorFilter &operator=(const DocumentModelColorFilter &other);

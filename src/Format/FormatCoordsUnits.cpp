@@ -1,8 +1,15 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #include "DocumentModelCoords.h"
 #include "FormatCoordsUnits.h"
 #include "FormatCoordsUnitsStrategyNonPolarTheta.h"
 #include "FormatCoordsUnitsStrategyPolarTheta.h"
 #include "Logger.h"
+#include "MainWindowModel.h"
 #include "Transformation.h"
 
 const bool IS_X_THETA = true;
@@ -16,6 +23,7 @@ FormatCoordsUnits::FormatCoordsUnits()
 void FormatCoordsUnits::formattedToUnformatted (const QString &xThetaFormatted,
                                                 const QString &yRadiusFormatted,
                                                 const DocumentModelCoords &modelCoords,
+                                                const MainWindowModel &mainWindowModel,
                                                 double &xThetaUnformatted,
                                                 double &yRadiusUnformatted) const
 {
@@ -27,10 +35,12 @@ void FormatCoordsUnits::formattedToUnformatted (const QString &xThetaFormatted,
   if (modelCoords.coordsType() == COORDS_TYPE_CARTESIAN) {
 
     xThetaUnformatted = formatNonPolarTheta.formattedToUnformatted (xThetaFormatted,
+                                                                    mainWindowModel.locale(),
                                                                     modelCoords.coordUnitsX(),
                                                                     modelCoords.coordUnitsDate(),
                                                                     modelCoords.coordUnitsTime());
     yRadiusUnformatted = formatNonPolarTheta.formattedToUnformatted (yRadiusFormatted,
+                                                                     mainWindowModel.locale(),
                                                                      modelCoords.coordUnitsY(),
                                                                      modelCoords.coordUnitsDate(),
                                                                      modelCoords.coordUnitsTime());
@@ -38,8 +48,10 @@ void FormatCoordsUnits::formattedToUnformatted (const QString &xThetaFormatted,
   } else {
 
     xThetaUnformatted = formatPolarTheta.formattedToUnformatted (xThetaFormatted,
+                                                                 mainWindowModel.locale(),
                                                                  modelCoords.coordUnitsTheta());
     yRadiusUnformatted = formatNonPolarTheta.formattedToUnformatted (yRadiusFormatted,
+                                                                     mainWindowModel.locale(),
                                                                      modelCoords.coordUnitsRadius(),
                                                                      modelCoords.coordUnitsDate(),
                                                                      modelCoords.coordUnitsTime());
@@ -50,6 +62,7 @@ void FormatCoordsUnits::formattedToUnformatted (const QString &xThetaFormatted,
 void FormatCoordsUnits::unformattedToFormatted (double xThetaUnformatted,
                                                 double yRadiusUnformatted,
                                                 const DocumentModelCoords &modelCoords,
+                                                const MainWindowModel &mainWindowModel,
                                                 QString &xThetaFormatted,
                                                 QString &yRadiusFormatted,
                                                 const Transformation &transformation) const
@@ -62,6 +75,7 @@ void FormatCoordsUnits::unformattedToFormatted (double xThetaUnformatted,
   if (modelCoords.coordsType() == COORDS_TYPE_CARTESIAN) {
 
     xThetaFormatted = formatNonPolarTheta.unformattedToFormatted (xThetaUnformatted,
+                                                                  mainWindowModel.locale(),
                                                                   modelCoords.coordUnitsX(),
                                                                   modelCoords.coordUnitsDate(),
                                                                   modelCoords.coordUnitsTime(),
@@ -69,6 +83,7 @@ void FormatCoordsUnits::unformattedToFormatted (double xThetaUnformatted,
                                                                   transformation,
                                                                   yRadiusUnformatted);
     yRadiusFormatted = formatNonPolarTheta.unformattedToFormatted (yRadiusUnformatted,
+                                                                   mainWindowModel.locale(),
                                                                    modelCoords.coordUnitsY(),
                                                                    modelCoords.coordUnitsDate(),
                                                                    modelCoords.coordUnitsTime(),
@@ -79,10 +94,12 @@ void FormatCoordsUnits::unformattedToFormatted (double xThetaUnformatted,
   } else {
     
     xThetaFormatted = formatPolarTheta.unformattedToFormatted (xThetaUnformatted,
+                                                               mainWindowModel.locale(),
                                                                modelCoords.coordUnitsTheta(),
                                                                transformation,
                                                                yRadiusUnformatted);
     yRadiusFormatted = formatNonPolarTheta.unformattedToFormatted (yRadiusUnformatted,
+                                                                   mainWindowModel.locale(),
                                                                    modelCoords.coordUnitsRadius(),
                                                                    modelCoords.coordUnitsDate(),
                                                                    modelCoords.coordUnitsTime(),

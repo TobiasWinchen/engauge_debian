@@ -1,3 +1,9 @@
+/******************************************************************************************************
+ * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
+ * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
+ * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
+ ******************************************************************************************************/
+
 #ifndef CURVE_NAME_LIST_ENTRY_H
 #define CURVE_NAME_LIST_ENTRY_H
 
@@ -20,6 +26,7 @@ class CurveNameListEntry
   CurveNameListEntry (const QString &curveNameCurrent,
                       const QString &curveNameOriginal,
                       int numPoints);
+
   /// Constructor for converting from QVariant.
   CurveNameListEntry (const QString &fromText);
 
@@ -40,9 +47,6 @@ class CurveNameListEntry
 
   /// Number of points in curve.
   int numPoints () const;
-
-  /// Serialize into stream
-  void saveXml(QXmlStreamWriter &writer) const;
 
   /// Set method for current curve name.
   void setCurveNameCurrent (const QString &curveNameCurrent);
