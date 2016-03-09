@@ -9,7 +9,7 @@ engauge-digitizer (7.0-1) unstable; urgency=medium
   * Updated licenses 
   * Added hardening flags 
 
- -- Tobias Winchen <tobias@winchen.de>  Wed, 09 Mar 2016 09:14:51 +0100
+ -- Tobias Winchen <tobias@winchen.de>  Wed, 09 Mar 2016 20:14:51 +0100
 
 engauge-digitizer (5.2-1) unstable; urgency=low
 
