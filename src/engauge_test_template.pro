@@ -252,6 +252,7 @@ HEADERS  += \
     Transformation/TransformationStateContext.h \
     Transformation/TransformationStateDefined.h \
     Transformation/TransformationStateUndefined.h \
+    Translator/TranslatorContainer.h \
     Tutorial/TutorialButton.h \
     Tutorial/TutorialButtonRect.h \
     Tutorial/TutorialButtonText.h \
@@ -502,6 +503,7 @@ SOURCES += \
     Transformation/TransformationStateContext.cpp \
     Transformation/TransformationStateDefined.cpp \
     Transformation/TransformationStateUndefined.cpp \
+    Translator/TranslatorContainer.cpp \
     Tutorial/TutorialButton.cpp \
     Tutorial/TutorialButtonRect.cpp \
     Tutorial/TutorialButtonText.cpp \
@@ -532,6 +534,10 @@ SOURCES += \
 TARGET = ../bin/TEST
 
 QT += core gui network printsupport testlib widgets xml help
+
+macx-* {
+LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
+}
 
 win32-g++* {
 CONFIG += windows
@@ -578,10 +584,16 @@ INCLUDEPATH += Background \
                StatusBar \
                Test \
                Transformation \
+               Translator \
                Tutorial \
                util \
                View \
                Zoom
+
+macx-* {
+INCLUDEPATH += $$(FFTW_HOME)/include \
+               $$(LOG4CPP_HOME)/include
+}
 
 win32-g++* {
 INCLUDEPATH += $$(FFTW_HOME)/include \
