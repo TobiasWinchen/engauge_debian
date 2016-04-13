@@ -1,8 +1,10 @@
 engauge-digitizer (7.2-2) unstable; urgency=medium
 
   * Changed build-depend from libpng12-dev to libpng-dev (Closes: #820864)
+  * Updated to standards version 3.9.8
+  * Updated homepage url
 
- -- Tobias Winchen <tobias@winchen.de>  Wed, 13 Apr 2016 13:10:50 +0200
+ -- Tobias Winchen <tobias@winchen.de>  Wed, 13 Apr 2016 20:12:13 +0200
 
 engauge-digitizer (7.2-1) unstable; urgency=medium
 
