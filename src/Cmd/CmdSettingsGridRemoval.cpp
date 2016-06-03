@@ -82,16 +82,20 @@ void CmdSettingsGridRemoval::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsGridRemoval::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
   mainWindow().updateSettingsGridRemoval(m_modelGridRemovalAfter);
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsGridRemoval::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsGridRemoval::cmdUndo";
 
+  saveOrCheckPostCommandDocumentStateHash (document ());
   mainWindow().updateSettingsGridRemoval(m_modelGridRemovalBefore);
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsGridRemoval::saveXml (QXmlStreamWriter &writer) const

@@ -5,6 +5,7 @@
  ******************************************************************************************************/
 
 #include "CallbackAddPointsInCurvesGraphs.h"
+#include "CallbackBoundingRects.h"
 #include "CallbackCheckAddPointAxis.h"
 #include "CallbackCheckEditPointAxis.h"
 #include "CallbackNextOrdinal.h"
@@ -16,6 +17,7 @@
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "EnumsToQt.h"
+#include "GridInitializer.h"
 #include <iostream>
 #include "Logger.h"
 #include "OrdinalGenerator.h"
@@ -26,6 +28,7 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QImage>
+#include <qmath.h>
 #include <QObject>
 #include <QtToString.h>
 #include <QXmlStreamReader>
@@ -39,6 +42,7 @@ const int FOUR_BYTES = 4;
 const int NOMINAL_COORD_SYSTEM_COUNT = 1;
 const int VERSION_6 = 6;
 const int VERSION_7 = 7;
+const int VERSION_8 = 8;
 
 Document::Document (const QImage &image) :
   m_name ("untitled"),
@@ -100,7 +104,8 @@ Document::Document (const QString &fileName) :
             break;
 
           case VERSION_7:
-            loadVersion7 (file);
+          case VERSION_8:
+            loadVersions7AndUp (file);
             break;
 
           default:
@@ -354,6 +359,36 @@ void Document::generateEmptyPixmap(const QXmlStreamAttributes &attributes)
   m_pixmap = QPixmap (width, height);
 }
 
+void Document::initializeGridDisplay (const Transformation &transformation)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "Document::initializeGridDisplay";
+
+  ENGAUGE_ASSERT (!m_coordSystemContext.modelGridDisplay().stable());
+
+  // Get graph coordinate bounds
+  CallbackBoundingRects ftor (transformation);
+
+  Functor2wRet<const QString &, const Point &, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
+                                                                                                     &CallbackBoundingRects::callback);
+
+  iterateThroughCurvePointsAxes (ftorWithCallback);
+
+  // Initialize. Note that if there are no graph points then these next steps have no effect
+  bool isEmpty;
+  QRectF boundingRectGraph =  ftor.boundingRectGraph(isEmpty);
+  if (!isEmpty) {
+
+    GridInitializer gridInitializer;
+
+    DocumentModelGridDisplay modelGridDisplay = gridInitializer.initializeWithWidePolarCoverage (boundingRectGraph,
+                                                                                                 modelCoords(),
+                                                                                                 transformation,
+                                                                                                 m_pixmap.size ());
+
+    m_coordSystemContext.setModelGridDisplay (modelGridDisplay);
+  }
+}
+
 bool Document::isXOnly (const QString &pointIdentifier) const
 {
   return m_coordSystemContext.isXOnly (pointIdentifier);
@@ -522,9 +557,9 @@ void Document::loadVersion6 (QFile *file)
   // There are already one axes curve and at least one graph curve so we do not need to add any more graph curves
 }
 
-void Document::loadVersion7 (QFile *file)
+void Document::loadVersions7AndUp (QFile *file)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "Document::loadVersion7";
+  LOG4CPP_INFO_S ((*mainCat)) << "Document::loadVersions7AndUp";
 
   const int ONE_COORDINATE_SYSTEM = 1;
 
@@ -576,8 +611,8 @@ void Document::loadVersion7 (QFile *file)
         if (tag == DOCUMENT_SERIALIZE_COORD_SYSTEM) {
           m_coordSystemContext.addCoordSystems (m_documentAxesPointsRequired,
                                                 ONE_COORDINATE_SYSTEM);
-          m_coordSystemContext.loadVersion7 (reader,
-                                             m_documentAxesPointsRequired);
+          m_coordSystemContext.loadVersions7AndUp (reader,
+                                                   m_documentAxesPointsRequired);
         } else if (tag == DOCUMENT_SERIALIZE_IMAGE) {
           // A standard Document file has DOCUMENT_SERIALIZE_IMAGE inside DOCUMENT_SERIALIZE_DOCUMENT, versus an error report file
           loadImage(reader);
@@ -641,6 +676,13 @@ DocumentModelGeneral Document::modelGeneral() const
   LOG4CPP_DEBUG_S ((*mainCat)) << "Document::modelGeneral";
 
   return m_coordSystemContext.modelGeneral();
+}
+
+DocumentModelGridDisplay Document::modelGridDisplay() const
+{
+  LOG4CPP_DEBUG_S ((*mainCat)) << "Document::modelGridDisplay";
+
+  return m_coordSystemContext.modelGridDisplay();
 }
 
 DocumentModelGridRemoval Document::modelGridRemoval() const
@@ -774,6 +816,11 @@ void Document::saveXml (QXmlStreamWriter &writer) const
   m_coordSystemContext.saveXml (writer);
 }
 
+QString Document::selectedCurveName() const
+{
+  return m_coordSystemContext.selectedCurveName();
+}
+
 void Document::setCoordSystemIndex(CoordSystemIndex coordSystemIndex)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Document::setCoordSystemIndex";
@@ -781,20 +828,18 @@ void Document::setCoordSystemIndex(CoordSystemIndex coordSystemIndex)
   m_coordSystemContext.setCoordSystemIndex (coordSystemIndex);
 }
 
+void Document::setCurveAxes (const Curve &curveAxes)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "Document::setCurveAxes";
+
+  m_coordSystemContext.setCurveAxes (curveAxes);
+}
+
 void Document::setCurvesGraphs (const CurvesGraphs &curvesGraphs)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Document::setCurvesGraphs";
 
   m_coordSystemContext.setCurvesGraphs(curvesGraphs);
-}
-
-void Document::setCurvesGraphs (CoordSystemIndex coordSystemIndex,
-                                const CurvesGraphs &curvesGraphs)
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "Document::setCurvesGraphs";
-
-  m_coordSystemContext.setCurvesGraphs(coordSystemIndex,
-                                       curvesGraphs);
 }
 
 void Document::setDocumentAxesPointsRequired(DocumentAxesPointsRequired documentAxesPointsRequired)
@@ -874,6 +919,13 @@ void Document::setModelGeneral (const DocumentModelGeneral &modelGeneral)
   m_coordSystemContext.setModelGeneral(modelGeneral);
 }
 
+void Document::setModelGridDisplay(const DocumentModelGridDisplay &modelGridDisplay)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "Document::setModelGridDisplay";
+
+  m_coordSystemContext.setModelGridDisplay(modelGridDisplay);
+}
+
 void Document::setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "Document::setModelGridRemoval";
@@ -893,6 +945,11 @@ void Document::setModelSegments(const DocumentModelSegments &modelSegments)
   LOG4CPP_INFO_S ((*mainCat)) << "Document::setModelSegments";
 
   m_coordSystemContext.setModelSegments (modelSegments);
+}
+
+void Document::setSelectedCurveName(const QString &selectedCurveName)
+{
+  m_coordSystemContext.setSelectedCurveName (selectedCurveName);
 }
 
 bool Document::successfulRead () const

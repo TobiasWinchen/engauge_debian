@@ -82,16 +82,20 @@ void CmdSettingsColorFilter::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsColorFilter::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
   mainWindow().updateSettingsColorFilter(m_modelColorFilterAfter);
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsColorFilter::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsColorFilter::cmdUndo";
 
+  saveOrCheckPostCommandDocumentStateHash (document ());
   mainWindow().updateSettingsColorFilter(m_modelColorFilterBefore);
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsColorFilter::saveXml (QXmlStreamWriter &writer) const

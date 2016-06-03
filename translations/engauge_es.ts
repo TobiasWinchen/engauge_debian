@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" version="2.1">
 <context>
     <name>ChecklistGuide</name>
     <message>
@@ -300,10 +298,6 @@ Para ejecutar el Asistente de Guía Lista de verificación cuando se importa un 
         <location filename="../src/Dlg/DlgAbout.cpp" line="21"/>
         <source>&lt;/p&gt;&lt;p&gt;&amp;copy; 2014 Mark Mitchell&lt;/p&gt;&lt;p&gt;Engauge Digitizer is an open source tool for efficiently extracting accurate numeric data from images of graphs. The process may be considered as &quot;inverse graphing&quot;. When you &quot;engauge&quot; a document, you are converting pixels into numbers.&lt;/p&gt;&lt;p&gt;This is free software, and you are welcome to redistribute it under certain conditions according to the GNU General Public License Version 2,or (at your option) any later version.&lt;/p&gt;&lt;p&gt;Engauge Digitizer comes with ABSOLUTELY NO WARRANTY.&lt;/p&gt;&lt;p&gt;Read the included LICENSE file for details.&lt;/p&gt;&lt;p&gt;Engauge Digitizer Links&lt;p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;https://github.com/markummitchell/engauge-digitizer&apos;&gt;Project Home Page&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&apos;https://gitter.im/markummitchell/engauge-digitizer&apos;&gt;Gitter Forum&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;FFTW 3.X.X Links&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;http://www.fftw.org&apos;&gt;Project page&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenJPEG 2.X Links&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;http://www.openjpeg.org&apos;&gt;Project page&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</source>
         <translation>&lt;/p&gt;&lt;p&gt;&amp;copy; 2014 Mark Mitchell&lt;/p&gt;&lt;p&gt;Engauge Digitizer es una herramienta de código abierto para la extracción eficiente de datos numéricos exactos a partir de imágenes de gráficos. El proceso se puede considerar como &quot; gráficos inversa &quot; . Cuando &quot; Engauge &quot; un documento , que está convirtiendo píxeles en números. &lt; / P &gt; &lt; p &gt; Este es software libre , y usted es bienvenido a redistribuirlo bajo ciertas condiciones según la Versión Licencia Pública General de GNU 2 , o (a su elección) cualquier versión posterior .&lt;/p&gt;&lt;p&gt;Engauge Digitalizador viene con absolutamente ninguna garantía.&lt;/p&gt;&lt;p&gt;Leer el archivo de licencia incluido para más detalles.&lt;/p&gt;&lt;p&gt;Enlaces Engauge Digitalizador&lt;p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;https://github.com/markummitchell/engauge-digitizer&apos;&gt;Página de inicio del proyecto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&apos;https://gitter.im/markummitchell/engauge-digitizer&apos;&gt;Foro de Gitter&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Enlaces de FFTW 3.X.X&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;http://www.fftw.org&apos;&gt;Página del proyecto&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenJPEG 2.X Links&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;http://www.openjpeg.org&apos;&gt;Página del proyecto&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;/p&gt;&lt;p&gt;&amp;copy; 2014 Mark Mitchell&lt;/p&gt;&lt;p&gt;Engauge Digitizer is an open source tool for efficiently extracting accurate numeric data from images of graphs. The process may be considered as &quot;inverse graphing&quot;. When you &quot;engauge&quot; a document, you are converting pixels into numbers.&lt;/p&gt;&lt;p&gt;This is free software, and you are welcome to redistribute it under certain conditions according to the GNU General Public License Version 2,or (at your option) any later version.&lt;/p&gt;&lt;p&gt;Engauge Digitizer comes with ABSOLUTELY NO WARRANTY.&lt;/p&gt;&lt;p&gt;Read the included LICENSE file for details.&lt;/p&gt;&lt;p&gt;Engauge Digitizer Links&lt;p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;https://github.com/markummitchell/engauge-digitizer&apos;&gt;Project Home Page&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&apos;https://gitter.im/markummitchell/engauge-digitizer&apos;&gt;Gitter Forum&lt;a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;FFTW 3.X.X Links&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;http://www.fftw.org&apos;&gt;Project page&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenJPEG 2.X Links&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&apos;http://www.openjpeg.org&apos;&gt;Project page&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</source>
-        <translation type="vanished">&lt;/P&gt;&lt;p&gt; &amp;copy; 2014 Mark Mitchell &lt;/p&gt;&lt;p&gt; Engauge Digitizer es una herramienta de código abierto para la extracción eficiente de datos numéricos exactos a partir de imágenes de gráficos. El proceso se puede considerar como &quot; gráficos inversa &quot; . Cuando &quot; Engauge &quot; un documento , que está convirtiendo píxeles en números. &lt;/P&gt;&lt;p&gt; Este es software libre , y usted es bienvenido a redistribuirlo bajo ciertas condiciones según la Versión Licencia Pública General de GNU 2 , o (a su elección) cualquier versión posterior . &lt;/p&gt;&lt;p&gt; Engauge Digitizer viene con absolutamente ninguna garantía. &lt;/p&gt;&lt;p&gt; Leer el archivo de licencia incluido para más detalles. &lt;/p&gt;&lt;p&gt; Engauge Digitizer Enlaces &lt;p&gt;&lt;ul&gt;&lt;li&gt; &lt;a href=&apos;https://github.com/markummitchell/engauge-digitizer&apos;&gt; Proyecto Página &lt;/a&gt; &lt;/li&gt; &lt;li&gt; &lt;a href=&apos;https://gitter.im/markummitchell/engauge-digitizer&apos;&gt;Gitter Foro&lt;/a&gt; &lt;/li&gt;&lt;/ul&gt;&lt;p&gt; FFTW 3.XX Enlaces &lt;/p&gt; &lt; ul &gt; &lt;li&gt; &lt;a href=&apos;http:// www.fftw.org&apos;&gt; página del proyecto &lt;/a&gt; &lt;/li&gt; &lt;/ul&gt; &lt;p&gt; OpenJPEG 2.X Enlaces &lt;/p&gt; &lt;ul&gt; &lt;li&gt; &lt;a href=&apos;http://www.openjpeg.org&apos;&gt; página del proyecto &lt;/a&gt; &lt;/li&gt; &lt;/ul&gt;</translation>
     </message>
 </context>
 <context>
@@ -1782,14 +1776,6 @@ The locale determines how numbers are formatted. Specifically, either commas or 
 Seleccione la configuración regional que se utiliza en los números (inmediatamente ) , y el idioma de la interfaz de usuario ( después de reiniciar ) .
 
 La configuración regional determina cómo se formatean los números . En concreto , comas o por períodos serán utilizados como delimitadores de grupo en cada número introducido por el usuario, que aparece en la interfaz de usuario , o exportar a un archivo .</translation>
-    </message>
-    <message>
-        <source>Locale
-
-Select the locale that will be used when converting between numbers and strings. This affects the use of commas or periods as group delimiters in each number entered by the user, displayed in the user interface, or exported to a file.</source>
-        <translation type="vanished">Lugar
-
-Seleccione la configuración regional que se utiliza cuando la conversión entre números y cadenas . Esto afecta el uso de comas o puntos como delimitadores de grupo en cada número introducido por el usuario, que aparece en la interfaz de usuario , o exportar a un archivo .</translation>
     </message>
     <message>
         <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="112"/>
@@ -3802,10 +3788,6 @@ Do you want to save your changes?</source>
         <translation>No pueden leer datos curvas del gráfico</translation>
     </message>
     <message>
-        <source>Application</source>
-        <translation type="vanished">Aplicación</translation>
-    </message>
-    <message>
         <location filename="../src/DigitizeState/DigitizeStateAxis.cpp" line="112"/>
         <location filename="../src/DigitizeState/DigitizeStateAxis.cpp" line="154"/>
         <source>Engauge Digitizer</source>
@@ -4090,30 +4072,6 @@ Do you want to save your changes?</source>
         <translation>Anterior</translation>
     </message>
     <message>
-        <source>Axis Point Tool</source>
-        <translation type="vanished">Herramienta Puntos de eje</translation>
-    </message>
-    <message>
-        <source>Color Picker Tool</source>
-        <translation type="vanished">Herramienta Selector de color</translation>
-    </message>
-    <message>
-        <source>Curve Point Tool</source>
-        <translation type="vanished">Herramienta Curva punto</translation>
-    </message>
-    <message>
-        <source>Point Match Tool</source>
-        <translation type="vanished">Herramienta de ajuste de punto</translation>
-    </message>
-    <message>
-        <source>Segment Fill Tool</source>
-        <translation type="vanished">Herramienta Relleno segmento</translation>
-    </message>
-    <message>
-        <source>Select Tool</source>
-        <translation type="vanished">Herramienta de selección</translation>
-    </message>
-    <message>
         <location filename="../src/main/MainWindowModel.cpp" line="65"/>
         <source>Cannot read main window data</source>
         <translation>No se puede leer los datos principales de la ventana</translation>
@@ -4240,7 +4198,7 @@ Haga clic en el botón de puntos del eje</translation>
         <source>Step 2 - Click on an axis or grid
 line with known coordinates. An axis
 point appears, with a dialog window
-for entering the axis point&apos;s
+for entering the axis point's
 coordinates</source>
         <translation>Paso 2 - Haga clic en un eje o rejilla
 de acuerdo con coordenadas conocidas . Un eje

@@ -22,9 +22,9 @@ CmdAddPointAxis::CmdAddPointAxis (MainWindow &mainWindow,
                                   const QPointF &posGraph,
                                   double ordinal,
                                   bool isXOnly) :
-  CmdAbstract (mainWindow,
-               document,
-               CMD_DESCRIPTION),
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      CMD_DESCRIPTION),
   m_posScreen (posScreen),
   m_posGraph (posGraph),
   m_ordinal (ordinal),
@@ -40,9 +40,9 @@ CmdAddPointAxis::CmdAddPointAxis (MainWindow &mainWindow,
                                   Document &document,
                                   const QString &cmdDescription,
                                   QXmlStreamReader &reader) :
-  CmdAbstract (mainWindow,
-               document,
-               cmdDescription)
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      cmdDescription)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdAddPointAxis::CmdAddPointAxis";
 
@@ -86,6 +86,8 @@ void CmdAddPointAxis::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdAddPointAxis::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
+  saveDocumentState (document ());
   document().addPointAxisWithGeneratedIdentifier (m_posScreen,
                                                   m_posGraph,
                                                   m_identifierAdded,
@@ -93,15 +95,17 @@ void CmdAddPointAxis::cmdRedo ()
                                                   m_isXOnly);
   document().updatePointOrdinals (mainWindow().transformation());
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdAddPointAxis::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdAddPointAxis::cmdUndo";
 
-  document().removePointAxis (m_identifierAdded);
-  document().updatePointOrdinals (mainWindow().transformation());
+  saveOrCheckPostCommandDocumentStateHash (document ());
+  restoreDocumentState (document ());
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdAddPointAxis::saveXml (QXmlStreamWriter &writer) const

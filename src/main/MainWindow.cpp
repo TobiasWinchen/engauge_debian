@@ -41,6 +41,7 @@
 #include "DlgSettingsDigitizeCurve.h"
 #include "DlgSettingsExportFormat.h"
 #include "DlgSettingsGeneral.h"
+#include "DlgSettingsGridDisplay.h"
 #include "DlgSettingsGridRemoval.h"
 #include "DlgSettingsMainWindow.h"
 #include "DlgSettingsPointMatch.h"
@@ -54,6 +55,7 @@
 #include "GraphicsItemType.h"
 #include "GraphicsScene.h"
 #include "GraphicsView.h"
+#include "GridLineFactory.h"
 #include "HelpWindow.h"
 #ifdef ENGAUGE_JPEG2000
 #include "Jpeg2000.h"
@@ -110,7 +112,7 @@
 const QString EMPTY_FILENAME ("");
 const char *ENGAUGE_FILENAME_DESCRIPTION = "Engauge Document";
 const QString ENGAUGE_FILENAME_EXTENSION ("dig");
-
+const int REGRESSION_INTERVAL = 400; // Milliseconds
 const unsigned int MAX_RECENT_FILE_LIST_SIZE = 8;
 
 MainWindow::MainWindow(const QString &errorReportFile,
@@ -134,10 +136,16 @@ MainWindow::MainWindow(const QString &errorReportFile,
   m_ghosts (0),
   m_timerRegressionErrorReport(0),
   m_fileCmdScript (0),
+  m_isRegressionTest (isRegressionTest),
   m_timerRegressionFileCmdScript(0)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::MainWindow"
                               << " curDir=" << QDir::currentPath().toLatin1().data();
+
+#ifdef OSX
+  qApp->setApplicationName ("Engauge Digitizer");
+  qApp->setOrganizationDomain ("Mark Mitchell");
+#endif
 
   LoggerUpload::bindToMainWindow(this);
 
@@ -163,6 +171,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
   createStateContextTransformation ();
   createSettingsDialogs ();
   createCommandStackShadow ();
+  createZoomMap ();
   updateControls ();
 
   settingsRead ();
@@ -173,7 +182,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
   if (!errorReportFile.isEmpty()) {
     loadErrorReportFile(initialPath,
                         errorReportFile);
-    if (isRegressionTest) {
+    if (m_isRegressionTest) {
       startRegressionTestErrorReport(initialPath,
                                      errorReportFile);
     }
@@ -195,57 +204,15 @@ MainWindow::~MainWindow()
 void MainWindow::applyZoomFactorAfterLoad()
 {
   ZoomFactor zoomFactor;
+  ZoomFactorInitial zoomFactorInitial = m_modelMainWindow.zoomFactorInitial();
 
-  switch (m_modelMainWindow.zoomFactorInitial())
-  {
-    case ZOOM_INITIAL_16_TO_1:
-      zoomFactor = ZOOM_16_TO_1;
-      break;
-
-    case ZOOM_INITIAL_8_TO_1:
-      zoomFactor = ZOOM_8_TO_1;
-      break;
-
-    case ZOOM_INITIAL_4_TO_1:
-      zoomFactor = ZOOM_4_TO_1;
-      break;
-
-    case ZOOM_INITIAL_2_TO_1:
-      zoomFactor = ZOOM_2_TO_1;
-      break;
-
-    case ZOOM_INITIAL_1_TO_1:
-      zoomFactor = ZOOM_1_TO_1;
-      break;
-
-    case ZOOM_INITIAL_1_TO_2:
-      zoomFactor = ZOOM_1_TO_2;
-      break;
-
-    case ZOOM_INITIAL_1_TO_4:
-      zoomFactor = ZOOM_1_TO_4;
-      break;
-
-    case ZOOM_INITIAL_1_TO_8:
-      zoomFactor = ZOOM_1_TO_8;
-      break;
-
-    case ZOOM_INITIAL_1_TO_16:
-      zoomFactor = ZOOM_1_TO_16;
-      break;
-
-    case ZOOM_INITIAL_FILL:
-      zoomFactor = ZOOM_FILL;
-      break;
-
-    case ZOOM_INITIAL_PREVIOUS:
-      zoomFactor = currentZoomFactor();
-      break;
-
-    default:
-      ENGAUGE_ASSERT (false);
-      zoomFactor = currentZoomFactor();
-      break;
+  if (m_zoomMap.contains (zoomFactorInitial)) {
+    zoomFactor = m_zoomMap [zoomFactorInitial];
+  } else if (zoomFactorInitial == ZOOM_INITIAL_PREVIOUS) {
+    zoomFactor = currentZoomFactor ();
+  } else {
+    ENGAUGE_ASSERT (false);
+    zoomFactor = currentZoomFactor();
   }
 
   slotViewZoom (zoomFactor);
@@ -488,12 +455,14 @@ void MainWindow::createActionsFile ()
                                   "Opens an existing document."));
   connect (m_actionOpen, SIGNAL (triggered ()), this, SLOT (slotFileOpen ()));
 
+#ifndef OSX
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     QAction *recentFileAction = new QAction (this);
     recentFileAction->setVisible (true);
     connect (recentFileAction, SIGNAL (triggered ()), this, SLOT (slotRecentFileAction ()));
     m_actionRecentFiles.append (recentFileAction);
   }
+#endif 
 
   m_actionClose = new QAction(tr ("&Close"), this);
   m_actionClose->setShortcut (QKeySequence::Close);
@@ -619,6 +588,13 @@ void MainWindow::createActionsSettings ()
                                                  "Axes checker can reveal any axis point mistakes, which are otherwise hard to find."));
   connect (m_actionSettingsAxesChecker, SIGNAL (triggered ()), this, SLOT (slotSettingsAxesChecker ()));
 
+  m_actionSettingsGridDisplay = new QAction (tr ("Grid Line Display..."), this);
+  m_actionSettingsGridDisplay->setStatusTip (tr ("Edit Grid Line Display settings."));
+  m_actionSettingsGridDisplay->setWhatsThis (tr ("Grid Line Display Settings\n\n"
+                                                 "Grid lines displayed on the graph can provide more accuracy than the Axis Checker, for distorted graphs. "
+                                                 "In a distorted graph, the grid lines can be used to adjust the axis points for more accuracy in different regions."));
+  connect (m_actionSettingsGridDisplay, SIGNAL (triggered ()), this, SLOT (slotSettingsGridDisplay ()));
+
   m_actionSettingsGridRemoval = new QAction (tr ("Grid Line Removal..."), this);
   m_actionSettingsGridRemoval->setStatusTip (tr ("Edit Grid Line Removal settings."));
   m_actionSettingsGridRemoval->setWhatsThis (tr ("Grid Line Removal Settings\n\n"
@@ -709,6 +685,15 @@ void MainWindow::createActionsView ()
   m_actionViewToolTips->setWhatsThis (tr ("View Tool Tips\n\n"
                                           "Show or hide the tool tips"));
   connect (m_actionViewToolTips, SIGNAL (triggered ()), this, SLOT (slotViewToolTips()));
+
+  m_actionViewGridLines = new QAction (tr ("Grid Lines"), this);
+  m_actionViewGridLines->setCheckable (true);
+  m_actionViewGridLines->setChecked (false);
+  m_actionViewGridLines->setStatusTip (tr ("Show or hide grid lines."));
+  m_actionViewGridLines->setWhatsThis (tr ("View Grid Lines\n\n"
+                                           "Show or hide grid lines that are added for accurate adjustments of the axes points, "
+                                           "which can improve accuracy in distorted graphs"));
+  connect (m_actionViewGridLines, SIGNAL (triggered ()), this, SLOT (slotViewGridLines()));
 
   m_actionViewBackgroundNone = new QAction (tr ("No Background"), this);
   m_actionViewBackgroundNone->setCheckable (true);
@@ -922,11 +907,13 @@ void MainWindow::createMenus()
   m_menuFile->addAction (m_actionImport);
   m_menuFile->addAction (m_actionImportAdvanced);
   m_menuFile->addAction (m_actionOpen);
+#ifndef OSX
   m_menuFileOpenRecent = new QMenu (tr ("Open &Recent"));
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     m_menuFileOpenRecent->addAction (m_actionRecentFiles.at (i));
   }
   m_menuFile->addMenu (m_menuFileOpenRecent);
+#endif
   m_menuFile->addAction (m_actionClose);
   m_menuFile->insertSeparator (m_actionSave);
   m_menuFile->addAction (m_actionSave);
@@ -966,6 +953,7 @@ void MainWindow::createMenus()
   m_menuView->addAction (m_actionViewCoordSystem);
   m_menuView->insertSeparator (m_actionViewToolTips);
   m_menuView->addAction (m_actionViewToolTips);
+  m_menuView->addAction (m_actionViewGridLines);
   m_menuView->insertSeparator (m_actionViewBackgroundNone);
   m_menuViewBackground = new QMenu (tr ("Background"));
   m_menuViewBackground->addAction (m_actionViewBackgroundNone);
@@ -1006,6 +994,7 @@ void MainWindow::createMenus()
   m_menuSettings->addAction (m_actionSettingsExport);
   m_menuSettings->addAction (m_actionSettingsColorFilter);
   m_menuSettings->addAction (m_actionSettingsAxesChecker);
+  m_menuSettings->addAction (m_actionSettingsGridDisplay);
   m_menuSettings->addAction (m_actionSettingsGridRemoval);
   m_menuSettings->addAction (m_actionSettingsPointMatch);
   m_menuSettings->addAction (m_actionSettingsSegments);
@@ -1042,6 +1031,7 @@ void MainWindow::createSettingsDialogs ()
   m_dlgSettingsExportFormat = new DlgSettingsExportFormat (*this);
   m_dlgSettingsColorFilter = new DlgSettingsColorFilter (*this);
   m_dlgSettingsAxesChecker = new DlgSettingsAxesChecker (*this);
+  m_dlgSettingsGridDisplay = new DlgSettingsGridDisplay (*this);
   m_dlgSettingsGridRemoval = new DlgSettingsGridRemoval (*this);
   m_dlgSettingsPointMatch = new DlgSettingsPointMatch (*this);
   m_dlgSettingsSegments = new DlgSettingsSegments (*this);
@@ -1055,6 +1045,7 @@ void MainWindow::createSettingsDialogs ()
   m_dlgSettingsExportFormat->setVisible (false);
   m_dlgSettingsColorFilter->setVisible (false);
   m_dlgSettingsAxesChecker->setVisible (false);
+  m_dlgSettingsGridDisplay->setVisible (false);
   m_dlgSettingsGridRemoval->setVisible (false);
   m_dlgSettingsPointMatch->setVisible (false);
   m_dlgSettingsSegments->setVisible (false);
@@ -1227,6 +1218,22 @@ void MainWindow::createTutorial ()
   m_tutorialDlg->hide();
 }
 
+void MainWindow::createZoomMap ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createZoomMap";
+
+  m_zoomMap [ZOOM_INITIAL_16_TO_1] = ZOOM_16_TO_1;
+  m_zoomMap [ZOOM_INITIAL_8_TO_1] = ZOOM_8_TO_1;
+  m_zoomMap [ZOOM_INITIAL_4_TO_1] = ZOOM_4_TO_1;
+  m_zoomMap [ZOOM_INITIAL_2_TO_1] = ZOOM_2_TO_1;
+  m_zoomMap [ZOOM_INITIAL_1_TO_1] = ZOOM_1_TO_1;
+  m_zoomMap [ZOOM_INITIAL_1_TO_2] = ZOOM_1_TO_2;
+  m_zoomMap [ZOOM_INITIAL_1_TO_4] = ZOOM_1_TO_4;
+  m_zoomMap [ZOOM_INITIAL_1_TO_8] = ZOOM_1_TO_8;
+  m_zoomMap [ZOOM_INITIAL_1_TO_16] = ZOOM_1_TO_16;
+  m_zoomMap [ZOOM_INITIAL_FILL] = ZOOM_FILL;
+}
+
 ZoomFactor MainWindow::currentZoomFactor () const
 {
   if (m_actionZoom1To1->isChecked()) {
@@ -1276,6 +1283,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
   return QObject::eventFilter (target, event);
 }
 
+#ifndef OSX
 void MainWindow::exportAllCoordinateSystems()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::exportAllCoordinateSystems";
@@ -1294,6 +1302,7 @@ void MainWindow::exportAllCoordinateSystems()
                 exportStrategy);
   }
 }
+#endif
 
 QString MainWindow::exportFilenameFromInputFilename (const QString &fileName) const
 {
@@ -1610,8 +1619,8 @@ void MainWindow::loadCurveListFromCmdMediator ()
     m_cmbCurve->addItem (curvesGraphName);
   }
 
-  // Arbitrarily pick the first curve
-  m_cmbCurve->setCurrentIndex (0);
+  // Select the curve that is associated with the current coordinate system
+  m_cmbCurve->setCurrentText (m_cmdMediator->selectedCurveName ());
 }
 
 void MainWindow::loadDocumentFile (const QString &fileName)
@@ -1647,6 +1656,7 @@ void MainWindow::loadDocumentFile (const QString &fileName)
     m_originalFile = fileName; // This is needed by updateAfterCommand below if an error report is generated
     m_originalFileWasImported = false;
 
+    updateGridLines ();
     updateAfterCommand (); // Enable Save button now that m_engaugeFile is set
 
   } else {
@@ -1761,8 +1771,7 @@ bool MainWindow::loadImage (const QString &fileName,
           CurvesGraphs curvesGraphs;
           wizard->populateCurvesGraphs (coordSystemIndex,
                                         curvesGraphs);
-          m_cmdMediator->document().setCurvesGraphs(coordSystemIndex,
-                                                    curvesGraphs);
+          m_cmdMediator->document().setCurvesGraphs(curvesGraphs);
         }
 
         // Unhide the checklist guide
@@ -1958,7 +1967,9 @@ void MainWindow::saveErrorReportFileAndExit (const char *context,
                                              int line,
                                              const char *comment) const
 {
-  if (m_cmdMediator != 0) {
+  // Skip if currently performing a regression test - in which case the preferred behavior is to let the current test fail and
+  // continue on to execute the remaining tests
+  if ((m_cmdMediator != 0) && !m_isRegressionTest) {
 
     QString report = saveErrorReportFileAndExitXml (context,
                                                     file,
@@ -2161,7 +2172,8 @@ void MainWindow::setPixmap (const QPixmap &pixmap)
   m_backgroundStateContext->setPixmap (m_transformation,
                                        m_cmdMediator->document().modelGridRemoval(),
                                        m_cmdMediator->document().modelColorFilter(),
-                                       pixmap);
+                                       pixmap,
+                                       m_cmbCurve->currentText());
 }
 
 void MainWindow::settingsRead ()
@@ -2541,6 +2553,7 @@ void MainWindow::slotCmbCurve(int /* index */)
                                               m_cmdMediator->document().modelColorFilter(),
                                               m_cmbCurve->currentText ());
   m_digitizeStateContext->handleCurveChange (m_cmdMediator);
+  m_cmdMediator->setSelectedCurveName (m_cmbCurve->currentText ()); // Save for next time current coordinate system returns
 
   updateViewedCurves();
   updateViewsOfSettings();
@@ -2716,6 +2729,7 @@ void MainWindow::slotFileClose()
     m_engaugeFile = "";
     setWindowTitle (engaugeWindowTitle ());
 
+    m_gridLines.clear();
     updateControls();
   }
 }
@@ -2730,6 +2744,8 @@ void MainWindow::slotFileExport ()
     QString filter = QString ("%1;;%2;;All files (*.*)")
                      .arg (exportStrategy.filterCsv ())
                      .arg (exportStrategy.filterTsv ());
+
+    // OSX sandbox requires, for the default, a non-empty filename
     QString defaultFileName = QString ("%1/%2.%3")
                               .arg (QDir::currentPath ())
                               .arg (m_currentFile)
@@ -2874,9 +2890,13 @@ bool MainWindow::slotFileSaveAs()
   filters << filterAll;
 
   QFileDialog dlg(this);
+  dlg.setFileMode (QFileDialog::AnyFile);
   dlg.selectNameFilter (filterDigitizer);
   dlg.setNameFilters (filters);
+#ifndef OSX
+  // Prevent hang in OSX
   dlg.setWindowModality(Qt::WindowModal);
+#endif
   dlg.setAcceptMode(QFileDialog::AcceptSave);
   dlg.selectFile(filenameDefault);
   if (dlg.exec()) {
@@ -3123,6 +3143,14 @@ void MainWindow::slotSettingsGeneral ()
   m_dlgSettingsGeneral->show ();
 }
 
+void MainWindow::slotSettingsGridDisplay()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSettingsGridDisplay";
+
+  m_dlgSettingsGridDisplay->load (*m_cmdMediator);
+  m_dlgSettingsGridDisplay->show ();
+}
+
 void MainWindow::slotSettingsGridRemoval ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSettingsGridRemoval";
@@ -3168,7 +3196,9 @@ void MainWindow::slotTimeoutRegressionErrorReport ()
 
   } else {
 
+#ifndef OSX
     exportAllCoordinateSystems ();
+#endif
 
     // Regression test has finished so exit. We unset the dirty flag so there is no prompt
     m_cmdMediator->setClean();
@@ -3190,7 +3220,9 @@ void MainWindow::slotTimeoutRegressionFileCmdScript ()
     // Script file might already have closed the Document so export only if last was not closed
     if (m_cmdMediator != 0) {
 
+#ifndef OSX
       exportAllCoordinateSystems ();
+#endif
 
       // We unset the dirty flag so there is no "Save changes?" prompt
       m_cmdMediator->setClean();
@@ -3212,6 +3244,13 @@ void MainWindow::slotUndoTextChanged (const QString &text)
     completeText += QString (" \"%1\"").arg (text);
   }
   m_actionEditUndo->setText (completeText);
+}
+
+void MainWindow::slotViewGridLines ()
+{
+  LOG4CPP_DEBUG_S ((*mainCat)) << "MainWindow::slotViewGridLines";
+
+  updateGridLines ();
 }
 
 void MainWindow::slotViewGroupBackground(QAction *action)
@@ -3555,8 +3594,13 @@ void MainWindow::slotViewZoomInFromWheelEvent ()
   if ((m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL) ||
       (m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)) {
 
+    // Anchor the zoom to the cursor position
+    m_view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
     // Forward this event
     slotViewZoomIn ();
+
+    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
   }
 }
 
@@ -3641,8 +3685,13 @@ void MainWindow::slotViewZoomOutFromWheelEvent ()
   if ((m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL) ||
       (m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)) {
 
+    // Anchor the zoom to the cursor position
+    m_view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
     // Forward this event
     slotViewZoomOut ();
+
+    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
   }
 }
 
@@ -3651,7 +3700,11 @@ void MainWindow::startRegressionTestErrorReport(const QString &initialPath,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::startRegressionTestErrorReport";
 
-  const int REGRESSION_INTERVAL = 400; // Milliseconds
+  // In order for point-deleting commands to work (CmdCut, CmdDelete) in the regression tests, we need to
+  // reset the Point identifier index here:
+  // 1) after loading of the file which has increased the index value to greater than 0
+  // 2) before running any commands since those commands implicitly assume the index is zero
+  Point::setIdentifierIndex(0);
 
   // Need absolute path since QDir::currentPath has been changed already so the
   // current path is not predictable
@@ -3672,8 +3725,6 @@ void MainWindow::startRegressionTestErrorReport(const QString &initialPath,
 void MainWindow::startRegressionTestFileCmdScript()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::startRegressionTestFileCmdScript";
-
-  const int REGRESSION_INTERVAL = 400; // Milliseconds
 
   m_timerRegressionFileCmdScript = new QTimer();
   m_timerRegressionFileCmdScript->setSingleShot(false);
@@ -3776,8 +3827,10 @@ void MainWindow::updateControls ()
 
   m_cmbBackground->setEnabled (!m_currentFile.isEmpty ());
 
+#ifndef OSX
   m_menuFileOpenRecent->setEnabled ((m_actionRecentFiles.count () > 0) &&
                                     (m_actionRecentFiles.at(0)->isVisible ())); // Need at least one visible recent file entry
+#endif
   m_actionClose->setEnabled (!m_currentFile.isEmpty ());
   m_actionSave->setEnabled (!m_currentFile.isEmpty ());
   m_actionSaveAs->setEnabled (!m_currentFile.isEmpty ());
@@ -3803,7 +3856,12 @@ void MainWindow::updateControls ()
   m_actionDigitizeColorPicker->setEnabled (!m_currentFile.isEmpty ());
   m_actionDigitizeSegment->setEnabled (!m_currentFile.isEmpty ());
   m_actionDigitizeSelect->setEnabled (!m_currentFile.isEmpty ());
-
+  if (m_transformation.transformIsDefined()) {
+    m_actionViewGridLines->setEnabled (true);
+  } else {
+    m_actionViewGridLines->setEnabled (false);
+    m_actionViewGridLines->setChecked (false);
+  }
   m_actionViewBackground->setEnabled (!m_currentFile.isEmpty());
   m_actionViewChecklistGuide->setEnabled (!m_dockChecklistGuide->browserIsEmpty());
   m_actionViewDigitize->setEnabled (!m_currentFile.isEmpty ());
@@ -3816,6 +3874,7 @@ void MainWindow::updateControls ()
   m_actionSettingsExport->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsColorFilter->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsAxesChecker->setEnabled (!m_currentFile.isEmpty ());
+  m_actionSettingsGridDisplay->setEnabled (!m_currentFile.isEmpty () && m_transformation.transformIsDefined());
   m_actionSettingsGridRemoval->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsPointMatch->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsSegments->setEnabled (!m_currentFile.isEmpty ());
@@ -3833,7 +3892,11 @@ void MainWindow::updateCoordSystem(CoordSystemIndex coordSystemIndex)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateCoordSystem";
 
+  // Set current curve in the Document and in the MainWindow combobox together so they are in sync. Setting
+  // the selected curve prevents a crash in updateTransformationAndItsDependencies
   m_cmdMediator->document().setCoordSystemIndex (coordSystemIndex);
+  loadCurveListFromCmdMediator ();
+
   updateTransformationAndItsDependencies(); // Transformation state may have changed
   updateSettingsAxesChecker(m_cmdMediator->document().modelAxesChecker()); // Axes checker dependes on transformation state
 
@@ -3896,10 +3959,28 @@ void MainWindow::updateGraphicsLinesToMatchGraphicsPoints()
                                                     m_transformation);
 }
 
+void MainWindow::updateGridLines ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateGridLines";
+
+  // Remove old grid lines
+  m_gridLines.clear ();
+
+  // Create new grid lines
+  GridLineFactory factory (*m_scene,
+                           m_cmdMediator->document().modelCoords(),
+                           m_transformation);
+  factory.createGridLinesForEvenlySpacedGrid (m_cmdMediator->document().modelGridDisplay(),
+                                              m_gridLines);
+
+  m_gridLines.setVisible (m_actionViewGridLines->isChecked());
+}
+
 void MainWindow::updateRecentFileList()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateRecentFileList";
 
+#ifndef OSX
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   QStringList recentFilePaths = settings.value(SETTINGS_RECENT_FILE_LIST).toStringList();
 
@@ -3922,6 +4003,7 @@ void MainWindow::updateRecentFileList()
   for (i = count; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     m_actionRecentFiles.at (i)->setVisible (false);
   }
+#endif
 }
 
 void MainWindow::updateSettingsAxesChecker(const DocumentModelAxesChecker &modelAxesChecker)
@@ -3949,7 +4031,8 @@ void MainWindow::updateSettingsColorFilter(const DocumentModelColorFilter &model
   m_cmdMediator->document().setModelColorFilter(modelColorFilter);
   m_backgroundStateContext->updateColorFilter (m_transformation,
                                                m_cmdMediator->document().modelGridRemoval(),
-                                               modelColorFilter);
+                                               modelColorFilter,
+                                               m_cmbCurve->currentText());
   m_digitizeStateContext->handleCurveChange (m_cmdMediator);
   updateViewsOfSettings();
 }
@@ -4000,6 +4083,13 @@ void MainWindow::updateSettingsGeneral(const DocumentModelGeneral &modelGeneral)
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateSettingsGeneral";
 
   m_cmdMediator->document().setModelGeneral(modelGeneral);
+}
+
+void MainWindow::updateSettingsGridDisplay(const DocumentModelGridDisplay &modelGridDisplay)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateSettingsGridDisplay";
+
+  m_cmdMediator->document().setModelGridDisplay(modelGridDisplay);
 }
 
 void MainWindow::updateSettingsGridRemoval(const DocumentModelGridRemoval &modelGridRemoval)
@@ -4058,11 +4148,15 @@ void MainWindow::updateTransformationAndItsDependencies()
                            *m_cmdMediator,
                            m_modelMainWindow);
 
-  // Grid removal is affected by new transformation
+  // Grid removal is affected by new transformation above
   m_backgroundStateContext->setCurveSelected (m_transformation,
                                               m_cmdMediator->document().modelGridRemoval(),
                                               m_cmdMediator->document().modelColorFilter(),
                                               m_cmbCurve->currentText ());
+
+  // Grid display is also affected by new transformation above, if there was a transition into defined state
+  // in which case that transition triggered the initialization of the grid display parameters
+  updateGridLines();
 }
 
 void MainWindow::updateViewedCurves ()

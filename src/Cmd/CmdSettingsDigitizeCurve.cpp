@@ -82,16 +82,20 @@ void CmdSettingsDigitizeCurve::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsDigitizeCurve::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
   mainWindow().updateSettingsDigitizeCurve(m_modelDigitizeCurveAfter);
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsDigitizeCurve::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsDigitizeCurve::cmdUndo";
 
+  saveOrCheckPostCommandDocumentStateHash (document ());
   mainWindow().updateSettingsDigitizeCurve(m_modelDigitizeCurveBefore);
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsDigitizeCurve::saveXml (QXmlStreamWriter &writer) const

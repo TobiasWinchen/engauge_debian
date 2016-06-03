@@ -31,6 +31,7 @@ HEADERS  += \
     Callback/CallbackBoundingRects.h \
     Callback/CallbackCheckAddPointAxis.h \
     Callback/CallbackCheckEditPointAxis.h \
+    Callback/CallbackDocumentHash.h \
     Callback/CallbackGatherXThetaValuesFunctions.h \
     Callback/CallbackNextOrdinal.h \
     Callback/CallbackPointOrdinal.h \
@@ -61,6 +62,8 @@ HEADERS  += \
     Cmd/CmdMediator.h \
     Cmd/CmdMoveBy.h \
     Cmd/CmdPaste.h \
+    Cmd/CmdPointChangeBase.h \
+    Cmd/CmdRedoForTest.h \
     Cmd/CmdSelectCoordSystem.h \
     Cmd/CmdSettingsAxesChecker.h \
     Cmd/CmdSettingsColorFilter.h \
@@ -70,16 +73,30 @@ HEADERS  += \
     Cmd/CmdSettingsDigitizeCurve.h \
     Cmd/CmdSettingsExportFormat.h \
     Cmd/CmdSettingsGeneral.h \
+    Cmd/CmdSettingsGridDisplay.h \
     Cmd/CmdSettingsGridRemoval.h \
     Cmd/CmdSettingsPointMatch.h \
     Cmd/CmdSettingsSegments.h \
     Cmd/CmdStackShadow.h \
+    Cmd/CmdUndoForTest.h \
     Color/ColorConstants.h \
     Color/ColorFilter.h \
     Color/ColorFilterEntry.h \
     Color/ColorFilterHistogram.h \
     Color/ColorFilterMode.h \
     Color/ColorFilterSettings.h \
+    Color/ColorFilterSettingsStrategyAbstractBase.h \
+    Color/ColorFilterSettingsStrategyForeground.h \
+    Color/ColorFilterSettingsStrategyHue.h \
+    Color/ColorFilterSettingsStrategyIntensity.h \
+    Color/ColorFilterSettingsStrategySaturation.h \
+    Color/ColorFilterSettingsStrategyValue.h \
+    Color/ColorFilterStrategyAbstractBase.h \
+    Color/ColorFilterStrategyForeground.h \
+    Color/ColorFilterStrategyHue.h \
+    Color/ColorFilterStrategyIntensity.h \
+    Color/ColorFilterStrategySaturation.h \
+    Color/ColorFilterStrategyValue.h \
     Color/ColorPalette.h \
     Coord/CoordScale.h \
     Coord/CoordsType.h \
@@ -130,6 +147,7 @@ HEADERS  += \
     Dlg/DlgSettingsDigitizeCurve.h \
     Dlg/DlgSettingsExportFormat.h \
     Dlg/DlgSettingsGeneral.h \
+    Dlg/DlgSettingsGridDisplay.h \
     Dlg/DlgSettingsGridRemoval.h \
     Dlg/DlgSettingsMainWindow.h \
     Dlg/DlgSettingsPointMatch.h \
@@ -141,6 +159,8 @@ HEADERS  += \
     Dlg/DlgValidatorNumber.h \
     Document/Document.h \
     Document/DocumentAxesPointsRequired.h \
+    Document/DocumentHash.h \
+    Document/DocumentHashGenerator.h \
     Document/DocumentModelAbstractBase.h \
     Document/DocumentModelAxesChecker.h \
     Document/DocumentModelColorFilter.h \
@@ -148,6 +168,7 @@ HEADERS  += \
     Document/DocumentModelDigitizeCurve.h \
     Document/DocumentModelExportFormat.h \
     Document/DocumentModelGeneral.h \
+    Document/DocumentModelGridDisplay.h \
     Document/DocumentModelGridRemoval.h \
     Document/DocumentModelPointMatch.h \
     Document/DocumentModelSegments.h \
@@ -209,6 +230,11 @@ HEADERS  += \
     Grid/GridClassifier.h \
     Grid/GridCoordDisable.h \
     Grid/GridHealer.h \
+    Grid/GridInitializer.h \
+    Grid/GridLine.h \
+    Grid/GridLineFactory.h \
+    Grid/GridLines.h \
+    Grid/GridLineStyle.h \
     Grid/GridRemoval.h \
     Help/HelpBrowser.h \
     Help/HelpWindow.h \
@@ -298,6 +324,7 @@ SOURCES += \
     Callback/CallbackBoundingRects.cpp \
     Callback/CallbackCheckAddPointAxis.cpp \
     Callback/CallbackCheckEditPointAxis.cpp \
+    Callback/CallbackDocumentHash.cpp \
     Callback/CallbackGatherXThetaValuesFunctions.cpp \
     Callback/CallbackNextOrdinal.cpp \
     Callback/CallbackPointOrdinal.cpp \
@@ -327,6 +354,8 @@ SOURCES += \
     Cmd/CmdMediator.cpp \
     Cmd/CmdMoveBy.cpp \
     Cmd/CmdPaste.cpp \
+    Cmd/CmdRedoForTest.cpp \
+    Cmd/CmdPointChangeBase.cpp \
     Cmd/CmdSelectCoordSystem.cpp \
     Cmd/CmdSettingsAxesChecker.cpp \
     Cmd/CmdSettingsColorFilter.cpp \
@@ -336,14 +365,28 @@ SOURCES += \
     Cmd/CmdSettingsDigitizeCurve.cpp \
     Cmd/CmdSettingsExportFormat.cpp \
     Cmd/CmdSettingsGeneral.cpp \
+    Cmd/CmdSettingsGridDisplay.cpp \
     Cmd/CmdSettingsGridRemoval.cpp \
     Cmd/CmdSettingsPointMatch.cpp \
     Cmd/CmdSettingsSegments.cpp \
     Cmd/CmdStackShadow.cpp \
+    Cmd/CmdUndoForTest.cpp \
     Color/ColorFilter.cpp \
     Color/ColorFilterHistogram.cpp \
     Color/ColorFilterMode.cpp \
     Color/ColorFilterSettings.cpp \
+    Color/ColorFilterSettingsStrategyAbstractBase.cpp \
+    Color/ColorFilterSettingsStrategyForeground.cpp \
+    Color/ColorFilterSettingsStrategyHue.cpp \
+    Color/ColorFilterSettingsStrategyIntensity.cpp \
+    Color/ColorFilterSettingsStrategySaturation.cpp \
+    Color/ColorFilterSettingsStrategyValue.cpp \
+    Color/ColorFilterStrategyAbstractBase.cpp \
+    Color/ColorFilterStrategyForeground.cpp \
+    Color/ColorFilterStrategyHue.cpp \
+    Color/ColorFilterStrategyIntensity.cpp \
+    Color/ColorFilterStrategySaturation.cpp \
+    Color/ColorFilterStrategyValue.cpp \
     Color/ColorPalette.cpp \
     Coord/CoordScale.cpp \
     Coord/CoordsType.cpp \
@@ -393,6 +436,7 @@ SOURCES += \
     Dlg/DlgSettingsDigitizeCurve.cpp \
     Dlg/DlgSettingsExportFormat.cpp \
     Dlg/DlgSettingsGeneral.cpp \
+    Dlg/DlgSettingsGridDisplay.cpp \
     Dlg/DlgSettingsGridRemoval.cpp \
     Dlg/DlgSettingsMainWindow.cpp \
     Dlg/DlgSettingsPointMatch.cpp \
@@ -403,6 +447,7 @@ SOURCES += \
     Dlg/DlgValidatorFactory.cpp \
     Dlg/DlgValidatorNumber.cpp \
     Document/Document.cpp \
+    Document/DocumentHashGenerator.cpp \
     Document/DocumentModelAbstractBase.cpp \
     Document/DocumentModelAxesChecker.cpp \
     Document/DocumentModelColorFilter.cpp \
@@ -410,6 +455,7 @@ SOURCES += \
     Document/DocumentModelDigitizeCurve.cpp \
     Document/DocumentModelExportFormat.cpp \
     Document/DocumentModelGeneral.cpp \
+    Document/DocumentModelGridDisplay.cpp \
     Document/DocumentModelGridRemoval.cpp \
     Document/DocumentModelPointMatch.cpp \
     Document/DocumentModelSegments.cpp \
@@ -465,6 +511,10 @@ SOURCES += \
     Grid/GridClassifier.cpp \
     Grid/GridCoordDisable.cpp \
     Grid/GridHealer.cpp \
+    Grid/GridInitializer.cpp \
+    Grid/GridLine.cpp \
+    Grid/GridLineFactory.cpp \
+    Grid/GridLines.cpp \
     Grid/GridRemoval.cpp \
     Help/HelpBrowser.cpp \
     Help/HelpWindow.cpp \

@@ -98,9 +98,10 @@ class CoordSystemContext : public CoordSystemInterface
                         double version);
   /// Load from file in version 6 format, into the single CoordSystem
   void loadVersion6 (QXmlStreamReader &reader);
-  /// Load one CoordSystem from file in version 7 format, into the most recent CoordSystem which was just created before the call to this method
-  void loadVersion7 (QXmlStreamReader &reader,
-                     DocumentAxesPointsRequired documentAxesPointsRequired);
+  /// Load one CoordSystem from file in version 7 format or newer, into the most recent CoordSystem which was just created before
+  /// the call to this method
+  void loadVersions7AndUp (QXmlStreamReader &reader,
+                           DocumentAxesPointsRequired documentAxesPointsRequired);
 
   virtual DocumentModelAxesChecker modelAxesChecker() const;
   virtual DocumentModelColorFilter modelColorFilter() const;
@@ -109,6 +110,7 @@ class CoordSystemContext : public CoordSystemInterface
   virtual DocumentModelDigitizeCurve modelDigitizeCurve() const;
   virtual DocumentModelExportFormat modelExport() const;
   virtual DocumentModelGeneral modelGeneral() const;
+  virtual DocumentModelGridDisplay modelGridDisplay() const;
   virtual DocumentModelGridRemoval modelGridRemoval() const;
   virtual DocumentModelPointMatch modelPointMatch() const;
   virtual DocumentModelSegments modelSegments() const;
@@ -125,13 +127,12 @@ class CoordSystemContext : public CoordSystemInterface
   virtual void removePointGraph (const QString &identifier);
   virtual void removePointsInCurvesGraphs (CurvesGraphs &curvesGraphs);
   virtual void saveXml (QXmlStreamWriter &writer) const;
+  virtual QString selectedCurveName () const;
 
   /// Index of current CoordSystem
   void setCoordSystemIndex (CoordSystemIndex coordSystemIndex);
 
-  /// Applies to current coordinate system
-  void setCurvesGraphs (CoordSystemIndex coordSystemIndex,
-                        const CurvesGraphs &curvesGraphs);
+  virtual void setCurveAxes (const Curve &curveAxes);
   virtual void setCurvesGraphs (const CurvesGraphs &curvesGraphs); // Applies to current coordinate system
   virtual void setModelAxesChecker(const DocumentModelAxesChecker &modelAxesChecker);
   virtual void setModelColorFilter(const DocumentModelColorFilter &modelColorFilter);
@@ -140,9 +141,11 @@ class CoordSystemContext : public CoordSystemInterface
   virtual void setModelDigitizeCurve (const DocumentModelDigitizeCurve &modelDigitizeCurve);
   virtual void setModelExport(const DocumentModelExportFormat &modelExport);
   virtual void setModelGeneral (const DocumentModelGeneral &modelGeneral);
+  virtual void setModelGridDisplay(const DocumentModelGridDisplay &modelGridDisplay);
   virtual void setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval);
   void setModelPointMatch(const DocumentModelPointMatch &modelPointMatch);
   virtual void setModelSegments(const DocumentModelSegments &modelSegments);
+  virtual void setSelectedCurveName(const QString &selectedCurveName);
   virtual bool successfulRead () const;
   virtual void updatePointOrdinals (const Transformation &transformation);
 

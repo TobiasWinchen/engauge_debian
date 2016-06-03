@@ -24,9 +24,9 @@ const QString CMD_DESCRIPTION ("Paste");
 CmdPaste::CmdPaste(MainWindow &mainWindow,
                    Document &document,
                    const QStringList &selectedPointIdentifiers) :
-  CmdAbstract(mainWindow,
-              document,
-              CMD_DESCRIPTION)
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      CMD_DESCRIPTION)
 {
   QStringList selected;
   QStringList::const_iterator itr;
@@ -46,9 +46,9 @@ CmdPaste::CmdPaste (MainWindow &mainWindow,
                     Document &document,
                     const QString &cmdDescription,
                     QXmlStreamReader &reader) :
-  CmdAbstract (mainWindow,
-               document,
-               cmdDescription)
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      cmdDescription)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdPaste::CmdPaste";
 
@@ -64,11 +64,14 @@ void CmdPaste::cmdRedo ()
   LOG4CPP_INFO_S ((*mainCat)) << "CmdPaste::cmdRedo"
                               << " pasting=" << m_copiedPoints.count ();
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
+  saveDocumentState (document ());
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setMimeData (&m_mimePoints, QClipboard::Clipboard);
   document().updatePointOrdinals (mainWindow().transformation());
   mainWindow().updateAfterCommand();
   resetSelection(m_copiedPoints);
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdPaste::cmdUndo ()
@@ -76,8 +79,11 @@ void CmdPaste::cmdUndo ()
   LOG4CPP_INFO_S ((*mainCat)) << "CmdPaste::cmdUndo"
                               << " pasting=" << m_copiedPoints.count ();
 
+  saveOrCheckPostCommandDocumentStateHash (document ());
+  restoreDocumentState (document ());
   mainWindow().updateAfterCommand();
   resetSelection(m_copiedPoints);
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdPaste::saveXml (QXmlStreamWriter &writer) const

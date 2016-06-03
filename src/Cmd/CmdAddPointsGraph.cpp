@@ -23,9 +23,9 @@ CmdAddPointsGraph::CmdAddPointsGraph (MainWindow &mainWindow,
                                       const QString &curveName,
                                       const QList<QPoint> &points,
                                       const QList<double> &ordinals) :
-  CmdAbstract (mainWindow,
-               document,
-               CMD_DESCRIPTION),
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      CMD_DESCRIPTION),
   m_curveName (curveName),
   m_points (points),
   m_ordinals (ordinals)
@@ -37,9 +37,9 @@ CmdAddPointsGraph::CmdAddPointsGraph (MainWindow &mainWindow,
                                       Document &document,
                                       const QString &cmdDescription,
                                       QXmlStreamReader &reader) :
-  CmdAbstract (mainWindow,
-               document,
-               cmdDescription)
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      cmdDescription)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdAddPointsGraph::CmdAddPointsGraph";
 
@@ -102,6 +102,8 @@ void CmdAddPointsGraph::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdAddPointsGraph::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
+  saveDocumentState (document ());
   for (int index = 0; index < m_points.count(); index++) {
 
     QString identifierAdded;
@@ -114,17 +116,17 @@ void CmdAddPointsGraph::cmdRedo ()
 
   document().updatePointOrdinals (mainWindow().transformation());
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdAddPointsGraph::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdAddPointsGraph::cmdUndo";
 
-  for (int index = 0; index < m_points.count(); index++) {
-    document().removePointGraph (m_identifiersAdded [index]);
-  }
-  document().updatePointOrdinals (mainWindow().transformation());
+  saveOrCheckPostCommandDocumentStateHash (document ());
+  restoreDocumentState (document ());
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdAddPointsGraph::saveXml (QXmlStreamWriter &writer) const

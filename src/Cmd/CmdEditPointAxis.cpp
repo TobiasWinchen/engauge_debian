@@ -23,9 +23,9 @@ CmdEditPointAxis::CmdEditPointAxis (MainWindow &mainWindow,
                                     const QPointF &posGraphBefore,
                                     const QPointF &posGraphAfter,
                                     bool isXOnly) :
-  CmdAbstract (mainWindow,
-               document,
-               CMD_DESCRIPTION),
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      CMD_DESCRIPTION),
   m_pointIdentifier (pointIdentifier),
   m_posGraphBefore (posGraphBefore),
   m_posGraphAfter (posGraphAfter),
@@ -41,9 +41,9 @@ CmdEditPointAxis::CmdEditPointAxis (MainWindow &mainWindow,
                                     Document &document,
                                     const QString &cmdDescription,
                                     QXmlStreamReader &reader) :
-  CmdAbstract (mainWindow,
-               document,
-               cmdDescription)
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      cmdDescription)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdEditPointAxis::CmdEditPointAxis";
 
@@ -86,20 +86,23 @@ void CmdEditPointAxis::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdEditPointAxis::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
+  saveDocumentState (document ());
   document().editPointAxis (m_posGraphAfter,
                             m_pointIdentifier);
   document().updatePointOrdinals (mainWindow().transformation());
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdEditPointAxis::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdEditPointAxis::cmdUndo";
 
-  document().editPointAxis (m_posGraphBefore,
-                            m_pointIdentifier);
-  document().updatePointOrdinals (mainWindow().transformation());
+  saveOrCheckPostCommandDocumentStateHash (document ());
+  restoreDocumentState (document ());
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdEditPointAxis::saveXml (QXmlStreamWriter &writer) const

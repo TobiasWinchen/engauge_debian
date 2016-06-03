@@ -13,8 +13,6 @@
 #
 # More comments are in the INSTALL file, and below
 
-# Comment out this CONFIG line in OSX to produce an OSX application bundle
-CONFIG = qt warn_on thread debug
 QT += core gui help network printsupport widgets xml
 
 _ENGAUGE_RELEASE = $$(ENGAUGE_RELEASE)
@@ -49,6 +47,7 @@ HEADERS  += \
     src/Callback/CallbackBoundingRects.h \
     src/Callback/CallbackCheckAddPointAxis.h \
     src/Callback/CallbackCheckEditPointAxis.h \
+    src/Callback/CallbackDocumentHash.h \
     src/Callback/CallbackGatherXThetaValuesFunctions.h \
     src/Callback/CallbackNextOrdinal.h \
     src/Callback/CallbackPointOrdinal.h \
@@ -79,6 +78,8 @@ HEADERS  += \
     src/Cmd/CmdMediator.h \
     src/Cmd/CmdMoveBy.h \
     src/Cmd/CmdPaste.h \
+    src/Cmd/CmdPointChangeBase.h \
+    src/Cmd/CmdRedoForTest.h \
     src/Cmd/CmdSelectCoordSystem.h \
     src/Cmd/CmdSettingsAxesChecker.h \
     src/Cmd/CmdSettingsColorFilter.h \
@@ -88,16 +89,30 @@ HEADERS  += \
     src/Cmd/CmdSettingsDigitizeCurve.h \
     src/Cmd/CmdSettingsExportFormat.h \
     src/Cmd/CmdSettingsGeneral.h \
+    src/Cmd/CmdSettingsGridDisplay.h \
     src/Cmd/CmdSettingsGridRemoval.h \
     src/Cmd/CmdSettingsPointMatch.h \
     src/Cmd/CmdSettingsSegments.h \
     src/Cmd/CmdStackShadow.h \
+    src/Cmd/CmdUndoForTest.h \
     src/Color/ColorConstants.h \
     src/Color/ColorFilter.h \
     src/Color/ColorFilterEntry.h \
     src/Color/ColorFilterHistogram.h \
     src/Color/ColorFilterMode.h \
     src/Color/ColorFilterSettings.h \
+    src/Color/ColorFilterSettingsStrategyAbstractBase.h \
+    src/Color/ColorFilterSettingsStrategyForeground.h \
+    src/Color/ColorFilterSettingsStrategyHue.h \
+    src/Color/ColorFilterSettingsStrategyIntensity.h \
+    src/Color/ColorFilterSettingsStrategySaturation.h \
+    src/Color/ColorFilterSettingsStrategyValue.h \
+    src/Color/ColorFilterStrategyAbstractBase.h \
+    src/Color/ColorFilterStrategyForeground.h \
+    src/Color/ColorFilterStrategyHue.h \
+    src/Color/ColorFilterStrategyIntensity.h \
+    src/Color/ColorFilterStrategySaturation.h \
+    src/Color/ColorFilterStrategyValue.h \
     src/Color/ColorPalette.h \
     src/Coord/CoordScale.h \
     src/Coord/CoordsType.h \
@@ -148,6 +163,7 @@ HEADERS  += \
     src/Dlg/DlgSettingsDigitizeCurve.h \
     src/Dlg/DlgSettingsExportFormat.h \
     src/Dlg/DlgSettingsGeneral.h \
+    src/Dlg/DlgSettingsGridDisplay.h \
     src/Dlg/DlgSettingsGridRemoval.h \
     src/Dlg/DlgSettingsMainWindow.h \
     src/Dlg/DlgSettingsPointMatch.h \
@@ -159,6 +175,8 @@ HEADERS  += \
     src/Dlg/DlgValidatorNumber.h \
     src/Document/Document.h \
     src/Document/DocumentAxesPointsRequired.h \
+    src/Document/DocumentHash.h \
+    src/Document/DocumentHashGenerator.h \
     src/Document/DocumentModelAbstractBase.h \
     src/Document/DocumentModelAxesChecker.h \
     src/Document/DocumentModelColorFilter.h \
@@ -166,6 +184,7 @@ HEADERS  += \
     src/Document/DocumentModelDigitizeCurve.h \
     src/Document/DocumentModelExportFormat.h \
     src/Document/DocumentModelGeneral.h \
+    src/Document/DocumentModelGridDisplay.h \
     src/Document/DocumentModelGridRemoval.h \
     src/Document/DocumentModelPointMatch.h \
     src/Document/DocumentModelSegments.h \
@@ -227,6 +246,11 @@ HEADERS  += \
     src/Grid/GridClassifier.h \
     src/Grid/GridCoordDisable.h \
     src/Grid/GridHealer.h \
+    src/Grid/GridInitializer.h \
+    src/Grid/GridLine.h \
+    src/Grid/GridLineFactory.h \
+    src/Grid/GridLines.h \
+    src/Grid/GridLineStyle.h \
     src/Grid/GridRemoval.h \
     src/Help/HelpBrowser.h \
     src/Help/HelpWindow.h \
@@ -315,6 +339,7 @@ SOURCES += \
     src/Callback/CallbackBoundingRects.cpp \
     src/Callback/CallbackCheckAddPointAxis.cpp \
     src/Callback/CallbackCheckEditPointAxis.cpp \
+    src/Callback/CallbackDocumentHash.cpp \
     src/Callback/CallbackGatherXThetaValuesFunctions.cpp \
     src/Callback/CallbackNextOrdinal.cpp \
     src/Callback/CallbackPointOrdinal.cpp \
@@ -344,6 +369,8 @@ SOURCES += \
     src/Cmd/CmdMediator.cpp \
     src/Cmd/CmdMoveBy.cpp \
     src/Cmd/CmdPaste.cpp \
+    src/Cmd/CmdRedoForTest.cpp \
+    src/Cmd/CmdPointChangeBase.cpp \
     src/Cmd/CmdSelectCoordSystem.cpp \
     src/Cmd/CmdSettingsAxesChecker.cpp \
     src/Cmd/CmdSettingsColorFilter.cpp \
@@ -353,14 +380,28 @@ SOURCES += \
     src/Cmd/CmdSettingsDigitizeCurve.cpp \
     src/Cmd/CmdSettingsExportFormat.cpp \
     src/Cmd/CmdSettingsGeneral.cpp \
+    src/Cmd/CmdSettingsGridDisplay.cpp \
     src/Cmd/CmdSettingsGridRemoval.cpp \
     src/Cmd/CmdSettingsPointMatch.cpp \
     src/Cmd/CmdSettingsSegments.cpp \
     src/Cmd/CmdStackShadow.cpp \
+    src/Cmd/CmdUndoForTest.cpp \
     src/Color/ColorFilter.cpp \
     src/Color/ColorFilterHistogram.cpp \
     src/Color/ColorFilterMode.cpp \
     src/Color/ColorFilterSettings.cpp \
+    src/Color/ColorFilterSettingsStrategyAbstractBase.cpp \
+    src/Color/ColorFilterSettingsStrategyForeground.cpp \
+    src/Color/ColorFilterSettingsStrategyHue.cpp \
+    src/Color/ColorFilterSettingsStrategyIntensity.cpp \
+    src/Color/ColorFilterSettingsStrategySaturation.cpp \
+    src/Color/ColorFilterSettingsStrategyValue.cpp \
+    src/Color/ColorFilterStrategyAbstractBase.cpp \
+    src/Color/ColorFilterStrategyForeground.cpp \
+    src/Color/ColorFilterStrategyHue.cpp \
+    src/Color/ColorFilterStrategyIntensity.cpp \
+    src/Color/ColorFilterStrategySaturation.cpp \
+    src/Color/ColorFilterStrategyValue.cpp \
     src/Color/ColorPalette.cpp \
     src/Coord/CoordScale.cpp \
     src/Coord/CoordsType.cpp \
@@ -410,6 +451,7 @@ SOURCES += \
     src/Dlg/DlgSettingsDigitizeCurve.cpp \
     src/Dlg/DlgSettingsExportFormat.cpp \
     src/Dlg/DlgSettingsGeneral.cpp \
+    src/Dlg/DlgSettingsGridDisplay.cpp \
     src/Dlg/DlgSettingsGridRemoval.cpp \
     src/Dlg/DlgSettingsMainWindow.cpp \
     src/Dlg/DlgSettingsPointMatch.cpp \
@@ -420,6 +462,7 @@ SOURCES += \
     src/Dlg/DlgValidatorFactory.cpp \
     src/Dlg/DlgValidatorNumber.cpp \
     src/Document/Document.cpp \
+    src/Document/DocumentHashGenerator.cpp \
     src/Document/DocumentModelAbstractBase.cpp \
     src/Document/DocumentModelAxesChecker.cpp \
     src/Document/DocumentModelColorFilter.cpp \
@@ -427,6 +470,7 @@ SOURCES += \
     src/Document/DocumentModelDigitizeCurve.cpp \
     src/Document/DocumentModelExportFormat.cpp \
     src/Document/DocumentModelGeneral.cpp \
+    src/Document/DocumentModelGridDisplay.cpp \
     src/Document/DocumentModelGridRemoval.cpp \
     src/Document/DocumentModelPointMatch.cpp \
     src/Document/DocumentModelSegments.cpp \
@@ -482,6 +526,10 @@ SOURCES += \
     src/Grid/GridClassifier.cpp \
     src/Grid/GridCoordDisable.cpp \
     src/Grid/GridHealer.cpp \
+    src/Grid/GridInitializer.cpp \
+    src/Grid/GridLine.cpp \
+    src/Grid/GridLineFactory.cpp \
+    src/Grid/GridLines.cpp \
     src/Grid/GridRemoval.cpp \
     src/Help/HelpBrowser.cpp \
     src/Help/HelpWindow.cpp \
@@ -549,22 +597,30 @@ SOURCES += \
     src/Zoom/ZoomLabels.cpp
 
 macx-* {
+
+# Change += to -= for app_bundle to debug in QtCreator
 CONFIG += app_bundle
-QMAKE_CXXFLAGS += "-stdlib=libc++"
-QMAKE_LFLAGS += "-stdlib=libc++"
+
+QMAKE_CXXFLAGS += "-DOSX -stdlib=libc++ -gdwarf-2"
+QMAKE_LFLAGS += "-stdlib=libc++ -gdwarf-2"
 INCLUDEPATH += \
-/usr/local/Cellar/fftw/3.3.4_1/include \
-/usr/local/Cellar/log4cpp/1.1.1/include \
+$$(FFTW_HOME)/include \
+$$(LOG4CPP_HOME)/include \
 /usr/local/Cellar/qt5/5.5.1_2/lib/QtCore.framework/Versions/5/Headers \
 /usr/local/Cellar/qt5/5.5.1_2/lib/QtHelp.framework/Versions/5/Headers \
 /usr/local/Cellar/qt5/5.5.1_2/lib/QtNetwork.framework/Versions/5/Headers \
 /usr/local/Cellar/qt5/5.5.1_2/lib/QtPrintSupport.framework/Versions/5/Headers \
 /usr/local/Cellar/qt5/5.5.1_2/lib/QtWidgets.framework/Versions/5/Headers \
 /usr/local/Cellar/qt5/5.5.1_2/lib/QtXml.framework/Versions/5/Headers
-LIBS += -L/$$(HOME)/fftw-3.3.4/lib -L$$(HOME)/log4cpp/lib -framework CoreFoundation
+LIBS += -L/$$(FFTW_HOME)/lib -L$$(LOG4CPP_HOME)/lib -framework CoreFoundation
+TARGET = "Engauge Digitizer"
+
 } else {
+
+CONFIG = qt warn_on thread debug
 TEMPLATE = app
 TARGET = bin/engauge
+
 }
 
 win32-* {
@@ -578,7 +634,7 @@ LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell3
 win32-g++* {
 LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
 }
-LIBS += -llog4cpp -lfftw3
+LIBS += -lfftw3 -llog4cpp
 }
 
 INCLUDEPATH += src \
