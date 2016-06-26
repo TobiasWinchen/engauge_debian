@@ -142,7 +142,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::MainWindow"
                               << " curDir=" << QDir::currentPath().toLatin1().data();
 
-#ifdef OSX
+#if defined(OSX_DEBUG) || defined(OSX_RELEASE)
   qApp->setApplicationName ("Engauge Digitizer");
   qApp->setOrganizationDomain ("Mark Mitchell");
 #endif
@@ -455,7 +455,7 @@ void MainWindow::createActionsFile ()
                                   "Opens an existing document."));
   connect (m_actionOpen, SIGNAL (triggered ()), this, SLOT (slotFileOpen ()));
 
-#ifndef OSX
+#ifndef OSX_RELEASE
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     QAction *recentFileAction = new QAction (this);
     recentFileAction->setVisible (true);
@@ -528,12 +528,14 @@ void MainWindow::createActionsHelp ()
                                           "and/or point"));
   connect (m_actionHelpTutorial, SIGNAL (triggered ()), this, SLOT (slotHelpTutorial()));
 
+#ifndef OSX_RELEASE
   m_actionHelpHelp = new QAction (tr ("Help"), this);
   m_actionHelpHelp->setShortcut (QKeySequence::HelpContents);
   m_actionHelpHelp->setStatusTip (tr ("Help documentation"));
   m_actionHelpHelp->setWhatsThis (tr ("Help Documentation\n\n"
                                       "Searchable help documentation"));
   // This action gets connected directly to the QDockWidget when that is created
+#endif
 
   m_actionHelpAbout = new QAction(tr ("About Engauge"), this);
   m_actionHelpAbout->setStatusTip (tr ("About the application."));
@@ -865,6 +867,7 @@ void MainWindow::createHelpWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createHelpWindow";
 
+#ifndef OSX_RELEASE
   m_helpWindow = new HelpWindow (this);
   m_helpWindow->hide ();
   addDockWidget (Qt::RightDockWidgetArea,
@@ -872,6 +875,7 @@ void MainWindow::createHelpWindow ()
   m_helpWindow->setFloating (true);
 
   connect (m_actionHelpHelp, SIGNAL (triggered ()), m_helpWindow, SLOT (show ()));
+#endif
 }
 
 void MainWindow::createIcons()
@@ -907,7 +911,7 @@ void MainWindow::createMenus()
   m_menuFile->addAction (m_actionImport);
   m_menuFile->addAction (m_actionImportAdvanced);
   m_menuFile->addAction (m_actionOpen);
-#ifndef OSX
+#ifndef OSX_RELEASE
   m_menuFileOpenRecent = new QMenu (tr ("Open &Recent"));
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     m_menuFileOpenRecent->addAction (m_actionRecentFiles.at (i));
@@ -1007,7 +1011,9 @@ void MainWindow::createMenus()
   m_menuHelp->insertSeparator(m_actionHelpWhatsThis);
   m_menuHelp->addAction (m_actionHelpWhatsThis);
   m_menuHelp->addAction (m_actionHelpTutorial);
+#ifndef OSX_RELEASE
   m_menuHelp->addAction (m_actionHelpHelp);
+#endif
   m_menuHelp->addAction (m_actionHelpAbout);
 
   updateRecentFileList();
@@ -1283,7 +1289,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
   return QObject::eventFilter (target, event);
 }
 
-#ifndef OSX
+#ifndef OSX_RELEASE
 void MainWindow::exportAllCoordinateSystems()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::exportAllCoordinateSystems";
@@ -1630,7 +1636,6 @@ void MainWindow::loadDocumentFile (const QString &fileName)
   QApplication::setOverrideCursor(Qt::WaitCursor);
   CmdMediator *cmdMediator = new CmdMediator (*this,
                                               fileName);
-  QApplication::restoreOverrideCursor();
 
   if (cmdMediator->successfulRead ()) {
 
@@ -1659,7 +1664,11 @@ void MainWindow::loadDocumentFile (const QString &fileName)
     updateGridLines ();
     updateAfterCommand (); // Enable Save button now that m_engaugeFile is set
 
+    QApplication::restoreOverrideCursor();
+
   } else {
+
+    QApplication::restoreOverrideCursor();
 
     QMessageBox::warning (this,
                           engaugeWindowTitle(),
@@ -2205,11 +2214,13 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
   // Help window geometry
   QSize helpSize = settings.value (SETTINGS_HELP_SIZE,
                                    QSize (900, 600)).toSize();
+#ifndef OSX_RELEASE
   m_helpWindow->resize (helpSize);
   if (settings.contains (SETTINGS_HELP_POS)) {
     QPoint helpPos = settings.value (SETTINGS_HELP_POS).toPoint();
     m_helpWindow->move (helpPos);
   }
+#endif
 
   // Checklist guide wizard
   m_actionHelpChecklistGuideWizard->setChecked (settings.value (SETTINGS_CHECKLIST_GUIDE_WIZARD,
@@ -2315,8 +2326,10 @@ void MainWindow::settingsWrite ()
   settings.beginGroup (SETTINGS_GROUP_MAIN_WINDOW);
   settings.setValue (SETTINGS_SIZE, size ());
   settings.setValue (SETTINGS_POS, pos ());
+#ifndef OSX_RELEASE
   settings.setValue (SETTINGS_HELP_SIZE, m_helpWindow->size());
   settings.setValue (SETTINGS_HELP_POS, m_helpWindow->pos ());
+#endif
   if (m_dockChecklistGuide->isFloating()) {
 
     settings.setValue (SETTINGS_CHECKLIST_GUIDE_DOCK_AREA, Qt::NoDockWidgetArea);
@@ -2893,7 +2906,8 @@ bool MainWindow::slotFileSaveAs()
   dlg.setFileMode (QFileDialog::AnyFile);
   dlg.selectNameFilter (filterDigitizer);
   dlg.setNameFilters (filters);
-#ifndef OSX
+#if defined(OSX_DEBUG) || defined(OSX_RELEASE)
+#else
   // Prevent hang in OSX
   dlg.setWindowModality(Qt::WindowModal);
 #endif
@@ -3196,7 +3210,7 @@ void MainWindow::slotTimeoutRegressionErrorReport ()
 
   } else {
 
-#ifndef OSX
+#ifndef OSX_RELEASE
     exportAllCoordinateSystems ();
 #endif
 
@@ -3220,7 +3234,7 @@ void MainWindow::slotTimeoutRegressionFileCmdScript ()
     // Script file might already have closed the Document so export only if last was not closed
     if (m_cmdMediator != 0) {
 
-#ifndef OSX
+#ifndef OSX_RELEASE
       exportAllCoordinateSystems ();
 #endif
 
@@ -3827,7 +3841,7 @@ void MainWindow::updateControls ()
 
   m_cmbBackground->setEnabled (!m_currentFile.isEmpty ());
 
-#ifndef OSX
+#ifndef OSX_RELEASE
   m_menuFileOpenRecent->setEnabled ((m_actionRecentFiles.count () > 0) &&
                                     (m_actionRecentFiles.at(0)->isVisible ())); // Need at least one visible recent file entry
 #endif
@@ -3980,7 +3994,7 @@ void MainWindow::updateRecentFileList()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateRecentFileList";
 
-#ifndef OSX
+#ifndef OSX_RELEASE
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   QStringList recentFilePaths = settings.value(SETTINGS_RECENT_FILE_LIST).toStringList();
 

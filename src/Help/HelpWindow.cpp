@@ -25,6 +25,7 @@ HelpWindow::HelpWindow(QWidget *parent) :
   setMinimumWidth (MIN_WIDTH);
   setMinimumHeight (MIN_HEIGHT);
 
+#ifndef OSX_RELEASE
   QHelpEngine *helpEngine = new QHelpEngine (helpPath());
   helpEngine->setupData();
 
@@ -47,13 +48,15 @@ HelpWindow::HelpWindow(QWidget *parent) :
   splitter->insertWidget (1, browser);
 
   setWidget (splitter);
+#endif
 }
 
+#ifndef OSX_RELEASE
 QString HelpWindow::helpPath() const
 {
   // Possible locations of help file. Each entry is first tried as is, and then with
-  // applicationDirPath as a prefix. Each entry should probably start with a slash
-
+  // applicationDirPath as a prefix. Each entry should probably start with a slash. This
+  // search approach offers some flexibility in the help file location
   QStringList paths;
 #ifdef HELPDIR
 #define QUOTE(string) _QUOTE(string)
@@ -62,12 +65,8 @@ QString HelpWindow::helpPath() const
     .arg (QUOTE (HELPDIR));
   paths << path;
 #endif
-#ifdef OSX
-  paths << "/../Resources/engauge.qhc";
-#else
   paths << "/documentation/engauge.qhc";
   paths << "/../share/doc/engauge-digitizer/engauge.qhc";
-#endif
 
   QStringList::iterator itr;
   for (itr = paths.begin(); itr != paths.end(); itr++) {
@@ -89,4 +88,4 @@ QString HelpWindow::helpPath() const
 
   return ""; // Empty file, since help file was never found, will simply result in empty help contents
 }
-
+#endif
