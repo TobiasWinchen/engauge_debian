@@ -49,6 +49,7 @@
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "EnumsToQt.h"
+#include "ExportImageForRegression.h"
 #include "ExportToFile.h"
 #include "FileCmdScript.h"
 #include "Ghosts.h"
@@ -66,6 +67,10 @@
 #include "MainTitleBarFormat.h"
 #include "MainWindow.h"
 #include "NetworkClient.h"
+#ifdef ENGAUGE_PDF
+#include "Pdf.h"
+#endif // ENGAUGE_PDF
+#include "PdfResolution.h"
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
@@ -136,7 +141,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
   m_ghosts (0),
   m_timerRegressionErrorReport(0),
   m_fileCmdScript (0),
-  m_isRegressionTest (isRegressionTest),
+  m_isErrorReportRegressionTest (isRegressionTest),
   m_timerRegressionFileCmdScript(0)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::MainWindow"
@@ -149,7 +154,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
 
   LoggerUpload::bindToMainWindow(this);
 
-  QString initialPath = QDir::currentPath();
+  m_startupDirectory = QDir::currentPath();
 
   setCurrentFile ("");
   createIcons();
@@ -174,17 +179,20 @@ MainWindow::MainWindow(const QString &errorReportFile,
   createZoomMap ();
   updateControls ();
 
-  settingsRead ();
+  settingsRead (); // This changes the current directory when not regression testing
   setCurrentFile ("");
   setUnifiedTitleAndToolBarOnMac(true);
 
   installEventFilter(this);
+
+  // Start regression scripting if appropriate. Regression scripts assume current directory is the original
+  // current directory, so we temporarily reset the current directory
+  QString originalPath = QDir::currentPath();
+  QDir::setCurrent (m_startupDirectory);
   if (!errorReportFile.isEmpty()) {
-    loadErrorReportFile(initialPath,
-                        errorReportFile);
-    if (m_isRegressionTest) {
-      startRegressionTestErrorReport(initialPath,
-                                     errorReportFile);
+    loadErrorReportFile(errorReportFile);
+    if (m_isErrorReportRegressionTest) {
+      startRegressionTestErrorReport(errorReportFile);
     }
   } else if (!fileCmdScriptFile.isEmpty()) {
     m_fileCmdScript = new FileCmdScript (fileCmdScriptFile);
@@ -195,6 +203,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
     // since only one of the two modes is available at any time, for simplicity
     m_loadStartupFiles = loadStartupFiles;
   }
+  QDir::setCurrent (originalPath);
 }
 
 MainWindow::~MainWindow()
@@ -447,6 +456,14 @@ void MainWindow::createActionsFile ()
                                             "Creates a new document by importing an image with support for advanced feaures. In "
                                             "advanced mode, there can be multiple coordinate systems and/or floating axes."));
   connect (m_actionImportAdvanced, SIGNAL (triggered ()), this, SLOT (slotFileImportAdvanced ()));
+
+  m_actionImportImageReplace = new QAction (tr ("Import (Image Replace)..."), this);
+  m_actionImportImageReplace->setStatusTip (tr ("Imports a new image into the current document, replacing the existing image."));
+  m_actionImportImageReplace->setWhatsThis (tr ("Import (Image Replace)\n\n"
+                                                "Imports a new image into the current document. The existing image is replaced, "
+                                                "and all curves in the document are preserved. This operation is useful for applying "
+                                                "the axis points and other settings from an existing document to a different image."));
+  connect (m_actionImportImageReplace, SIGNAL (triggered ()), this, SLOT (slotFileImportImageReplace ()));
 
   m_actionOpen = new QAction(tr ("&Open..."), this);
   m_actionOpen->setShortcut (QKeySequence::Open);
@@ -910,6 +927,7 @@ void MainWindow::createMenus()
   m_menuFile = menuBar()->addMenu(tr("&File"));
   m_menuFile->addAction (m_actionImport);
   m_menuFile->addAction (m_actionImportAdvanced);
+  m_menuFile->addAction (m_actionImportImageReplace);
   m_menuFile->addAction (m_actionOpen);
 #ifndef OSX_RELEASE
   m_menuFileOpenRecent = new QMenu (tr ("Open &Recent"));
@@ -1290,11 +1308,9 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 }
 
 #ifndef OSX_RELEASE
-void MainWindow::exportAllCoordinateSystems()
+void MainWindow::exportAllCoordinateSystemsAfterRegressionTests()
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::exportAllCoordinateSystems";
-
-  ExportToFile exportStrategy;
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::exportAllCoordinateSystemsAfterRegressionTests curDir=" << QDir::currentPath().toLatin1().data();
 
   // Output the regression test results. One file is output for every coordinate system
   for (CoordSystemIndex index = 0; index < m_cmdMediator->document().coordSystemCount(); index++) {
@@ -1304,8 +1320,21 @@ void MainWindow::exportAllCoordinateSystems()
     QString regressionFile = QString ("%1_%2")
                              .arg (m_regressionFile)
                              .arg (index + 1); // Append the coordinate system index
-    fileExport (regressionFile,
-                exportStrategy);
+
+    // Normally we just export to a file, but when regression testing the export will fail since coordinates are not defined. To
+    // get an export file when regression testing, we just output the image size
+    if (m_isErrorReportRegressionTest && !m_transformation.transformIsDefined()) {
+
+      ExportImageForRegression exportStrategy (m_cmdMediator->pixmap ());
+      exportStrategy.fileExport (regressionFile);
+
+    } else {
+
+      ExportToFile exportStrategy;
+
+      fileExport (regressionFile,
+                  exportStrategy);
+    }
   }
 }
 #endif
@@ -1316,6 +1345,7 @@ QString MainWindow::exportFilenameFromInputFilename (const QString &fileName) co
 
   outFileName = outFileName.replace (".xml", ".csv_actual"); // Applies when extension is xml
   outFileName = outFileName.replace (".dig", ".csv_actual"); // Applies when extension is dig
+  outFileName = outFileName.replace (".pdf", ".csv_actual"); // Applies when extension is pdf
 
   return outFileName;
 }
@@ -1324,6 +1354,7 @@ void MainWindow::fileExport(const QString &fileName,
                             ExportToFile exportStrategy)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::fileExport"
+                              << " curDir=" << QDir::currentPath().toLatin1().data()
                               << " fileName=" << fileName.toLatin1().data();
 
   QFile file (fileName);
@@ -1372,7 +1403,7 @@ void MainWindow::fileImport (const QString &fileName,
 
   if (importType == IMPORT_TYPE_ADVANCED) {
 
-    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoad
+    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoadNewDocument
     // when previewing for IMAGE_TYPE_ADVANCED
     slotFileClose();
 
@@ -1382,21 +1413,45 @@ void MainWindow::fileImport (const QString &fileName,
 
   QImage image;
   bool loaded = false;
+
 #ifdef ENGAUGE_JPEG2000
   Jpeg2000 jpeg2000;
   loaded = jpeg2000.load (fileName,
                           image);
 #endif // ENGAUGE_JPEG2000
+
+#ifdef ENGAUGE_PDF
+  if (!loaded) {
+    
+    Pdf pdf;
+    PdfReturn pdfReturn = pdf.load (fileName,
+                                    image,
+                                    m_modelMainWindow.pdfResolution(),
+                                    m_isErrorReportRegressionTest);
+    if (pdfReturn == PDF_RETURN_CANCELED) {
+
+      // User canceled so exit immediately
+      return;
+
+    }
+
+    loaded = (pdfReturn == PDF_RETURN_SUCCESS);
+  }
+#endif // ENGAUGE_PDF
+
   if (!loaded) {
     loaded = image.load (fileName);
   }
 
   if (!loaded) {
+    QString msg = QString("%1 %2 %3 %4.")
+                  .arg (tr ("Cannot read file"))
+                  .arg (fileName)
+                  .arg (tr ("from directory"))
+                  .arg (QDir::currentPath());
     QMessageBox::warning (this,
                           engaugeWindowTitle(),
-                          QString("%1 %2.")
-                          .arg (tr ("Cannot read file"))
-                          .arg(fileName));
+                          msg);
 
     // Reset
     m_originalFile = originalFileOld;
@@ -1433,7 +1488,14 @@ void MainWindow::fileImportWithPrompts (ImportType importType)
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::fileImportWithPrompts"
                               << " importType=" << importType;
 
-  if (maybeSave ()) {
+  // Skip maybeSave method for IMPORT_TYPE_REPLACE_IMAGE since open file dialog is enough to allow user to cancel the operation, and
+  // since no information is lost in that case
+  bool okToContinue = true;
+  if (importType != IMPORT_TYPE_IMAGE_REPLACE) {
+    okToContinue = maybeSave ();
+  }
+
+  if (okToContinue) {
 
     QString filter;
     QTextStream str (&filter);
@@ -1451,6 +1513,10 @@ void MainWindow::fileImportWithPrompts (ImportType importType)
     Jpeg2000 jpeg2000;
     supportedImageFormatStrings << jpeg2000.supportedImageWildcards();
 #endif // ENGAUGE_JPEG2000
+
+#ifdef ENGAUGE_PDF
+    supportedImageFormatStrings << "*.pdf";
+#endif // ENGAUGE_PDF
 
     supportedImageFormatStrings.sort();
 
@@ -1487,7 +1553,7 @@ void MainWindow::filePaste (ImportType importType)
 
   if (importType == IMPORT_TYPE_ADVANCED) {
 
-    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoad
+    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoadNewDocument
     // when previewing for IMAGE_TYPE_ADVANCED
     slotFileClose();
 
@@ -1506,9 +1572,11 @@ void MainWindow::filePaste (ImportType importType)
   if (!loaded) {
     QMessageBox::warning (this,
                           engaugeWindowTitle(),
-                          QString("%1 %2.")
+                          QString("%1 %2 %3 %4.")
                           .arg (tr ("Cannot read file"))
-                          .arg(fileName));
+                          .arg (fileName)
+                          .arg (tr ("from directory"))
+                          .arg (QDir::currentPath ()));
 
     // Reset
     m_originalFile = originalFileOld;
@@ -1649,9 +1717,9 @@ void MainWindow::loadDocumentFile (const QString &fileName)
     }
 
     m_cmdMediator = cmdMediator;
-    setupAfterLoad(fileName,
-                   "File opened",
-                   IMPORT_TYPE_SIMPLE);
+    setupAfterLoadNewDocument (fileName,
+                               "File opened",
+                               IMPORT_TYPE_SIMPLE);
 
     // Start select mode
     m_actionDigitizeSelect->setChecked (true); // We assume user wants to first select existing stuff
@@ -1672,28 +1740,21 @@ void MainWindow::loadDocumentFile (const QString &fileName)
 
     QMessageBox::warning (this,
                           engaugeWindowTitle(),
-                          QString("%1 %2:\n%3.")
+                          QString("%1 %2 %3 %4:\n%5.")
                           .arg (tr ("Cannot read file"))
-                          .arg(fileName)
+                          .arg (fileName)
+                          .arg (tr ("from directory"))
+                          .arg (QDir::currentPath ())
                           .arg(cmdMediator->reasonForUnsuccessfulRead ()));
     delete cmdMediator;
 
   }
 }
 
-void MainWindow::loadErrorReportFile(const QString &initialPath,
-                                     const QString &errorReportFile)
+void MainWindow::loadErrorReportFile(const QString &errorReportFile)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::loadErrorReportFile"
-                              << " path=" << initialPath.toLatin1().data()
                               << " file=" << errorReportFile.toLatin1().data();
-
-  // The default path has been changed from its original executable-based initial value to the last directory used
-  // according to the settings. Since the executable-based directory is much more stable, and we want a predictable
-  // directory in the likely event that the error report file has a relative path, we temporarily switch the default path
-  // back to the executable-based initial value
-  QString originalPath = QDir::currentPath();
-  QDir::setCurrent(initialPath);
 
   QFile file (errorReportFile);
   if (!file.exists()) {
@@ -1718,12 +1779,9 @@ void MainWindow::loadErrorReportFile(const QString &initialPath,
                                   reader);
   file.close();
 
-  // Reset the original path now that the error report file has been read in
-  QDir::setCurrent(originalPath);
-
-  setupAfterLoad(errorReportFile,
-                 "Error report opened",
-                 IMPORT_TYPE_SIMPLE);
+  setupAfterLoadNewDocument (errorReportFile,
+                             "Error report opened",
+                             IMPORT_TYPE_SIMPLE);
 
   // Start select mode
   m_actionDigitizeSelect->setChecked (true); // We assume user wants to first select existing stuff
@@ -1740,6 +1798,30 @@ bool MainWindow::loadImage (const QString &fileName,
                               << " fileName=" << fileName.toLatin1 ().data ()
                               << " importType=" << importType;
 
+  bool success;
+  if (importType == IMPORT_TYPE_IMAGE_REPLACE) {
+    success = loadImageReplacingImage (fileName,
+                                       image,
+                                       importType);
+  } else {
+    success = loadImageNewDocument (fileName,
+                                    image,
+                                    importType);
+  }
+
+  return success;
+}
+
+bool MainWindow::loadImageNewDocument (const QString &fileName,
+                                       const QImage &image,
+                                       ImportType importType)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::loadImageNewDocument"
+                              << " fileName=" << fileName.toLatin1 ().data ()
+                              << " importType=" << importType;
+
+  ENGAUGE_ASSERT (importType != IMPORT_TYPE_IMAGE_REPLACE);
+
   QApplication::setOverrideCursor(Qt::WaitCursor);
   CmdMediator *cmdMediator = new CmdMediator (*this,
                                               image);
@@ -1755,9 +1837,9 @@ bool MainWindow::loadImage (const QString &fileName,
   }
 
   m_cmdMediator = cmdMediator;
-  bool accepted = setupAfterLoad(fileName,
-                                 tr ("File imported"),
-                                 importType);
+  bool accepted = setupAfterLoadNewDocument (fileName,
+                                             tr ("File imported"),
+                                             importType);
 
   if (accepted) {
 
@@ -1801,6 +1883,33 @@ bool MainWindow::loadImage (const QString &fileName,
 
     updateControls ();
   }
+
+  return accepted;
+}
+
+bool MainWindow::loadImageReplacingImage (const QString &fileName,
+                                          const QImage &image,
+                                          ImportType importType)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::loadImageReplacingImage"
+                              << " fileName=" << fileName.toLatin1 ().data ()
+                              << " importType=" << importType;
+
+  ENGAUGE_ASSERT (importType == IMPORT_TYPE_IMAGE_REPLACE);
+
+  setCurrentPathFromFile (fileName);
+  // We do not call rebuildRecentFileListForCurrentFile for an image file, so only proper Engauge document files appear in the recent file list
+  m_engaugeFile = EMPTY_FILENAME; // Forces first Save to be treated as Save As
+
+  ENGAUGE_ASSERT (m_cmdMediator != 0); // Menu option should only be available when a document is currently open
+
+  m_cmdMediator->document().setPixmap (image);
+
+  bool accepted = setupAfterLoadReplacingImage (fileName,
+                                                tr ("File imported"),
+                                                importType);
+
+  // No checklist guide wizard is displayed when just replacing the image
 
   return accepted;
 }
@@ -1978,7 +2087,7 @@ void MainWindow::saveErrorReportFileAndExit (const char *context,
 {
   // Skip if currently performing a regression test - in which case the preferred behavior is to let the current test fail and
   // continue on to execute the remaining tests
-  if ((m_cmdMediator != 0) && !m_isRegressionTest) {
+  if ((m_cmdMediator != 0) && !m_isErrorReportRegressionTest) {
 
     QString report = saveErrorReportFileAndExitXml (context,
                                                     file,
@@ -2172,17 +2281,21 @@ void MainWindow::setCurrentPathFromFile (const QString &fileName)
   }
 }
 
-void MainWindow::setPixmap (const QPixmap &pixmap)
+void MainWindow::setPixmap (const QString &curveSelected,
+                            const QPixmap &pixmap)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setPixmap";
 
   m_digitizeStateContext->setImageIsLoaded (m_cmdMediator,
                                             true);
+
+  // We cannot reliably use m_cmbCurve->currentText below for the selected curve since that control
+  // can be pointing to a curve that no longer exists so this method requires curveSelected as an argument
   m_backgroundStateContext->setPixmap (m_transformation,
                                        m_cmdMediator->document().modelGridRemoval(),
                                        m_cmdMediator->document().modelColorFilter(),
                                        pixmap,
-                                       m_cmbCurve->currentText());
+                                       curveSelected);
 }
 
 void MainWindow::settingsRead ()
@@ -2310,6 +2423,9 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                                                                   QVariant (ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)).toInt());
   m_modelMainWindow.setMainTitleBarFormat ((MainTitleBarFormat) settings.value (SETTINGS_MAIN_TITLE_BAR_FORMAT,
                                                                                 QVariant (MAIN_TITLE_BAR_FORMAT_PATH)).toInt());
+  m_modelMainWindow.setPdfResolution (settings.value (SETTINGS_IMPORT_PDF_RESOLUTION,
+                                                      QVariant (DEFAULT_IMPORT_PDF_RESOLUTION)).toInt ());
+
   updateSettingsMainWindow();
 
   settings.endGroup();
@@ -2341,6 +2457,7 @@ void MainWindow::settingsWrite ()
 
   }
   settings.setValue (SETTINGS_CHECKLIST_GUIDE_WIZARD, m_actionHelpChecklistGuideWizard->isChecked ());
+  settings.setValue (SETTINGS_IMPORT_PDF_RESOLUTION, m_modelMainWindow.pdfResolution ());
   settings.setValue (SETTINGS_LOCALE_LANGUAGE, m_modelMainWindow.locale().language());
   settings.setValue (SETTINGS_LOCALE_COUNTRY, m_modelMainWindow.locale().country());
   settings.setValue (SETTINGS_VIEW_BACKGROUND_TOOLBAR, m_actionViewBackground->isChecked());
@@ -2357,14 +2474,17 @@ void MainWindow::settingsWrite ()
   settings.endGroup ();
 }
 
-bool MainWindow::setupAfterLoad (const QString &fileName,
-                                 const QString &temporaryMessage ,
-                                 ImportType importType)
+bool MainWindow::setupAfterLoadNewDocument (const QString &fileName,
+                                            const QString &temporaryMessage ,
+                                            ImportType importType)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setupAfterLoad"
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setupAfterLoadNewDocument"
                               << " file=" << fileName.toLatin1().data()
                               << " message=" << temporaryMessage.toLatin1().data()
                               << " importType=" << importType;
+
+  // The steps in this method should theoretically be a superset of the steps in setupAfterLoadNewDocument. Therefore, any
+  // changes to this method should be considered for application to the other method also
 
   const QString EMPTY_CURVE_NAME_TO_SKIP_BACKGROUND_PROCESSING; // For bootstrapping the preview
 
@@ -2375,7 +2495,8 @@ bool MainWindow::setupAfterLoad (const QString &fileName,
                                               m_cmdMediator->document().modelGridRemoval(),
                                               m_cmdMediator->document().modelColorFilter(),
                                               EMPTY_CURVE_NAME_TO_SKIP_BACKGROUND_PROCESSING); // Before setPixmap
-  setPixmap (m_cmdMediator->pixmap ()); // Set background immediately so it is visible as a preview when any dialogs are displayed
+  setPixmap (m_cmdMediator->document().curvesGraphsNames().first(),
+             m_cmdMediator->pixmap ()); // Set background immediately so it is visible as a preview when any dialogs are displayed
 
   // Image is visible now so the user can refer to it when we ask for the number of coordinate systems. Note that the Document
   // may already have multiple CoordSystem if user loaded a file that had multiple CoordSystem entries
@@ -2421,6 +2542,40 @@ bool MainWindow::setupAfterLoad (const QString &fileName,
                                               m_cmdMediator->document().modelGridRemoval(),
                                               m_cmdMediator->document().modelColorFilter(),
                                               m_cmbCurve->currentText ());
+  m_backgroundStateContext->setBackgroundImage ((BackgroundImage) m_cmbBackground->currentIndex ());
+
+  applyZoomFactorAfterLoad(); // Zoom factor must be reapplied after background image is set, to have any effect
+
+  setCurrentFile(fileName);
+  m_statusBar->showTemporaryMessage (temporaryMessage);
+  m_statusBar->wakeUp ();
+
+  saveStartingDocumentSnapshot();
+
+  updateAfterCommand(); // Replace stale points by points in new Document
+
+  return true;
+}
+
+bool MainWindow::setupAfterLoadReplacingImage (const QString &fileName,
+                                               const QString &temporaryMessage ,
+                                               ImportType importType)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setupAfterLoadReplacingImage"
+                              << " file=" << fileName.toLatin1().data()
+                              << " message=" << temporaryMessage.toLatin1().data()
+                              << " importType=" << importType;
+
+  // The steps in this method should theoretically be just a subset of the steps in setupAfterLoadNewDocument
+
+  // After this point there should be no commands in CmdMediator, since we effectively have a new document
+  m_cmdMediator->clear();
+
+  setPixmap (m_cmdMediator->document().curvesGraphsNames().first(),
+             m_cmdMediator->pixmap ()); // Set background immediately so it is visible as a preview when any dialogs are displayed
+
+  m_isDocumentExported = false;
+
   m_backgroundStateContext->setBackgroundImage ((BackgroundImage) m_cmbBackground->currentIndex ());
 
   applyZoomFactorAfterLoad(); // Zoom factor must be reapplied after background image is set, to have any effect
@@ -2822,6 +2977,13 @@ void MainWindow::slotFileImportImage(QString fileName, QImage image)
              IMPORT_TYPE_SIMPLE);
 }
 
+void MainWindow::slotFileImportImageReplace ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFileImportImageReplace";
+
+  fileImportWithPrompts (IMPORT_TYPE_IMAGE_REPLACE);
+}
+
 void MainWindow::slotFileOpen()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFileOpen";
@@ -3206,12 +3368,18 @@ void MainWindow::slotTimeoutRegressionErrorReport ()
 
   if (m_cmdStackShadow->canRedo()) {
 
+    // Always reset current directory before the command. This guarantees the upcoming redo step will work
+    QDir::setCurrent (m_startupDirectory);
+
     m_cmdStackShadow->slotRedo();
+
+    // Always reset current directory after the command. This guarantees the final export to file will work
+    QDir::setCurrent (m_startupDirectory);
 
   } else {
 
 #ifndef OSX_RELEASE
-    exportAllCoordinateSystems ();
+    exportAllCoordinateSystemsAfterRegressionTests ();
 #endif
 
     // Regression test has finished so exit. We unset the dirty flag so there is no prompt
@@ -3227,7 +3395,13 @@ void MainWindow::slotTimeoutRegressionFileCmdScript ()
 
   if (m_fileCmdScript->canRedo()) {
 
+    // Always reset current directory before the command. This guarantees the upcoming redo step will work
+    QDir::setCurrent (m_startupDirectory);
+
     m_fileCmdScript->redo(*this);
+
+    // Always reset current directory after the command. This guarantees the final export to file will work
+    QDir::setCurrent (m_startupDirectory);
 
   } else {
 
@@ -3235,7 +3409,7 @@ void MainWindow::slotTimeoutRegressionFileCmdScript ()
     if (m_cmdMediator != 0) {
 
 #ifndef OSX_RELEASE
-      exportAllCoordinateSystems ();
+      exportAllCoordinateSystemsAfterRegressionTests ();
 #endif
 
       // We unset the dirty flag so there is no "Save changes?" prompt
@@ -3709,8 +3883,7 @@ void MainWindow::slotViewZoomOutFromWheelEvent ()
   }
 }
 
-void MainWindow::startRegressionTestErrorReport(const QString &initialPath,
-                                                const QString &regressionInputFile)
+void MainWindow::startRegressionTestErrorReport(const QString &regressionInputFile)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::startRegressionTestErrorReport";
 
@@ -3720,14 +3893,8 @@ void MainWindow::startRegressionTestErrorReport(const QString &initialPath,
   // 2) before running any commands since those commands implicitly assume the index is zero
   Point::setIdentifierIndex(0);
 
-  // Need absolute path since QDir::currentPath has been changed already so the
-  // current path is not predictable
-  QString absoluteRegressionInputFile = QString ("%1/%2")
-                                        .arg (initialPath)
-                                        .arg (regressionInputFile);
-
   // Save output/export file name
-  m_regressionFile = exportFilenameFromInputFilename (absoluteRegressionInputFile);
+  m_regressionFile = exportFilenameFromInputFilename (regressionInputFile);
 
   m_timerRegressionErrorReport = new QTimer();
   m_timerRegressionErrorReport->setSingleShot(false);
@@ -3841,6 +4008,7 @@ void MainWindow::updateControls ()
 
   m_cmbBackground->setEnabled (!m_currentFile.isEmpty ());
 
+  m_actionImportImageReplace->setEnabled (m_cmdMediator != 0);
 #ifndef OSX_RELEASE
   m_menuFileOpenRecent->setEnabled ((m_actionRecentFiles.count () > 0) &&
                                     (m_actionRecentFiles.at(0)->isVisible ())); // Need at least one visible recent file entry

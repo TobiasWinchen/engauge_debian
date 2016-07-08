@@ -4,15 +4,25 @@
 # 1) This builds 'release' executables by default, to greatly reduce the chances of a 'debug' build getting deployed.
 #    To get a 'debug' build, add 'CONFIG=debug' to the qmake command line:
 #        qmake CONFIG=debug
-# 2) Add 'jpeg2000' to the qmake command line to include support for JPEG2000 input files. Requires JPEG2000_INCLUDE and 
-#    JPEG2000_LIB environment variables. At some point, Qt may provide its own support for this format, at which point 
-#    this can be skipped
+# 2) Add 'jpeg2000' to the qmake command line to include support for JPEG2000 input files. Requires:
+#        1) previous installation of OpenJPEG 2.1 development package
+#        2) OPENJPEG_INCLUDE environment variable pointing to directory with openjpeg.h
+#        3) OPENJPEG_LIB environment variable pointing to directory with libopenjp2.so
+#    Sample command lines:
 #        qmake CONFIG+=jpeg2000
 #        qmake "CONFIG+=debug jpeg2000"
-# 3) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
-#    include/library files in an automated and platform-independent manner, so it will not be removed
+#    At some point, Qt may provide its own support for this format, at which point this can be skipped
+# 3) Add 'pdf' to the qmake command line to include support for PDF input files. Requires
+#        1) previous installation of the poppler-qt5 development package. Engauge has been tested with versions 0.24.5 and 0.44.0
+#        2) POPPLER_INCLUDE environment variable pointing to directory containing Document.h
+#        3) POPPLER_LIB environment variable pointing to directory containing libpoppler-qt5.so
+#    Sample command lines:
+#        qmake CONFIG+=pdf
+#        qmake "CONFIG+=debug pdf"
 # 4) Set environment variable HELPDIR to override the default directory for the help files. On the command line, use
 #    qmake "DEFINES+=HELPDIR=<directory>". The <directory> is absolute or relative to the application executable directory
+# 5) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
+#    include/library files in an automated and platform-independent manner, so it will not be removed
 #
 # More comments are in the INSTALL file, and below
 
@@ -196,6 +206,7 @@ HEADERS  += \
     src/Export/ExportAlignLinear.h \
     src/Export/ExportAlignLog.h \
     src/Export/ExportDelimiter.h \
+    src/Export/ExportImageForRegression.h \
     src/Export/ExportLayoutFunctions.h \
     src/Export/ExportPointsIntervalUnits.h \
     src/Export/ExportPointsSelectionFunctions.h \
@@ -270,6 +281,7 @@ HEADERS  += \
     src/Network/NetworkClient.h \
     src/Ordinal/OrdinalGenerator.h \
     src/Ordinal/OrdinalToGraphicsPoint.h \
+    src/Pdf/PdfResolution.h \
     src/Point/Point.h \
     src/Point/PointComparator.h \
     src/Point/PointIdentifiers.h \
@@ -325,7 +337,8 @@ HEADERS  += \
     src/Zoom/ZoomControl.h \
     src/Zoom/ZoomFactor.h \
     src/Zoom/ZoomFactorInitial.h \
-    src/Zoom/ZoomLabels.h
+    src/Zoom/ZoomLabels.h \
+    src/util/ZValues.h
 
 SOURCES += \
     src/Background/BackgroundImage.cpp \
@@ -485,6 +498,7 @@ SOURCES += \
     src/Export/ExportFileFunctions.cpp \
     src/Export/ExportFileRelations.cpp \
     src/Export/ExportHeader.cpp \
+    src/Export/ExportImageForRegression.cpp \
     src/Export/ExportLayoutFunctions.cpp \
     src/Export/ExportOrdinalsSmooth.cpp \
     src/Export/ExportOrdinalsStraight.cpp \
@@ -548,6 +562,7 @@ SOURCES += \
     src/util/mmsubs.cpp \
     src/Network/NetworkClient.cpp \
     src/Ordinal/OrdinalGenerator.cpp \
+    src/Pdf/PdfResolution.cpp \
     src/Point/Point.cpp \
     src/Point/PointIdentifiers.cpp \
     src/Point/PointMatchAlgorithm.cpp \
@@ -596,7 +611,8 @@ SOURCES += \
     src/View/ViewProfileScale.cpp \
     src/View/ViewSegmentFilter.cpp \
     src/util/Xml.cpp \
-    src/Zoom/ZoomLabels.cpp
+    src/Zoom/ZoomLabels.cpp \
+    src/util/ZValues.cpp
 
 macx-* {
   CONFIG(debug,debug|release){
@@ -629,15 +645,15 @@ macx-* {
 
 win32-* {
   CONFIG += windows
-  QMAKE_LFLAGS += -Wl,--stack,32000000
 }
 
 win32-msvc* {
-  QMAKE_CXXFLAGS += -EHsc
+  QMAKE_CXXFLAGS += -EHsc /F 32000000
   LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell32.lib
 } else {
   win32-g++* {
     LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
+    QMAKE_LFLAGS += -Wl,--stack,32000000
   }
   LIBS += -lfftw3 -llog4cpp
 }
@@ -674,6 +690,7 @@ INCLUDEPATH += src \
                src/Mime \
                src/Network \
                src/Ordinal \
+               src/Pdf \
                src/Plot \
                src/Point \
                src/Segment \
@@ -694,53 +711,68 @@ win32-* {
 
 RESOURCES += src/engauge.qrc
 
+CONFIG(debug,debug|release) {
+  message("Build type:       debug")
+} else {
+  message("Build type:       release")
+}
+
 jpeg2000 {
-    CONFIG(debug,debug|release) {
-      message(Building dynamic debug version with internal support for JPEG2000 files)
-    } else {
-      message(Building static release version with internal support for JPEG2000 files)
-    }
+    message("JPEG2000 support: yes")
     _OPENJPEG_INCLUDE = $$(OPENJPEG_INCLUDE)
     _OPENJPEG_LIB = $$(OPENJPEG_LIB)
-    _JPEG2000_INCLUDE = $$(JPEG2000_INCLUDE)
-    _JPEG2000_LIB = $$(JPEG2000_LIB)
     isEmpty(_OPENJPEG_INCLUDE) {
-      error("OPENJPEG_INCLUDE, OPENJPEG_LIB, JPEG2000_INCLUDE and JPEG2000_LIB environment variables must be defined")
+      error("OPENJPEG_INCLUDE and OPENJPEG_LIB environment variables must be defined")
     } else {
       isEmpty(_OPENJPEG_LIB) {
-        error("OPENJPEG_INCLUDE, OPENJPEG_LIB, JPEG2000_INCLUDE and JPEG2000_LIB environment variables must be defined")
-      } else {
-        isEmpty(_JPEG2000_INCLUDE) {
-          error("JPEG_INCLUDE, JPEG_LIB, JPEG2000_INCLUDE and JPEG2000_LIB environment variables must be defined")
-        } else {
-          isEmpty(_JPEG2000_LIB) {
-            error("JPEG_INCLUDE, JPEG_LIB, JPEG2000_INCLUDE and JPEG2000_LIB environment variables must be defined")
-          }
-        }
+        error("OPENJPEG_INCLUDE and OPENJPEG_LIB environment variables must be defined")
       }
     }
     DEFINES += "ENGAUGE_JPEG2000"
     INCLUDEPATH += $$(OPENJPEG_INCLUDE) \
-                   $$(JPEG2000_INCLUDE)
-    LIBS += -L$$(OPENJPEG_LIB) -L$$(JPEG2000_LIB) -lopenjp2
-
+                   src/Jpeg2000
+    LIBS += -L$$(OPENJPEG_LIB) -lopenjp2
     HEADERS += src/Jpeg2000/Jpeg2000.h \
                src/Jpeg2000/Jpeg2000Callbacks.h \
                src/Jpeg2000/Jpeg2000Color.h \
                src/Jpeg2000/Jpeg2000Convert.h \
                src/Jpeg2000/Jpeg2000FormatDefs.h
-
     SOURCES += src/Jpeg2000/Jpeg2000.cpp \
                src/Jpeg2000/Jpeg2000Callbacks.cpp \
                src/Jpeg2000/Jpeg2000Color.cpp \
                src/Jpeg2000/Jpeg2000Convert.cpp
+    QMAKE_LFLAGS += -Wl,-rpath=\'\$\$ORIGIN\'
+    QMAKE_POST_LINK += cp $$(OPENJPEG_LIB)/libopenjp2.so.7 bin
 
 } else {
-    CONFIG(debug,debug|release) {
-      message(Building debug version without internal support for JPEG2000 files)
+    message("JPEG2000 support: no")
+}
+
+pdf {
+    message("PDF support:      yes")
+    _POPPLER_INCLUDE = $$(POPPLER_INCLUDE)
+    _POPPLER_LIB = $$(POPPLER_LIB)
+    isEmpty(_POPPLER_INCLUDE) {
+      error("POPPLER_INCLUDE and POPPLER_LIB environment variables must be defined")
     } else {
-      message(Building release version without internal support for JPEG2000 files)
+      isEmpty(_POPPLER_LIB) {
+        error("POPPLER_INCLUDE and POPPLER_LIB environment variables must be defined")
+      }
     }
+    DEFINES += "ENGAUGE_PDF"
+    LIBS += -L$$(POPPLER_LIB) -lpoppler-qt5
+    INCLUDEPATH += $$(POPPLER_INCLUDE)
+    HEADERS += src/Dlg/DlgPdfFrame.h \
+               src/Pdf/Pdf.h \
+               src/Pdf/PdfFrame.h \
+               src/Pdf/PdfFrameHandle.h
+    SOURCES += src/Dlg/DlgPdfFrame.cpp \
+               src/Pdf/Pdf.cpp \
+               src/Pdf/PdfFrame.cpp \
+               src/Pdf/PdfFrameHandle.cpp
+
+} else {
+    message("PDF support:      no")
 }
 
 # People interested in translating a language can contact the developers for help. 
