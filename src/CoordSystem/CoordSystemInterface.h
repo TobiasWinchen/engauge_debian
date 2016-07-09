@@ -15,6 +15,7 @@
 #include "DocumentModelDigitizeCurve.h"
 #include "DocumentModelExportFormat.h"
 #include "DocumentModelGeneral.h"
+#include "DocumentModelGridDisplay.h"
 #include "DocumentModelGridRemoval.h"
 #include "DocumentModelPointMatch.h"
 #include "DocumentModelSegments.h"
@@ -154,6 +155,9 @@ public:
   /// Get method for DocumentModelGeneral.
   virtual DocumentModelGeneral modelGeneral() const = 0;
 
+  /// Get method for DocumentModelGridDisplay.
+  virtual DocumentModelGridDisplay modelGridDisplay() const = 0;
+
   /// Get method for DocumentModelGridRemoval.
   virtual DocumentModelGridRemoval modelGridRemoval() const = 0;
 
@@ -198,7 +202,13 @@ public:
   /// Save graph to xml
   virtual void saveXml (QXmlStreamWriter &writer) const = 0;
 
-  /// Let CmdAbstract classes overwrite CurvesGraphs.
+  /// Currently selected curve name. This is used to set the selected curve combobox in MainWindow
+  virtual QString selectedCurveName () const = 0;
+
+  /// Let CmdAbstract classes overwrite axes Curve. Applies to current coordinate system
+  virtual void setCurveAxes (const Curve &curveAxes) = 0;
+
+  /// Let CmdAbstract classes overwrite CurvesGraphs. Applies to current coordinate system
   virtual void setCurvesGraphs (const CurvesGraphs &curvesGraphs) = 0;
 
   /// Set method for DocumentModelAxesChecker.
@@ -222,6 +232,9 @@ public:
   /// Set method for DocumentModelGeneral.
   virtual void setModelGeneral (const DocumentModelGeneral &modelGeneral) = 0;
 
+  /// Set method for DocumentModelGridDisplay.
+  virtual void setModelGridDisplay(const DocumentModelGridDisplay &modelGridDisplay) = 0;
+
   /// Set method for DocumentModelGridRemoval.
   virtual void setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval) = 0;
 
@@ -230,6 +243,9 @@ public:
 
   /// Set method for DocumentModelSegments.
   virtual void setModelSegments(const DocumentModelSegments &modelSegments) = 0;
+
+  /// Save curve name that is selected for the current coordinate system, for the next time the coordinate system reappears
+  virtual void setSelectedCurveName(const QString &selectedCurveName) = 0;
 
   /// Return true if startup loading succeeded. If the loading failed then reasonForUnsuccessfulRed will explain why
   virtual bool successfulRead () const = 0;

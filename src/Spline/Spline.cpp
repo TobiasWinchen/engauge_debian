@@ -12,7 +12,7 @@ Spline::Spline(const std::vector<double> &t,
                const std::vector<SplinePair> &xy)
 {
   ENGAUGE_ASSERT (t.size() == xy.size());
-  ENGAUGE_ASSERT (xy.size() >= 3);
+  ENGAUGE_ASSERT (xy.size() > 0); // Need at least one point for this class to not fail with a crash
 
   checkTIncrements (t);
   computeCoefficientsForIntervals (t, xy);
@@ -37,44 +37,56 @@ void Spline::checkTIncrements (const std::vector<double> &t) const
 void Spline::computeCoefficientsForIntervals (const std::vector<double> &t,
                                               const std::vector<SplinePair> &xy)
 {
-  int i, j;
-  int n = (int) xy.size() - 1;
+  if (xy.size() > 1) {
 
-  m_t = t;
-  m_xy = xy;
+    // There are enough points to compute the coefficients
+    int i, j;
+    int n = (int) xy.size() - 1;
 
-  vector<SplinePair> b(n), d(n), a(n), c(n+1), l(n+1), u(n+1), z(n+1);
-  vector<SplinePair> h(n+1);
+    m_t = t;
+    m_xy = xy;
 
-  l[0] = SplinePair (1.0);
-  u[0] = SplinePair (0.0);
-  z[0] = SplinePair (0.0);
-  h[0] = t[1] - t[0];
+    vector<SplinePair> b(n), d(n), a(n), c(n+1), l(n+1), u(n+1), z(n+1);
+    vector<SplinePair> h(n+1);
 
-  for (i = 1; i < n; i++) {
-    h[i] = t[i+1] - t[i];
-    l[i] = SplinePair (2.0) * (t[i+1] - t[i-1]) - h[i-1] * u[i-1];
-    u[i] = h[i] / l[i];
-    a[i] = (SplinePair (3.0) / h[i]) * (xy[i+1] - xy[i]) - (SplinePair (3.0) / h[i-1]) * (xy[i] - xy[i-1]);
-    z[i] = (a[i] - h[i-1] * z[i-1]) / l[i];
-  }
+    l[0] = SplinePair (1.0);
+    u[0] = SplinePair (0.0);
+    z[0] = SplinePair (0.0);
+    h[0] = t[1] - t[0];
 
-  l[n] = SplinePair (1.0);
-  z[n] = SplinePair (0.0);
-  c[n] = SplinePair (0.0);
+    for (i = 1; i < n; i++) {
+      h[i] = t[i+1] - t[i];
+      l[i] = SplinePair (2.0) * (t[i+1] - t[i-1]) - h[i-1] * u[i-1];
+      u[i] = h[i] / l[i];
+      a[i] = (SplinePair (3.0) / h[i]) * (xy[i+1] - xy[i]) - (SplinePair (3.0) / h[i-1]) * (xy[i] - xy[i-1]);
+      z[i] = (a[i] - h[i-1] * z[i-1]) / l[i];
+    }
 
-  for (j = n - 1; j >= 0; j--) {
-    c[j] = z[j] - u[j] * c[j+1];
-    b[j] = (xy[j+1] - xy[j]) / (h[j]) - (h[j] * (c[j+1] + SplinePair (2.0) * c[j])) / SplinePair (3.0);
-    d[j] = (c[j+1] - c[j]) / (SplinePair (3.0) * h[j]);
-  }
+    l[n] = SplinePair (1.0);
+    z[n] = SplinePair (0.0);
+    c[n] = SplinePair (0.0);
 
-  for (i = 0; i < n; i++) {
-    m_elements.push_back(SplineCoeff(t[i],
-                                     xy[i],
-                                     b[i],
-                                     c[i],
-                                     d[i]));
+    for (j = n - 1; j >= 0; j--) {
+      c[j] = z[j] - u[j] * c[j+1];
+      b[j] = (xy[j+1] - xy[j]) / (h[j]) - (h[j] * (c[j+1] + SplinePair (2.0) * c[j])) / SplinePair (3.0);
+      d[j] = (c[j+1] - c[j]) / (SplinePair (3.0) * h[j]);
+    }
+
+    for (i = 0; i < n; i++) {
+      m_elements.push_back(SplineCoeff(t[i],
+                                       xy[i],
+                                       b[i],
+                                       c[i],
+                                       d[i]));
+    }
+  } else {
+
+    // There is only one point so we have to hack a coefficient entry
+    m_elements.push_back(SplineCoeff(t[0],
+                                     xy[0],
+                                     0.0,
+                                     0.0,
+                                     0.0));
   }
 }
 
@@ -109,6 +121,33 @@ SplinePair Spline::findSplinePairForFunctionX (double x,
   double tLow = m_t[0];
   double tHigh = m_t[m_xy.size() - 1];
 
+  // This method implicitly assumes that the x values are monotonically increasing
+
+  // Extrapolation that is performed if x is out of bounds. As a starting point, we assume that the t
+  // values and x values behave the same, which is linearly. This assumption works best when user
+  // has set the points so the spline line is linear at the endpoints - which is also preferred since
+  // higher order polynomials are typically unstable and can "explode" off into unwanted directions
+  double x0 = interpolateCoeff (m_t[0]).x();
+  double xNm1 = interpolateCoeff (m_t[m_xy.size() - 1]).x();
+  if (x < x0) {
+
+    // Extrapolate with x < x(0) < x(N-1) which correspond to s, s0 and sNm1
+    double x1 = interpolateCoeff (m_t[1]).x();
+    double tStart = (x - x0) / (x1 - x0); // This is less than zero. x=x0 for t=0 and x=x1 for t=1
+    tLow = 2.0 * tStart;
+    tHigh = 0.0;
+
+  } else if (xNm1 < x) {
+
+    // Extrapolate with x(0) < x(N-1) < x which correspond to s0, sNm1 and s
+    double xNm2 = interpolateCoeff (m_t[m_xy.size() - 2]).x();
+    double tStart = tHigh + (x - xNm1) / (xNm1 - xNm2); // This is greater than one. x=xNm2 for t=0 and x=xNm1 for t=1
+    tLow = m_xy.size() - 1;
+    tHigh = tHigh + 2.0 * (tStart - tLow);
+
+   }
+
+  // Interpolation using bisection search
   double tCurrent = (tHigh + tLow) / 2.0;
   double tDelta = (tHigh - tLow) / 4.0;
   for (int iteration = 0; iteration < numIterations; iteration++) {

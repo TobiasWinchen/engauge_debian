@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt_BR">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="pt" version="2.1">
 <context>
     <name>ChecklistGuide</name>
     <message>
@@ -4205,7 +4203,7 @@ Clique no botão Pontos Axis</translation>
         <source>Step 2 - Click on an axis or grid
 line with known coordinates. An axis
 point appears, with a dialog window
-for entering the axis point&apos;s
+for entering the axis point's
 coordinates</source>
         <translation>Passo 2 - Clique em um eixo ou grade
 linha com coordenadas conhecidas. um eixo

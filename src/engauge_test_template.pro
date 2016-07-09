@@ -5,13 +5,23 @@
 TEMPLATE    = app
 
 # CONFIG comments:
-# 1) Remove 'debug' in the CONFIG= line or set environment variable ENGAUGE_RELEASE=1 to create a release version 
-#    without debug information
-# 2) Add 'jpeg2000' to the CONFIG= line to include support for JPEG2000 input files. Requires JPEG2000_INCLUDE and JPEG2000_LIB 
-#    environment variables
+# 1) Add 'jpeg2000' to the qmake command line to include support for JPEG2000 input files. Requires
+#       1) previous installation of the jpeg2000 development package
+#       2) JPEG2000_INCLUDE environment variable pointing to directory containing openjpeg.h
+#       3) JPEG2000_LIB environment variable pointing to directory containing libopenjp2.so
+#    Sample command lines
+#       qmake CONFIG+=jpeg2000
+#       qmake "CONFIG+=debug jpeg2000"
+# 2) Add 'pdf' to the qmake command line to include support for PDF input files. Requires
+#       1) previous installation of the poppler-qt5 development package
+#       2) POPPLER_INCLUDE environment variable pointing to directory containing Document.h
+#       3) POPPLER_LIB environment variable pointing to directory containing libpoppler-qt5.so
+#    Sample command lines
+#       qmake CONFIG+=pdf
+#       qmake "CONFIG+=debug pdf"
 # 3) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
 #    include/library files in an automated and platform-independent manner, so it will not be removed
-CONFIG      = qt warn_on thread debug testcase debug
+CONFIG      += qt warn_on thread testcase 
 
 OBJECTS_DIR = .objs_test
 MOC_DIR = .moc_test
@@ -31,6 +41,7 @@ HEADERS  += \
     Callback/CallbackBoundingRects.h \
     Callback/CallbackCheckAddPointAxis.h \
     Callback/CallbackCheckEditPointAxis.h \
+    Callback/CallbackDocumentHash.h \
     Callback/CallbackGatherXThetaValuesFunctions.h \
     Callback/CallbackNextOrdinal.h \
     Callback/CallbackPointOrdinal.h \
@@ -61,6 +72,8 @@ HEADERS  += \
     Cmd/CmdMediator.h \
     Cmd/CmdMoveBy.h \
     Cmd/CmdPaste.h \
+    Cmd/CmdPointChangeBase.h \
+    Cmd/CmdRedoForTest.h \
     Cmd/CmdSelectCoordSystem.h \
     Cmd/CmdSettingsAxesChecker.h \
     Cmd/CmdSettingsColorFilter.h \
@@ -70,16 +83,30 @@ HEADERS  += \
     Cmd/CmdSettingsDigitizeCurve.h \
     Cmd/CmdSettingsExportFormat.h \
     Cmd/CmdSettingsGeneral.h \
+    Cmd/CmdSettingsGridDisplay.h \
     Cmd/CmdSettingsGridRemoval.h \
     Cmd/CmdSettingsPointMatch.h \
     Cmd/CmdSettingsSegments.h \
     Cmd/CmdStackShadow.h \
+    Cmd/CmdUndoForTest.h \
     Color/ColorConstants.h \
     Color/ColorFilter.h \
     Color/ColorFilterEntry.h \
     Color/ColorFilterHistogram.h \
     Color/ColorFilterMode.h \
     Color/ColorFilterSettings.h \
+    Color/ColorFilterSettingsStrategyAbstractBase.h \
+    Color/ColorFilterSettingsStrategyForeground.h \
+    Color/ColorFilterSettingsStrategyHue.h \
+    Color/ColorFilterSettingsStrategyIntensity.h \
+    Color/ColorFilterSettingsStrategySaturation.h \
+    Color/ColorFilterSettingsStrategyValue.h \
+    Color/ColorFilterStrategyAbstractBase.h \
+    Color/ColorFilterStrategyForeground.h \
+    Color/ColorFilterStrategyHue.h \
+    Color/ColorFilterStrategyIntensity.h \
+    Color/ColorFilterStrategySaturation.h \
+    Color/ColorFilterStrategyValue.h \
     Color/ColorPalette.h \
     Coord/CoordScale.h \
     Coord/CoordsType.h \
@@ -130,6 +157,7 @@ HEADERS  += \
     Dlg/DlgSettingsDigitizeCurve.h \
     Dlg/DlgSettingsExportFormat.h \
     Dlg/DlgSettingsGeneral.h \
+    Dlg/DlgSettingsGridDisplay.h \
     Dlg/DlgSettingsGridRemoval.h \
     Dlg/DlgSettingsMainWindow.h \
     Dlg/DlgSettingsPointMatch.h \
@@ -141,6 +169,8 @@ HEADERS  += \
     Dlg/DlgValidatorNumber.h \
     Document/Document.h \
     Document/DocumentAxesPointsRequired.h \
+    Document/DocumentHash.h \
+    Document/DocumentHashGenerator.h \
     Document/DocumentModelAbstractBase.h \
     Document/DocumentModelAxesChecker.h \
     Document/DocumentModelColorFilter.h \
@@ -148,6 +178,7 @@ HEADERS  += \
     Document/DocumentModelDigitizeCurve.h \
     Document/DocumentModelExportFormat.h \
     Document/DocumentModelGeneral.h \
+    Document/DocumentModelGridDisplay.h \
     Document/DocumentModelGridRemoval.h \
     Document/DocumentModelPointMatch.h \
     Document/DocumentModelSegments.h \
@@ -166,6 +197,7 @@ HEADERS  += \
     Export/ExportFileFunctions.h \
     Export/ExportFileRelations.h \
     Export/ExportHeader.h \
+    Export/ExportImageForRegression.h \
     Export/ExportOrdinalsSmooth.h \
     Export/ExportOrdinalsStraight.h \
     Export/ExportToClipboard.h \
@@ -209,6 +241,11 @@ HEADERS  += \
     Grid/GridClassifier.h \
     Grid/GridCoordDisable.h \
     Grid/GridHealer.h \
+    Grid/GridInitializer.h \
+    Grid/GridLine.h \
+    Grid/GridLineFactory.h \
+    Grid/GridLines.h \
+    Grid/GridLineStyle.h \
     Grid/GridRemoval.h \
     Help/HelpBrowser.h \
     Help/HelpWindow.h \
@@ -226,6 +263,7 @@ HEADERS  += \
     Network/NetworkClient.h \
     Ordinal/OrdinalGenerator.h \
     Ordinal/OrdinalToGraphicsPoint.h \
+    Pdf/PdfResolution.h \
     Point/Point.h \
     Point/PointComparator.h \
     Point/PointIdentifiers.h \
@@ -282,7 +320,8 @@ HEADERS  += \
     Zoom/ZoomControl.h \
     Zoom/ZoomFactor.h \
     Zoom/ZoomFactorInitial.h\
-    Zoom/ZoomLabels.h
+    Zoom/ZoomLabels.h \
+    util/ZValues.h
 
 SOURCES += \
     Background/BackgroundImage.cpp \
@@ -298,6 +337,7 @@ SOURCES += \
     Callback/CallbackBoundingRects.cpp \
     Callback/CallbackCheckAddPointAxis.cpp \
     Callback/CallbackCheckEditPointAxis.cpp \
+    Callback/CallbackDocumentHash.cpp \
     Callback/CallbackGatherXThetaValuesFunctions.cpp \
     Callback/CallbackNextOrdinal.cpp \
     Callback/CallbackPointOrdinal.cpp \
@@ -327,6 +367,8 @@ SOURCES += \
     Cmd/CmdMediator.cpp \
     Cmd/CmdMoveBy.cpp \
     Cmd/CmdPaste.cpp \
+    Cmd/CmdRedoForTest.cpp \
+    Cmd/CmdPointChangeBase.cpp \
     Cmd/CmdSelectCoordSystem.cpp \
     Cmd/CmdSettingsAxesChecker.cpp \
     Cmd/CmdSettingsColorFilter.cpp \
@@ -336,14 +378,28 @@ SOURCES += \
     Cmd/CmdSettingsDigitizeCurve.cpp \
     Cmd/CmdSettingsExportFormat.cpp \
     Cmd/CmdSettingsGeneral.cpp \
+    Cmd/CmdSettingsGridDisplay.cpp \
     Cmd/CmdSettingsGridRemoval.cpp \
     Cmd/CmdSettingsPointMatch.cpp \
     Cmd/CmdSettingsSegments.cpp \
     Cmd/CmdStackShadow.cpp \
+    Cmd/CmdUndoForTest.cpp \
     Color/ColorFilter.cpp \
     Color/ColorFilterHistogram.cpp \
     Color/ColorFilterMode.cpp \
     Color/ColorFilterSettings.cpp \
+    Color/ColorFilterSettingsStrategyAbstractBase.cpp \
+    Color/ColorFilterSettingsStrategyForeground.cpp \
+    Color/ColorFilterSettingsStrategyHue.cpp \
+    Color/ColorFilterSettingsStrategyIntensity.cpp \
+    Color/ColorFilterSettingsStrategySaturation.cpp \
+    Color/ColorFilterSettingsStrategyValue.cpp \
+    Color/ColorFilterStrategyAbstractBase.cpp \
+    Color/ColorFilterStrategyForeground.cpp \
+    Color/ColorFilterStrategyHue.cpp \
+    Color/ColorFilterStrategyIntensity.cpp \
+    Color/ColorFilterStrategySaturation.cpp \
+    Color/ColorFilterStrategyValue.cpp \
     Color/ColorPalette.cpp \
     Coord/CoordScale.cpp \
     Coord/CoordsType.cpp \
@@ -393,6 +449,7 @@ SOURCES += \
     Dlg/DlgSettingsDigitizeCurve.cpp \
     Dlg/DlgSettingsExportFormat.cpp \
     Dlg/DlgSettingsGeneral.cpp \
+    Dlg/DlgSettingsGridDisplay.cpp \
     Dlg/DlgSettingsGridRemoval.cpp \
     Dlg/DlgSettingsMainWindow.cpp \
     Dlg/DlgSettingsPointMatch.cpp \
@@ -403,6 +460,7 @@ SOURCES += \
     Dlg/DlgValidatorFactory.cpp \
     Dlg/DlgValidatorNumber.cpp \
     Document/Document.cpp \
+    Document/DocumentHashGenerator.cpp \
     Document/DocumentModelAbstractBase.cpp \
     Document/DocumentModelAxesChecker.cpp \
     Document/DocumentModelColorFilter.cpp \
@@ -410,6 +468,7 @@ SOURCES += \
     Document/DocumentModelDigitizeCurve.cpp \
     Document/DocumentModelExportFormat.cpp \
     Document/DocumentModelGeneral.cpp \
+    Document/DocumentModelGridDisplay.cpp \
     Document/DocumentModelGridRemoval.cpp \
     Document/DocumentModelPointMatch.cpp \
     Document/DocumentModelSegments.cpp \
@@ -422,6 +481,7 @@ SOURCES += \
     Export/ExportFileFunctions.cpp \
     Export/ExportFileRelations.cpp \
     Export/ExportHeader.cpp \
+    Export/ExportImageForRegression.cpp \
     Export/ExportLayoutFunctions.cpp \
     Export/ExportOrdinalsSmooth.cpp \
     Export/ExportOrdinalsStraight.cpp \
@@ -465,6 +525,10 @@ SOURCES += \
     Grid/GridClassifier.cpp \
     Grid/GridCoordDisable.cpp \
     Grid/GridHealer.cpp \
+    Grid/GridInitializer.cpp \
+    Grid/GridLine.cpp \
+    Grid/GridLineFactory.cpp \
+    Grid/GridLines.cpp \
     Grid/GridRemoval.cpp \
     Help/HelpBrowser.cpp \
     Help/HelpWindow.cpp \
@@ -480,6 +544,7 @@ SOURCES += \
     util/mmsubs.cpp \
     Network/NetworkClient.cpp \
     Ordinal/OrdinalGenerator.cpp \
+    Pdf/PdfResolution.cpp \
     Point/Point.cpp \
     Point/PointIdentifiers.cpp \
     Point/PointMatchAlgorithm.cpp \
@@ -529,7 +594,8 @@ SOURCES += \
     View/ViewProfileScale.cpp \
     View/ViewSegmentFilter.cpp \
     util/Xml.cpp \
-    Zoom/ZoomLabels.cpp
+    Zoom/ZoomLabels.cpp \
+    util/ZValues.cpp
 
 TARGET = ../bin/TEST
 
@@ -576,6 +642,7 @@ INCLUDEPATH += Background \
                Mime \
                Network \
                Ordinal \
+               Pdf \
                Plot \
                Point \
                Segment \
@@ -603,12 +670,14 @@ INCLUDEPATH += $$(FFTW_HOME)/include \
 RESOURCES += \
     engauge.qrc
 
+CONFIG(debug,debug|release) {
+  message("Build type:       debug")
+} else {
+  message("Build type:       release")
+}
+
 jpeg2000 {
-    CONFIG(debug,debug|release) {
-      message(Building debug version with internal support for JPEG2000 files)
-    } else {
-      message(Building release version with internal support for JPEG2000 files)
-    }
+    message("JPEG2000 support: yes")
     _JPEG2000_INCLUDE = $$(JPEG2000_INCLUDE)
     _JPEG2000_LIB = $$(JPEG2000_LIB)
     isEmpty(_JPEG2000_INCLUDE) {
@@ -635,9 +704,32 @@ jpeg2000 {
                Jpeg2000/Jpeg2000Convert.cpp                
 
 } else {
-    CONFIG(debug,debug|release) {
-      message(Building debug version without internal support for JPEG2000 files)
+    message("JPEG2000 support: no")
+}
+
+pdf {
+    message("PDF support:      yes")
+    _POPPLER_INCLUDE = $$(POPPLER_INCLUDE)
+    _POPPLER_LIB = $$(POPPLER_LIB)
+    isEmpty(_POPPLER_INCLUDE) {
+      error("POPPLER_INCLUDE and POPPLER_LIB environment variables must be defined")
     } else {
-      message(Building release version without internal support for JPEG2000 files)
+      isEmpty(_POPPLER_LIB) {
+        error("POPPLER_INCLUDE and POPPLER_LIB environment variables must be defined")
+      }
     }
+    DEFINES += "ENGAUGE_PDF"
+    INCLUDEPATH += $$(POPPLER_INCLUDE)
+    LIBS += -L$$(POPPLER_LIB) -lpoppler -lpoppler-qt5
+    HEADERS += Dlg/DlgPdfFrame.h \
+               Pdf/Pdf.h \
+               Pdf/PdfFrame.h \
+               Pdf/PdfFrameHandle.h
+    SOURCES += Dlg/DlgPdfFrame.cpp \
+               Pdf/Pdf.cpp \
+               Pdf/PdfFrame.cpp \
+               Pdf/PdfFrameHandle.cpp
+
+} else {
+    message("PDF support:      no")
 }

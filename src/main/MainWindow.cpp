@@ -41,6 +41,7 @@
 #include "DlgSettingsDigitizeCurve.h"
 #include "DlgSettingsExportFormat.h"
 #include "DlgSettingsGeneral.h"
+#include "DlgSettingsGridDisplay.h"
 #include "DlgSettingsGridRemoval.h"
 #include "DlgSettingsMainWindow.h"
 #include "DlgSettingsPointMatch.h"
@@ -48,12 +49,14 @@
 #include "DocumentSerialize.h"
 #include "EngaugeAssert.h"
 #include "EnumsToQt.h"
+#include "ExportImageForRegression.h"
 #include "ExportToFile.h"
 #include "FileCmdScript.h"
 #include "Ghosts.h"
 #include "GraphicsItemType.h"
 #include "GraphicsScene.h"
 #include "GraphicsView.h"
+#include "GridLineFactory.h"
 #include "HelpWindow.h"
 #ifdef ENGAUGE_JPEG2000
 #include "Jpeg2000.h"
@@ -64,6 +67,10 @@
 #include "MainTitleBarFormat.h"
 #include "MainWindow.h"
 #include "NetworkClient.h"
+#ifdef ENGAUGE_PDF
+#include "Pdf.h"
+#endif // ENGAUGE_PDF
+#include "PdfResolution.h"
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
@@ -110,7 +117,7 @@
 const QString EMPTY_FILENAME ("");
 const char *ENGAUGE_FILENAME_DESCRIPTION = "Engauge Document";
 const QString ENGAUGE_FILENAME_EXTENSION ("dig");
-
+const int REGRESSION_INTERVAL = 400; // Milliseconds
 const unsigned int MAX_RECENT_FILE_LIST_SIZE = 8;
 
 MainWindow::MainWindow(const QString &errorReportFile,
@@ -134,14 +141,20 @@ MainWindow::MainWindow(const QString &errorReportFile,
   m_ghosts (0),
   m_timerRegressionErrorReport(0),
   m_fileCmdScript (0),
+  m_isErrorReportRegressionTest (isRegressionTest),
   m_timerRegressionFileCmdScript(0)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::MainWindow"
                               << " curDir=" << QDir::currentPath().toLatin1().data();
 
+#if defined(OSX_DEBUG) || defined(OSX_RELEASE)
+  qApp->setApplicationName ("Engauge Digitizer");
+  qApp->setOrganizationDomain ("Mark Mitchell");
+#endif
+
   LoggerUpload::bindToMainWindow(this);
 
-  QString initialPath = QDir::currentPath();
+  m_startupDirectory = QDir::currentPath();
 
   setCurrentFile ("");
   createIcons();
@@ -163,19 +176,23 @@ MainWindow::MainWindow(const QString &errorReportFile,
   createStateContextTransformation ();
   createSettingsDialogs ();
   createCommandStackShadow ();
+  createZoomMap ();
   updateControls ();
 
-  settingsRead ();
+  settingsRead (); // This changes the current directory when not regression testing
   setCurrentFile ("");
   setUnifiedTitleAndToolBarOnMac(true);
 
   installEventFilter(this);
+
+  // Start regression scripting if appropriate. Regression scripts assume current directory is the original
+  // current directory, so we temporarily reset the current directory
+  QString originalPath = QDir::currentPath();
+  QDir::setCurrent (m_startupDirectory);
   if (!errorReportFile.isEmpty()) {
-    loadErrorReportFile(initialPath,
-                        errorReportFile);
-    if (isRegressionTest) {
-      startRegressionTestErrorReport(initialPath,
-                                     errorReportFile);
+    loadErrorReportFile(errorReportFile);
+    if (m_isErrorReportRegressionTest) {
+      startRegressionTestErrorReport(errorReportFile);
     }
   } else if (!fileCmdScriptFile.isEmpty()) {
     m_fileCmdScript = new FileCmdScript (fileCmdScriptFile);
@@ -186,6 +203,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
     // since only one of the two modes is available at any time, for simplicity
     m_loadStartupFiles = loadStartupFiles;
   }
+  QDir::setCurrent (originalPath);
 }
 
 MainWindow::~MainWindow()
@@ -195,57 +213,15 @@ MainWindow::~MainWindow()
 void MainWindow::applyZoomFactorAfterLoad()
 {
   ZoomFactor zoomFactor;
+  ZoomFactorInitial zoomFactorInitial = m_modelMainWindow.zoomFactorInitial();
 
-  switch (m_modelMainWindow.zoomFactorInitial())
-  {
-    case ZOOM_INITIAL_16_TO_1:
-      zoomFactor = ZOOM_16_TO_1;
-      break;
-
-    case ZOOM_INITIAL_8_TO_1:
-      zoomFactor = ZOOM_8_TO_1;
-      break;
-
-    case ZOOM_INITIAL_4_TO_1:
-      zoomFactor = ZOOM_4_TO_1;
-      break;
-
-    case ZOOM_INITIAL_2_TO_1:
-      zoomFactor = ZOOM_2_TO_1;
-      break;
-
-    case ZOOM_INITIAL_1_TO_1:
-      zoomFactor = ZOOM_1_TO_1;
-      break;
-
-    case ZOOM_INITIAL_1_TO_2:
-      zoomFactor = ZOOM_1_TO_2;
-      break;
-
-    case ZOOM_INITIAL_1_TO_4:
-      zoomFactor = ZOOM_1_TO_4;
-      break;
-
-    case ZOOM_INITIAL_1_TO_8:
-      zoomFactor = ZOOM_1_TO_8;
-      break;
-
-    case ZOOM_INITIAL_1_TO_16:
-      zoomFactor = ZOOM_1_TO_16;
-      break;
-
-    case ZOOM_INITIAL_FILL:
-      zoomFactor = ZOOM_FILL;
-      break;
-
-    case ZOOM_INITIAL_PREVIOUS:
-      zoomFactor = currentZoomFactor();
-      break;
-
-    default:
-      ENGAUGE_ASSERT (false);
-      zoomFactor = currentZoomFactor();
-      break;
+  if (m_zoomMap.contains (zoomFactorInitial)) {
+    zoomFactor = m_zoomMap [zoomFactorInitial];
+  } else if (zoomFactorInitial == ZOOM_INITIAL_PREVIOUS) {
+    zoomFactor = currentZoomFactor ();
+  } else {
+    ENGAUGE_ASSERT (false);
+    zoomFactor = currentZoomFactor();
   }
 
   slotViewZoom (zoomFactor);
@@ -481,6 +457,14 @@ void MainWindow::createActionsFile ()
                                             "advanced mode, there can be multiple coordinate systems and/or floating axes."));
   connect (m_actionImportAdvanced, SIGNAL (triggered ()), this, SLOT (slotFileImportAdvanced ()));
 
+  m_actionImportImageReplace = new QAction (tr ("Import (Image Replace)..."), this);
+  m_actionImportImageReplace->setStatusTip (tr ("Imports a new image into the current document, replacing the existing image."));
+  m_actionImportImageReplace->setWhatsThis (tr ("Import (Image Replace)\n\n"
+                                                "Imports a new image into the current document. The existing image is replaced, "
+                                                "and all curves in the document are preserved. This operation is useful for applying "
+                                                "the axis points and other settings from an existing document to a different image."));
+  connect (m_actionImportImageReplace, SIGNAL (triggered ()), this, SLOT (slotFileImportImageReplace ()));
+
   m_actionOpen = new QAction(tr ("&Open..."), this);
   m_actionOpen->setShortcut (QKeySequence::Open);
   m_actionOpen->setStatusTip (tr ("Opens an existing document."));
@@ -488,12 +472,14 @@ void MainWindow::createActionsFile ()
                                   "Opens an existing document."));
   connect (m_actionOpen, SIGNAL (triggered ()), this, SLOT (slotFileOpen ()));
 
+#ifndef OSX_RELEASE
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     QAction *recentFileAction = new QAction (this);
     recentFileAction->setVisible (true);
     connect (recentFileAction, SIGNAL (triggered ()), this, SLOT (slotRecentFileAction ()));
     m_actionRecentFiles.append (recentFileAction);
   }
+#endif 
 
   m_actionClose = new QAction(tr ("&Close"), this);
   m_actionClose->setShortcut (QKeySequence::Close);
@@ -559,12 +545,14 @@ void MainWindow::createActionsHelp ()
                                           "and/or point"));
   connect (m_actionHelpTutorial, SIGNAL (triggered ()), this, SLOT (slotHelpTutorial()));
 
+#ifndef OSX_RELEASE
   m_actionHelpHelp = new QAction (tr ("Help"), this);
   m_actionHelpHelp->setShortcut (QKeySequence::HelpContents);
   m_actionHelpHelp->setStatusTip (tr ("Help documentation"));
   m_actionHelpHelp->setWhatsThis (tr ("Help Documentation\n\n"
                                       "Searchable help documentation"));
   // This action gets connected directly to the QDockWidget when that is created
+#endif
 
   m_actionHelpAbout = new QAction(tr ("About Engauge"), this);
   m_actionHelpAbout->setStatusTip (tr ("About the application."));
@@ -618,6 +606,13 @@ void MainWindow::createActionsSettings ()
   m_actionSettingsAxesChecker->setWhatsThis (tr ("Axes Checker Settings\n\n"
                                                  "Axes checker can reveal any axis point mistakes, which are otherwise hard to find."));
   connect (m_actionSettingsAxesChecker, SIGNAL (triggered ()), this, SLOT (slotSettingsAxesChecker ()));
+
+  m_actionSettingsGridDisplay = new QAction (tr ("Grid Line Display..."), this);
+  m_actionSettingsGridDisplay->setStatusTip (tr ("Edit Grid Line Display settings."));
+  m_actionSettingsGridDisplay->setWhatsThis (tr ("Grid Line Display Settings\n\n"
+                                                 "Grid lines displayed on the graph can provide more accuracy than the Axis Checker, for distorted graphs. "
+                                                 "In a distorted graph, the grid lines can be used to adjust the axis points for more accuracy in different regions."));
+  connect (m_actionSettingsGridDisplay, SIGNAL (triggered ()), this, SLOT (slotSettingsGridDisplay ()));
 
   m_actionSettingsGridRemoval = new QAction (tr ("Grid Line Removal..."), this);
   m_actionSettingsGridRemoval->setStatusTip (tr ("Edit Grid Line Removal settings."));
@@ -709,6 +704,15 @@ void MainWindow::createActionsView ()
   m_actionViewToolTips->setWhatsThis (tr ("View Tool Tips\n\n"
                                           "Show or hide the tool tips"));
   connect (m_actionViewToolTips, SIGNAL (triggered ()), this, SLOT (slotViewToolTips()));
+
+  m_actionViewGridLines = new QAction (tr ("Grid Lines"), this);
+  m_actionViewGridLines->setCheckable (true);
+  m_actionViewGridLines->setChecked (false);
+  m_actionViewGridLines->setStatusTip (tr ("Show or hide grid lines."));
+  m_actionViewGridLines->setWhatsThis (tr ("View Grid Lines\n\n"
+                                           "Show or hide grid lines that are added for accurate adjustments of the axes points, "
+                                           "which can improve accuracy in distorted graphs"));
+  connect (m_actionViewGridLines, SIGNAL (triggered ()), this, SLOT (slotViewGridLines()));
 
   m_actionViewBackgroundNone = new QAction (tr ("No Background"), this);
   m_actionViewBackgroundNone->setCheckable (true);
@@ -880,6 +884,7 @@ void MainWindow::createHelpWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createHelpWindow";
 
+#ifndef OSX_RELEASE
   m_helpWindow = new HelpWindow (this);
   m_helpWindow->hide ();
   addDockWidget (Qt::RightDockWidgetArea,
@@ -887,6 +892,7 @@ void MainWindow::createHelpWindow ()
   m_helpWindow->setFloating (true);
 
   connect (m_actionHelpHelp, SIGNAL (triggered ()), m_helpWindow, SLOT (show ()));
+#endif
 }
 
 void MainWindow::createIcons()
@@ -921,12 +927,15 @@ void MainWindow::createMenus()
   m_menuFile = menuBar()->addMenu(tr("&File"));
   m_menuFile->addAction (m_actionImport);
   m_menuFile->addAction (m_actionImportAdvanced);
+  m_menuFile->addAction (m_actionImportImageReplace);
   m_menuFile->addAction (m_actionOpen);
+#ifndef OSX_RELEASE
   m_menuFileOpenRecent = new QMenu (tr ("Open &Recent"));
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     m_menuFileOpenRecent->addAction (m_actionRecentFiles.at (i));
   }
   m_menuFile->addMenu (m_menuFileOpenRecent);
+#endif
   m_menuFile->addAction (m_actionClose);
   m_menuFile->insertSeparator (m_actionSave);
   m_menuFile->addAction (m_actionSave);
@@ -966,6 +975,7 @@ void MainWindow::createMenus()
   m_menuView->addAction (m_actionViewCoordSystem);
   m_menuView->insertSeparator (m_actionViewToolTips);
   m_menuView->addAction (m_actionViewToolTips);
+  m_menuView->addAction (m_actionViewGridLines);
   m_menuView->insertSeparator (m_actionViewBackgroundNone);
   m_menuViewBackground = new QMenu (tr ("Background"));
   m_menuViewBackground->addAction (m_actionViewBackgroundNone);
@@ -1006,6 +1016,7 @@ void MainWindow::createMenus()
   m_menuSettings->addAction (m_actionSettingsExport);
   m_menuSettings->addAction (m_actionSettingsColorFilter);
   m_menuSettings->addAction (m_actionSettingsAxesChecker);
+  m_menuSettings->addAction (m_actionSettingsGridDisplay);
   m_menuSettings->addAction (m_actionSettingsGridRemoval);
   m_menuSettings->addAction (m_actionSettingsPointMatch);
   m_menuSettings->addAction (m_actionSettingsSegments);
@@ -1018,7 +1029,9 @@ void MainWindow::createMenus()
   m_menuHelp->insertSeparator(m_actionHelpWhatsThis);
   m_menuHelp->addAction (m_actionHelpWhatsThis);
   m_menuHelp->addAction (m_actionHelpTutorial);
+#ifndef OSX_RELEASE
   m_menuHelp->addAction (m_actionHelpHelp);
+#endif
   m_menuHelp->addAction (m_actionHelpAbout);
 
   updateRecentFileList();
@@ -1042,6 +1055,7 @@ void MainWindow::createSettingsDialogs ()
   m_dlgSettingsExportFormat = new DlgSettingsExportFormat (*this);
   m_dlgSettingsColorFilter = new DlgSettingsColorFilter (*this);
   m_dlgSettingsAxesChecker = new DlgSettingsAxesChecker (*this);
+  m_dlgSettingsGridDisplay = new DlgSettingsGridDisplay (*this);
   m_dlgSettingsGridRemoval = new DlgSettingsGridRemoval (*this);
   m_dlgSettingsPointMatch = new DlgSettingsPointMatch (*this);
   m_dlgSettingsSegments = new DlgSettingsSegments (*this);
@@ -1055,6 +1069,7 @@ void MainWindow::createSettingsDialogs ()
   m_dlgSettingsExportFormat->setVisible (false);
   m_dlgSettingsColorFilter->setVisible (false);
   m_dlgSettingsAxesChecker->setVisible (false);
+  m_dlgSettingsGridDisplay->setVisible (false);
   m_dlgSettingsGridRemoval->setVisible (false);
   m_dlgSettingsPointMatch->setVisible (false);
   m_dlgSettingsSegments->setVisible (false);
@@ -1227,6 +1242,22 @@ void MainWindow::createTutorial ()
   m_tutorialDlg->hide();
 }
 
+void MainWindow::createZoomMap ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createZoomMap";
+
+  m_zoomMap [ZOOM_INITIAL_16_TO_1] = ZOOM_16_TO_1;
+  m_zoomMap [ZOOM_INITIAL_8_TO_1] = ZOOM_8_TO_1;
+  m_zoomMap [ZOOM_INITIAL_4_TO_1] = ZOOM_4_TO_1;
+  m_zoomMap [ZOOM_INITIAL_2_TO_1] = ZOOM_2_TO_1;
+  m_zoomMap [ZOOM_INITIAL_1_TO_1] = ZOOM_1_TO_1;
+  m_zoomMap [ZOOM_INITIAL_1_TO_2] = ZOOM_1_TO_2;
+  m_zoomMap [ZOOM_INITIAL_1_TO_4] = ZOOM_1_TO_4;
+  m_zoomMap [ZOOM_INITIAL_1_TO_8] = ZOOM_1_TO_8;
+  m_zoomMap [ZOOM_INITIAL_1_TO_16] = ZOOM_1_TO_16;
+  m_zoomMap [ZOOM_INITIAL_FILL] = ZOOM_FILL;
+}
+
 ZoomFactor MainWindow::currentZoomFactor () const
 {
   if (m_actionZoom1To1->isChecked()) {
@@ -1276,11 +1307,10 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
   return QObject::eventFilter (target, event);
 }
 
-void MainWindow::exportAllCoordinateSystems()
+#ifndef OSX_RELEASE
+void MainWindow::exportAllCoordinateSystemsAfterRegressionTests()
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::exportAllCoordinateSystems";
-
-  ExportToFile exportStrategy;
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::exportAllCoordinateSystemsAfterRegressionTests curDir=" << QDir::currentPath().toLatin1().data();
 
   // Output the regression test results. One file is output for every coordinate system
   for (CoordSystemIndex index = 0; index < m_cmdMediator->document().coordSystemCount(); index++) {
@@ -1290,10 +1320,24 @@ void MainWindow::exportAllCoordinateSystems()
     QString regressionFile = QString ("%1_%2")
                              .arg (m_regressionFile)
                              .arg (index + 1); // Append the coordinate system index
-    fileExport (regressionFile,
-                exportStrategy);
+
+    // Normally we just export to a file, but when regression testing the export will fail since coordinates are not defined. To
+    // get an export file when regression testing, we just output the image size
+    if (m_isErrorReportRegressionTest && !m_transformation.transformIsDefined()) {
+
+      ExportImageForRegression exportStrategy (m_cmdMediator->pixmap ());
+      exportStrategy.fileExport (regressionFile);
+
+    } else {
+
+      ExportToFile exportStrategy;
+
+      fileExport (regressionFile,
+                  exportStrategy);
+    }
   }
 }
+#endif
 
 QString MainWindow::exportFilenameFromInputFilename (const QString &fileName) const
 {
@@ -1301,6 +1345,7 @@ QString MainWindow::exportFilenameFromInputFilename (const QString &fileName) co
 
   outFileName = outFileName.replace (".xml", ".csv_actual"); // Applies when extension is xml
   outFileName = outFileName.replace (".dig", ".csv_actual"); // Applies when extension is dig
+  outFileName = outFileName.replace (".pdf", ".csv_actual"); // Applies when extension is pdf
 
   return outFileName;
 }
@@ -1309,6 +1354,7 @@ void MainWindow::fileExport(const QString &fileName,
                             ExportToFile exportStrategy)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::fileExport"
+                              << " curDir=" << QDir::currentPath().toLatin1().data()
                               << " fileName=" << fileName.toLatin1().data();
 
   QFile file (fileName);
@@ -1357,7 +1403,7 @@ void MainWindow::fileImport (const QString &fileName,
 
   if (importType == IMPORT_TYPE_ADVANCED) {
 
-    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoad
+    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoadNewDocument
     // when previewing for IMAGE_TYPE_ADVANCED
     slotFileClose();
 
@@ -1367,21 +1413,45 @@ void MainWindow::fileImport (const QString &fileName,
 
   QImage image;
   bool loaded = false;
+
 #ifdef ENGAUGE_JPEG2000
   Jpeg2000 jpeg2000;
   loaded = jpeg2000.load (fileName,
                           image);
 #endif // ENGAUGE_JPEG2000
+
+#ifdef ENGAUGE_PDF
+  if (!loaded) {
+    
+    Pdf pdf;
+    PdfReturn pdfReturn = pdf.load (fileName,
+                                    image,
+                                    m_modelMainWindow.pdfResolution(),
+                                    m_isErrorReportRegressionTest);
+    if (pdfReturn == PDF_RETURN_CANCELED) {
+
+      // User canceled so exit immediately
+      return;
+
+    }
+
+    loaded = (pdfReturn == PDF_RETURN_SUCCESS);
+  }
+#endif // ENGAUGE_PDF
+
   if (!loaded) {
     loaded = image.load (fileName);
   }
 
   if (!loaded) {
+    QString msg = QString("%1 %2 %3 %4.")
+                  .arg (tr ("Cannot read file"))
+                  .arg (fileName)
+                  .arg (tr ("from directory"))
+                  .arg (QDir::currentPath());
     QMessageBox::warning (this,
                           engaugeWindowTitle(),
-                          QString("%1 %2.")
-                          .arg (tr ("Cannot read file"))
-                          .arg(fileName));
+                          msg);
 
     // Reset
     m_originalFile = originalFileOld;
@@ -1418,7 +1488,14 @@ void MainWindow::fileImportWithPrompts (ImportType importType)
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::fileImportWithPrompts"
                               << " importType=" << importType;
 
-  if (maybeSave ()) {
+  // Skip maybeSave method for IMPORT_TYPE_REPLACE_IMAGE since open file dialog is enough to allow user to cancel the operation, and
+  // since no information is lost in that case
+  bool okToContinue = true;
+  if (importType != IMPORT_TYPE_IMAGE_REPLACE) {
+    okToContinue = maybeSave ();
+  }
+
+  if (okToContinue) {
 
     QString filter;
     QTextStream str (&filter);
@@ -1436,6 +1513,10 @@ void MainWindow::fileImportWithPrompts (ImportType importType)
     Jpeg2000 jpeg2000;
     supportedImageFormatStrings << jpeg2000.supportedImageWildcards();
 #endif // ENGAUGE_JPEG2000
+
+#ifdef ENGAUGE_PDF
+    supportedImageFormatStrings << "*.pdf";
+#endif // ENGAUGE_PDF
 
     supportedImageFormatStrings.sort();
 
@@ -1472,7 +1553,7 @@ void MainWindow::filePaste (ImportType importType)
 
   if (importType == IMPORT_TYPE_ADVANCED) {
 
-    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoad
+    // Remove any existing points, axes checker(s) and such from the previous Document so they do not appear in setupAfterLoadNewDocument
     // when previewing for IMAGE_TYPE_ADVANCED
     slotFileClose();
 
@@ -1491,9 +1572,11 @@ void MainWindow::filePaste (ImportType importType)
   if (!loaded) {
     QMessageBox::warning (this,
                           engaugeWindowTitle(),
-                          QString("%1 %2.")
+                          QString("%1 %2 %3 %4.")
                           .arg (tr ("Cannot read file"))
-                          .arg(fileName));
+                          .arg (fileName)
+                          .arg (tr ("from directory"))
+                          .arg (QDir::currentPath ()));
 
     // Reset
     m_originalFile = originalFileOld;
@@ -1610,8 +1693,8 @@ void MainWindow::loadCurveListFromCmdMediator ()
     m_cmbCurve->addItem (curvesGraphName);
   }
 
-  // Arbitrarily pick the first curve
-  m_cmbCurve->setCurrentIndex (0);
+  // Select the curve that is associated with the current coordinate system
+  m_cmbCurve->setCurrentText (m_cmdMediator->selectedCurveName ());
 }
 
 void MainWindow::loadDocumentFile (const QString &fileName)
@@ -1621,7 +1704,6 @@ void MainWindow::loadDocumentFile (const QString &fileName)
   QApplication::setOverrideCursor(Qt::WaitCursor);
   CmdMediator *cmdMediator = new CmdMediator (*this,
                                               fileName);
-  QApplication::restoreOverrideCursor();
 
   if (cmdMediator->successfulRead ()) {
 
@@ -1635,9 +1717,9 @@ void MainWindow::loadDocumentFile (const QString &fileName)
     }
 
     m_cmdMediator = cmdMediator;
-    setupAfterLoad(fileName,
-                   "File opened",
-                   IMPORT_TYPE_SIMPLE);
+    setupAfterLoadNewDocument (fileName,
+                               "File opened",
+                               IMPORT_TYPE_SIMPLE);
 
     // Start select mode
     m_actionDigitizeSelect->setChecked (true); // We assume user wants to first select existing stuff
@@ -1647,34 +1729,32 @@ void MainWindow::loadDocumentFile (const QString &fileName)
     m_originalFile = fileName; // This is needed by updateAfterCommand below if an error report is generated
     m_originalFileWasImported = false;
 
+    updateGridLines ();
     updateAfterCommand (); // Enable Save button now that m_engaugeFile is set
+
+    QApplication::restoreOverrideCursor();
 
   } else {
 
+    QApplication::restoreOverrideCursor();
+
     QMessageBox::warning (this,
                           engaugeWindowTitle(),
-                          QString("%1 %2:\n%3.")
+                          QString("%1 %2 %3 %4:\n%5.")
                           .arg (tr ("Cannot read file"))
-                          .arg(fileName)
+                          .arg (fileName)
+                          .arg (tr ("from directory"))
+                          .arg (QDir::currentPath ())
                           .arg(cmdMediator->reasonForUnsuccessfulRead ()));
     delete cmdMediator;
 
   }
 }
 
-void MainWindow::loadErrorReportFile(const QString &initialPath,
-                                     const QString &errorReportFile)
+void MainWindow::loadErrorReportFile(const QString &errorReportFile)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::loadErrorReportFile"
-                              << " path=" << initialPath.toLatin1().data()
                               << " file=" << errorReportFile.toLatin1().data();
-
-  // The default path has been changed from its original executable-based initial value to the last directory used
-  // according to the settings. Since the executable-based directory is much more stable, and we want a predictable
-  // directory in the likely event that the error report file has a relative path, we temporarily switch the default path
-  // back to the executable-based initial value
-  QString originalPath = QDir::currentPath();
-  QDir::setCurrent(initialPath);
 
   QFile file (errorReportFile);
   if (!file.exists()) {
@@ -1699,12 +1779,9 @@ void MainWindow::loadErrorReportFile(const QString &initialPath,
                                   reader);
   file.close();
 
-  // Reset the original path now that the error report file has been read in
-  QDir::setCurrent(originalPath);
-
-  setupAfterLoad(errorReportFile,
-                 "Error report opened",
-                 IMPORT_TYPE_SIMPLE);
+  setupAfterLoadNewDocument (errorReportFile,
+                             "Error report opened",
+                             IMPORT_TYPE_SIMPLE);
 
   // Start select mode
   m_actionDigitizeSelect->setChecked (true); // We assume user wants to first select existing stuff
@@ -1721,6 +1798,30 @@ bool MainWindow::loadImage (const QString &fileName,
                               << " fileName=" << fileName.toLatin1 ().data ()
                               << " importType=" << importType;
 
+  bool success;
+  if (importType == IMPORT_TYPE_IMAGE_REPLACE) {
+    success = loadImageReplacingImage (fileName,
+                                       image,
+                                       importType);
+  } else {
+    success = loadImageNewDocument (fileName,
+                                    image,
+                                    importType);
+  }
+
+  return success;
+}
+
+bool MainWindow::loadImageNewDocument (const QString &fileName,
+                                       const QImage &image,
+                                       ImportType importType)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::loadImageNewDocument"
+                              << " fileName=" << fileName.toLatin1 ().data ()
+                              << " importType=" << importType;
+
+  ENGAUGE_ASSERT (importType != IMPORT_TYPE_IMAGE_REPLACE);
+
   QApplication::setOverrideCursor(Qt::WaitCursor);
   CmdMediator *cmdMediator = new CmdMediator (*this,
                                               image);
@@ -1736,9 +1837,9 @@ bool MainWindow::loadImage (const QString &fileName,
   }
 
   m_cmdMediator = cmdMediator;
-  bool accepted = setupAfterLoad(fileName,
-                                 tr ("File imported"),
-                                 importType);
+  bool accepted = setupAfterLoadNewDocument (fileName,
+                                             tr ("File imported"),
+                                             importType);
 
   if (accepted) {
 
@@ -1761,8 +1862,7 @@ bool MainWindow::loadImage (const QString &fileName,
           CurvesGraphs curvesGraphs;
           wizard->populateCurvesGraphs (coordSystemIndex,
                                         curvesGraphs);
-          m_cmdMediator->document().setCurvesGraphs(coordSystemIndex,
-                                                    curvesGraphs);
+          m_cmdMediator->document().setCurvesGraphs(curvesGraphs);
         }
 
         // Unhide the checklist guide
@@ -1783,6 +1883,33 @@ bool MainWindow::loadImage (const QString &fileName,
 
     updateControls ();
   }
+
+  return accepted;
+}
+
+bool MainWindow::loadImageReplacingImage (const QString &fileName,
+                                          const QImage &image,
+                                          ImportType importType)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::loadImageReplacingImage"
+                              << " fileName=" << fileName.toLatin1 ().data ()
+                              << " importType=" << importType;
+
+  ENGAUGE_ASSERT (importType == IMPORT_TYPE_IMAGE_REPLACE);
+
+  setCurrentPathFromFile (fileName);
+  // We do not call rebuildRecentFileListForCurrentFile for an image file, so only proper Engauge document files appear in the recent file list
+  m_engaugeFile = EMPTY_FILENAME; // Forces first Save to be treated as Save As
+
+  ENGAUGE_ASSERT (m_cmdMediator != 0); // Menu option should only be available when a document is currently open
+
+  m_cmdMediator->document().setPixmap (image);
+
+  bool accepted = setupAfterLoadReplacingImage (fileName,
+                                                tr ("File imported"),
+                                                importType);
+
+  // No checklist guide wizard is displayed when just replacing the image
 
   return accepted;
 }
@@ -1958,7 +2085,9 @@ void MainWindow::saveErrorReportFileAndExit (const char *context,
                                              int line,
                                              const char *comment) const
 {
-  if (m_cmdMediator != 0) {
+  // Skip if currently performing a regression test - in which case the preferred behavior is to let the current test fail and
+  // continue on to execute the remaining tests
+  if ((m_cmdMediator != 0) && !m_isErrorReportRegressionTest) {
 
     QString report = saveErrorReportFileAndExitXml (context,
                                                     file,
@@ -2152,16 +2281,21 @@ void MainWindow::setCurrentPathFromFile (const QString &fileName)
   }
 }
 
-void MainWindow::setPixmap (const QPixmap &pixmap)
+void MainWindow::setPixmap (const QString &curveSelected,
+                            const QPixmap &pixmap)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setPixmap";
 
   m_digitizeStateContext->setImageIsLoaded (m_cmdMediator,
                                             true);
+
+  // We cannot reliably use m_cmbCurve->currentText below for the selected curve since that control
+  // can be pointing to a curve that no longer exists so this method requires curveSelected as an argument
   m_backgroundStateContext->setPixmap (m_transformation,
                                        m_cmdMediator->document().modelGridRemoval(),
                                        m_cmdMediator->document().modelColorFilter(),
-                                       pixmap);
+                                       pixmap,
+                                       curveSelected);
 }
 
 void MainWindow::settingsRead ()
@@ -2193,11 +2327,13 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
   // Help window geometry
   QSize helpSize = settings.value (SETTINGS_HELP_SIZE,
                                    QSize (900, 600)).toSize();
+#ifndef OSX_RELEASE
   m_helpWindow->resize (helpSize);
   if (settings.contains (SETTINGS_HELP_POS)) {
     QPoint helpPos = settings.value (SETTINGS_HELP_POS).toPoint();
     m_helpWindow->move (helpPos);
   }
+#endif
 
   // Checklist guide wizard
   m_actionHelpChecklistGuideWizard->setChecked (settings.value (SETTINGS_CHECKLIST_GUIDE_WIZARD,
@@ -2287,6 +2423,9 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                                                                   QVariant (ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)).toInt());
   m_modelMainWindow.setMainTitleBarFormat ((MainTitleBarFormat) settings.value (SETTINGS_MAIN_TITLE_BAR_FORMAT,
                                                                                 QVariant (MAIN_TITLE_BAR_FORMAT_PATH)).toInt());
+  m_modelMainWindow.setPdfResolution (settings.value (SETTINGS_IMPORT_PDF_RESOLUTION,
+                                                      QVariant (DEFAULT_IMPORT_PDF_RESOLUTION)).toInt ());
+
   updateSettingsMainWindow();
 
   settings.endGroup();
@@ -2303,8 +2442,10 @@ void MainWindow::settingsWrite ()
   settings.beginGroup (SETTINGS_GROUP_MAIN_WINDOW);
   settings.setValue (SETTINGS_SIZE, size ());
   settings.setValue (SETTINGS_POS, pos ());
+#ifndef OSX_RELEASE
   settings.setValue (SETTINGS_HELP_SIZE, m_helpWindow->size());
   settings.setValue (SETTINGS_HELP_POS, m_helpWindow->pos ());
+#endif
   if (m_dockChecklistGuide->isFloating()) {
 
     settings.setValue (SETTINGS_CHECKLIST_GUIDE_DOCK_AREA, Qt::NoDockWidgetArea);
@@ -2316,6 +2457,7 @@ void MainWindow::settingsWrite ()
 
   }
   settings.setValue (SETTINGS_CHECKLIST_GUIDE_WIZARD, m_actionHelpChecklistGuideWizard->isChecked ());
+  settings.setValue (SETTINGS_IMPORT_PDF_RESOLUTION, m_modelMainWindow.pdfResolution ());
   settings.setValue (SETTINGS_LOCALE_LANGUAGE, m_modelMainWindow.locale().language());
   settings.setValue (SETTINGS_LOCALE_COUNTRY, m_modelMainWindow.locale().country());
   settings.setValue (SETTINGS_VIEW_BACKGROUND_TOOLBAR, m_actionViewBackground->isChecked());
@@ -2332,14 +2474,17 @@ void MainWindow::settingsWrite ()
   settings.endGroup ();
 }
 
-bool MainWindow::setupAfterLoad (const QString &fileName,
-                                 const QString &temporaryMessage ,
-                                 ImportType importType)
+bool MainWindow::setupAfterLoadNewDocument (const QString &fileName,
+                                            const QString &temporaryMessage ,
+                                            ImportType importType)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setupAfterLoad"
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setupAfterLoadNewDocument"
                               << " file=" << fileName.toLatin1().data()
                               << " message=" << temporaryMessage.toLatin1().data()
                               << " importType=" << importType;
+
+  // The steps in this method should theoretically be a superset of the steps in setupAfterLoadNewDocument. Therefore, any
+  // changes to this method should be considered for application to the other method also
 
   const QString EMPTY_CURVE_NAME_TO_SKIP_BACKGROUND_PROCESSING; // For bootstrapping the preview
 
@@ -2350,7 +2495,8 @@ bool MainWindow::setupAfterLoad (const QString &fileName,
                                               m_cmdMediator->document().modelGridRemoval(),
                                               m_cmdMediator->document().modelColorFilter(),
                                               EMPTY_CURVE_NAME_TO_SKIP_BACKGROUND_PROCESSING); // Before setPixmap
-  setPixmap (m_cmdMediator->pixmap ()); // Set background immediately so it is visible as a preview when any dialogs are displayed
+  setPixmap (m_cmdMediator->document().curvesGraphsNames().first(),
+             m_cmdMediator->pixmap ()); // Set background immediately so it is visible as a preview when any dialogs are displayed
 
   // Image is visible now so the user can refer to it when we ask for the number of coordinate systems. Note that the Document
   // may already have multiple CoordSystem if user loaded a file that had multiple CoordSystem entries
@@ -2396,6 +2542,40 @@ bool MainWindow::setupAfterLoad (const QString &fileName,
                                               m_cmdMediator->document().modelGridRemoval(),
                                               m_cmdMediator->document().modelColorFilter(),
                                               m_cmbCurve->currentText ());
+  m_backgroundStateContext->setBackgroundImage ((BackgroundImage) m_cmbBackground->currentIndex ());
+
+  applyZoomFactorAfterLoad(); // Zoom factor must be reapplied after background image is set, to have any effect
+
+  setCurrentFile(fileName);
+  m_statusBar->showTemporaryMessage (temporaryMessage);
+  m_statusBar->wakeUp ();
+
+  saveStartingDocumentSnapshot();
+
+  updateAfterCommand(); // Replace stale points by points in new Document
+
+  return true;
+}
+
+bool MainWindow::setupAfterLoadReplacingImage (const QString &fileName,
+                                               const QString &temporaryMessage ,
+                                               ImportType importType)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::setupAfterLoadReplacingImage"
+                              << " file=" << fileName.toLatin1().data()
+                              << " message=" << temporaryMessage.toLatin1().data()
+                              << " importType=" << importType;
+
+  // The steps in this method should theoretically be just a subset of the steps in setupAfterLoadNewDocument
+
+  // After this point there should be no commands in CmdMediator, since we effectively have a new document
+  m_cmdMediator->clear();
+
+  setPixmap (m_cmdMediator->document().curvesGraphsNames().first(),
+             m_cmdMediator->pixmap ()); // Set background immediately so it is visible as a preview when any dialogs are displayed
+
+  m_isDocumentExported = false;
+
   m_backgroundStateContext->setBackgroundImage ((BackgroundImage) m_cmbBackground->currentIndex ());
 
   applyZoomFactorAfterLoad(); // Zoom factor must be reapplied after background image is set, to have any effect
@@ -2541,6 +2721,7 @@ void MainWindow::slotCmbCurve(int /* index */)
                                               m_cmdMediator->document().modelColorFilter(),
                                               m_cmbCurve->currentText ());
   m_digitizeStateContext->handleCurveChange (m_cmdMediator);
+  m_cmdMediator->setSelectedCurveName (m_cmbCurve->currentText ()); // Save for next time current coordinate system returns
 
   updateViewedCurves();
   updateViewsOfSettings();
@@ -2716,6 +2897,7 @@ void MainWindow::slotFileClose()
     m_engaugeFile = "";
     setWindowTitle (engaugeWindowTitle ());
 
+    m_gridLines.clear();
     updateControls();
   }
 }
@@ -2730,6 +2912,8 @@ void MainWindow::slotFileExport ()
     QString filter = QString ("%1;;%2;;All files (*.*)")
                      .arg (exportStrategy.filterCsv ())
                      .arg (exportStrategy.filterTsv ());
+
+    // OSX sandbox requires, for the default, a non-empty filename
     QString defaultFileName = QString ("%1/%2.%3")
                               .arg (QDir::currentPath ())
                               .arg (m_currentFile)
@@ -2791,6 +2975,13 @@ void MainWindow::slotFileImportImage(QString fileName, QImage image)
   loadImage (fileName,
              image,
              IMPORT_TYPE_SIMPLE);
+}
+
+void MainWindow::slotFileImportImageReplace ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFileImportImageReplace";
+
+  fileImportWithPrompts (IMPORT_TYPE_IMAGE_REPLACE);
 }
 
 void MainWindow::slotFileOpen()
@@ -2874,9 +3065,14 @@ bool MainWindow::slotFileSaveAs()
   filters << filterAll;
 
   QFileDialog dlg(this);
+  dlg.setFileMode (QFileDialog::AnyFile);
   dlg.selectNameFilter (filterDigitizer);
   dlg.setNameFilters (filters);
+#if defined(OSX_DEBUG) || defined(OSX_RELEASE)
+#else
+  // Prevent hang in OSX
   dlg.setWindowModality(Qt::WindowModal);
+#endif
   dlg.setAcceptMode(QFileDialog::AcceptSave);
   dlg.selectFile(filenameDefault);
   if (dlg.exec()) {
@@ -3123,6 +3319,14 @@ void MainWindow::slotSettingsGeneral ()
   m_dlgSettingsGeneral->show ();
 }
 
+void MainWindow::slotSettingsGridDisplay()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSettingsGridDisplay";
+
+  m_dlgSettingsGridDisplay->load (*m_cmdMediator);
+  m_dlgSettingsGridDisplay->show ();
+}
+
 void MainWindow::slotSettingsGridRemoval ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSettingsGridRemoval";
@@ -3164,11 +3368,19 @@ void MainWindow::slotTimeoutRegressionErrorReport ()
 
   if (m_cmdStackShadow->canRedo()) {
 
+    // Always reset current directory before the command. This guarantees the upcoming redo step will work
+    QDir::setCurrent (m_startupDirectory);
+
     m_cmdStackShadow->slotRedo();
+
+    // Always reset current directory after the command. This guarantees the final export to file will work
+    QDir::setCurrent (m_startupDirectory);
 
   } else {
 
-    exportAllCoordinateSystems ();
+#ifndef OSX_RELEASE
+    exportAllCoordinateSystemsAfterRegressionTests ();
+#endif
 
     // Regression test has finished so exit. We unset the dirty flag so there is no prompt
     m_cmdMediator->setClean();
@@ -3183,14 +3395,22 @@ void MainWindow::slotTimeoutRegressionFileCmdScript ()
 
   if (m_fileCmdScript->canRedo()) {
 
+    // Always reset current directory before the command. This guarantees the upcoming redo step will work
+    QDir::setCurrent (m_startupDirectory);
+
     m_fileCmdScript->redo(*this);
+
+    // Always reset current directory after the command. This guarantees the final export to file will work
+    QDir::setCurrent (m_startupDirectory);
 
   } else {
 
     // Script file might already have closed the Document so export only if last was not closed
     if (m_cmdMediator != 0) {
 
-      exportAllCoordinateSystems ();
+#ifndef OSX_RELEASE
+      exportAllCoordinateSystemsAfterRegressionTests ();
+#endif
 
       // We unset the dirty flag so there is no "Save changes?" prompt
       m_cmdMediator->setClean();
@@ -3212,6 +3432,13 @@ void MainWindow::slotUndoTextChanged (const QString &text)
     completeText += QString (" \"%1\"").arg (text);
   }
   m_actionEditUndo->setText (completeText);
+}
+
+void MainWindow::slotViewGridLines ()
+{
+  LOG4CPP_DEBUG_S ((*mainCat)) << "MainWindow::slotViewGridLines";
+
+  updateGridLines ();
 }
 
 void MainWindow::slotViewGroupBackground(QAction *action)
@@ -3555,8 +3782,13 @@ void MainWindow::slotViewZoomInFromWheelEvent ()
   if ((m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL) ||
       (m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)) {
 
+    // Anchor the zoom to the cursor position
+    m_view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
     // Forward this event
     slotViewZoomIn ();
+
+    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
   }
 }
 
@@ -3641,26 +3873,28 @@ void MainWindow::slotViewZoomOutFromWheelEvent ()
   if ((m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL) ||
       (m_modelMainWindow.zoomControl() == ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)) {
 
+    // Anchor the zoom to the cursor position
+    m_view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
     // Forward this event
     slotViewZoomOut ();
+
+    m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
   }
 }
 
-void MainWindow::startRegressionTestErrorReport(const QString &initialPath,
-                                                const QString &regressionInputFile)
+void MainWindow::startRegressionTestErrorReport(const QString &regressionInputFile)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::startRegressionTestErrorReport";
 
-  const int REGRESSION_INTERVAL = 400; // Milliseconds
-
-  // Need absolute path since QDir::currentPath has been changed already so the
-  // current path is not predictable
-  QString absoluteRegressionInputFile = QString ("%1/%2")
-                                        .arg (initialPath)
-                                        .arg (regressionInputFile);
+  // In order for point-deleting commands to work (CmdCut, CmdDelete) in the regression tests, we need to
+  // reset the Point identifier index here:
+  // 1) after loading of the file which has increased the index value to greater than 0
+  // 2) before running any commands since those commands implicitly assume the index is zero
+  Point::setIdentifierIndex(0);
 
   // Save output/export file name
-  m_regressionFile = exportFilenameFromInputFilename (absoluteRegressionInputFile);
+  m_regressionFile = exportFilenameFromInputFilename (regressionInputFile);
 
   m_timerRegressionErrorReport = new QTimer();
   m_timerRegressionErrorReport->setSingleShot(false);
@@ -3672,8 +3906,6 @@ void MainWindow::startRegressionTestErrorReport(const QString &initialPath,
 void MainWindow::startRegressionTestFileCmdScript()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::startRegressionTestFileCmdScript";
-
-  const int REGRESSION_INTERVAL = 400; // Milliseconds
 
   m_timerRegressionFileCmdScript = new QTimer();
   m_timerRegressionFileCmdScript->setSingleShot(false);
@@ -3776,8 +4008,11 @@ void MainWindow::updateControls ()
 
   m_cmbBackground->setEnabled (!m_currentFile.isEmpty ());
 
+  m_actionImportImageReplace->setEnabled (m_cmdMediator != 0);
+#ifndef OSX_RELEASE
   m_menuFileOpenRecent->setEnabled ((m_actionRecentFiles.count () > 0) &&
                                     (m_actionRecentFiles.at(0)->isVisible ())); // Need at least one visible recent file entry
+#endif
   m_actionClose->setEnabled (!m_currentFile.isEmpty ());
   m_actionSave->setEnabled (!m_currentFile.isEmpty ());
   m_actionSaveAs->setEnabled (!m_currentFile.isEmpty ());
@@ -3803,7 +4038,12 @@ void MainWindow::updateControls ()
   m_actionDigitizeColorPicker->setEnabled (!m_currentFile.isEmpty ());
   m_actionDigitizeSegment->setEnabled (!m_currentFile.isEmpty ());
   m_actionDigitizeSelect->setEnabled (!m_currentFile.isEmpty ());
-
+  if (m_transformation.transformIsDefined()) {
+    m_actionViewGridLines->setEnabled (true);
+  } else {
+    m_actionViewGridLines->setEnabled (false);
+    m_actionViewGridLines->setChecked (false);
+  }
   m_actionViewBackground->setEnabled (!m_currentFile.isEmpty());
   m_actionViewChecklistGuide->setEnabled (!m_dockChecklistGuide->browserIsEmpty());
   m_actionViewDigitize->setEnabled (!m_currentFile.isEmpty ());
@@ -3816,6 +4056,7 @@ void MainWindow::updateControls ()
   m_actionSettingsExport->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsColorFilter->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsAxesChecker->setEnabled (!m_currentFile.isEmpty ());
+  m_actionSettingsGridDisplay->setEnabled (!m_currentFile.isEmpty () && m_transformation.transformIsDefined());
   m_actionSettingsGridRemoval->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsPointMatch->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsSegments->setEnabled (!m_currentFile.isEmpty ());
@@ -3833,7 +4074,11 @@ void MainWindow::updateCoordSystem(CoordSystemIndex coordSystemIndex)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateCoordSystem";
 
+  // Set current curve in the Document and in the MainWindow combobox together so they are in sync. Setting
+  // the selected curve prevents a crash in updateTransformationAndItsDependencies
   m_cmdMediator->document().setCoordSystemIndex (coordSystemIndex);
+  loadCurveListFromCmdMediator ();
+
   updateTransformationAndItsDependencies(); // Transformation state may have changed
   updateSettingsAxesChecker(m_cmdMediator->document().modelAxesChecker()); // Axes checker dependes on transformation state
 
@@ -3896,10 +4141,28 @@ void MainWindow::updateGraphicsLinesToMatchGraphicsPoints()
                                                     m_transformation);
 }
 
+void MainWindow::updateGridLines ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateGridLines";
+
+  // Remove old grid lines
+  m_gridLines.clear ();
+
+  // Create new grid lines
+  GridLineFactory factory (*m_scene,
+                           m_cmdMediator->document().modelCoords(),
+                           m_transformation);
+  factory.createGridLinesForEvenlySpacedGrid (m_cmdMediator->document().modelGridDisplay(),
+                                              m_gridLines);
+
+  m_gridLines.setVisible (m_actionViewGridLines->isChecked());
+}
+
 void MainWindow::updateRecentFileList()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateRecentFileList";
 
+#ifndef OSX_RELEASE
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   QStringList recentFilePaths = settings.value(SETTINGS_RECENT_FILE_LIST).toStringList();
 
@@ -3922,6 +4185,7 @@ void MainWindow::updateRecentFileList()
   for (i = count; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     m_actionRecentFiles.at (i)->setVisible (false);
   }
+#endif
 }
 
 void MainWindow::updateSettingsAxesChecker(const DocumentModelAxesChecker &modelAxesChecker)
@@ -3949,7 +4213,8 @@ void MainWindow::updateSettingsColorFilter(const DocumentModelColorFilter &model
   m_cmdMediator->document().setModelColorFilter(modelColorFilter);
   m_backgroundStateContext->updateColorFilter (m_transformation,
                                                m_cmdMediator->document().modelGridRemoval(),
-                                               modelColorFilter);
+                                               modelColorFilter,
+                                               m_cmbCurve->currentText());
   m_digitizeStateContext->handleCurveChange (m_cmdMediator);
   updateViewsOfSettings();
 }
@@ -4000,6 +4265,13 @@ void MainWindow::updateSettingsGeneral(const DocumentModelGeneral &modelGeneral)
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateSettingsGeneral";
 
   m_cmdMediator->document().setModelGeneral(modelGeneral);
+}
+
+void MainWindow::updateSettingsGridDisplay(const DocumentModelGridDisplay &modelGridDisplay)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateSettingsGridDisplay";
+
+  m_cmdMediator->document().setModelGridDisplay(modelGridDisplay);
 }
 
 void MainWindow::updateSettingsGridRemoval(const DocumentModelGridRemoval &modelGridRemoval)
@@ -4058,11 +4330,15 @@ void MainWindow::updateTransformationAndItsDependencies()
                            *m_cmdMediator,
                            m_modelMainWindow);
 
-  // Grid removal is affected by new transformation
+  // Grid removal is affected by new transformation above
   m_backgroundStateContext->setCurveSelected (m_transformation,
                                               m_cmdMediator->document().modelGridRemoval(),
                                               m_cmdMediator->document().modelColorFilter(),
                                               m_cmbCurve->currentText ());
+
+  // Grid display is also affected by new transformation above, if there was a transition into defined state
+  // in which case that transition triggered the initialization of the grid display parameters
+  updateGridLines();
 }
 
 void MainWindow::updateViewedCurves ()

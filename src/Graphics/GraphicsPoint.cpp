@@ -20,9 +20,9 @@
 #include <QPen>
 #include <QTextStream>
 #include "QtToString.h"
+#include "ZValues.h"
 
 const double ZERO_WIDTH = 0.0;
-const double Z_VALUE = 100.0; // Put on top of Segments in DlgSettingsSegments
 
 GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
                              const QString &identifier,
@@ -42,8 +42,8 @@ GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
   m_lineWidth (lineWidth),
   m_wanted (true)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsPoint::GraphicsPoint"
-                              << " identifier=" << identifier.toLatin1 ().data ();
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::GraphicsPoint"
+                               << " identifier=" << identifier.toLatin1 ().data ();
 
   createPointEllipse (radius);
 }
@@ -66,15 +66,15 @@ GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
   m_lineWidth (lineWidth),
   m_wanted (true)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsPoint::GraphicsPoint "
-                              << " identifier=" << identifier.toLatin1 ().data ();
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::GraphicsPoint "
+                               << " identifier=" << identifier.toLatin1 ().data ();
 
   createPointPolygon (polygon);
 }
 
 GraphicsPoint::~GraphicsPoint()
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsPoint::~GraphicsPoint";
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::~GraphicsPoint";
 
   if (m_graphicsItemEllipse == 0) {
 
@@ -102,7 +102,7 @@ GraphicsPoint::~GraphicsPoint()
 
 void GraphicsPoint::createPointEllipse (unsigned int radius)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsPoint::createPointEllipse";
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::createPointEllipse";
 
   const int radiusSigned = radius; // Radius must be signed before multiplying by -1 below, for Visual Studio
   m_graphicsItemEllipse = new GraphicsPointEllipse (*this,
@@ -112,7 +112,7 @@ void GraphicsPoint::createPointEllipse (unsigned int radius)
                                                            2 * radiusSigned + 1));
   m_scene.addItem (m_graphicsItemEllipse);
 
-  m_graphicsItemEllipse->setZValue (Z_VALUE);
+  m_graphicsItemEllipse->setZValue (Z_VALUE_POINT);
   m_graphicsItemEllipse->setData (DATA_KEY_IDENTIFIER, m_identifier);
   m_graphicsItemEllipse->setData (DATA_KEY_GRAPHICS_ITEM_TYPE, GRAPHICS_ITEM_TYPE_POINT);
   m_graphicsItemEllipse->setPos (m_posScreen.x (),
@@ -141,13 +141,13 @@ void GraphicsPoint::createPointEllipse (unsigned int radius)
 
 void GraphicsPoint::createPointPolygon (const QPolygonF &polygon)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsPoint::createPointPolygon";
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::createPointPolygon";
 
   m_graphicsItemPolygon = new GraphicsPointPolygon (*this,
                                                     polygon);
   m_scene.addItem (m_graphicsItemPolygon);
 
-  m_graphicsItemPolygon->setZValue (Z_VALUE);
+  m_graphicsItemPolygon->setZValue (Z_VALUE_POINT);
   m_graphicsItemPolygon->setData (DATA_KEY_IDENTIFIER, m_identifier);
   m_graphicsItemPolygon->setData (DATA_KEY_GRAPHICS_ITEM_TYPE, GRAPHICS_ITEM_TYPE_POINT);
   m_graphicsItemPolygon->setPos (m_posScreen.x (),

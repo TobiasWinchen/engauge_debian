@@ -24,12 +24,12 @@ const QString CMD_DESCRIPTION ("Delete");
 CmdDelete::CmdDelete(MainWindow &mainWindow,
                      Document &document,
                      const QStringList &selectedPointIdentifiers) :
-  CmdAbstract(mainWindow,
-              document,
-              CMD_DESCRIPTION)
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      CMD_DESCRIPTION)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdDelete::CmdDelete"
-                              << " selected=(" << selectedPointIdentifiers.join (", ").toLatin1 ().data () << ")";
+                              << " selected=" << selectedPointIdentifiers.count ();
 
   // Export to clipboard
   ExportToClipboard exportStrategy;
@@ -47,9 +47,9 @@ CmdDelete::CmdDelete (MainWindow &mainWindow,
                       Document &document,
                       const QString &cmdDescription,
                       QXmlStreamReader &reader) :
-  CmdAbstract (mainWindow,
-               document,
-               cmdDescription)
+  CmdPointChangeBase (mainWindow,
+                      document,
+                      cmdDescription)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdDelete::CmdDelete";
 
@@ -83,20 +83,23 @@ void CmdDelete::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdDelete::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
+  saveDocumentState (document ());
   document().removePointsInCurvesGraphs (m_curvesGraphsRemoved);
 
   document().updatePointOrdinals (mainWindow().transformation());
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdDelete::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdDelete::cmdUndo";
 
-  document().addPointsInCurvesGraphs (m_curvesGraphsRemoved);
-
-  document().updatePointOrdinals (mainWindow().transformation());
+  saveOrCheckPostCommandDocumentStateHash (document ());
+  restoreDocumentState (document ());
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdDelete::saveXml (QXmlStreamWriter &writer) const

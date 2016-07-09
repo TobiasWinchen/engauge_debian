@@ -17,6 +17,7 @@
 #include "DocumentModelDigitizeCurve.h"
 #include "DocumentModelExportFormat.h"
 #include "DocumentModelGeneral.h"
+#include "DocumentModelGridDisplay.h"
 #include "DocumentModelGridRemoval.h"
 #include "DocumentModelPointMatch.h"
 #include "DocumentModelSegments.h"
@@ -102,9 +103,9 @@ public:
                         double version);
   /// Load from file in version 6 format
   void loadVersion6 (QXmlStreamReader &reader);
-  /// Load from file in version 7 format
-  void loadVersion7 (QXmlStreamReader &reader,
-                     DocumentAxesPointsRequired documentAxesPointsRequired);
+  /// Load from file in versions 7 and 8 formats
+  void loadVersions7AndUp (QXmlStreamReader &reader,
+                           DocumentAxesPointsRequired documentAxesPointsRequired);
 
   virtual DocumentModelAxesChecker modelAxesChecker() const;
   virtual DocumentModelColorFilter modelColorFilter() const;
@@ -113,6 +114,7 @@ public:
   virtual DocumentModelDigitizeCurve modelDigitizeCurve() const;
   virtual DocumentModelExportFormat modelExport() const;
   virtual DocumentModelGeneral modelGeneral() const;
+  virtual DocumentModelGridDisplay modelGridDisplay() const;
   virtual DocumentModelGridRemoval modelGridRemoval() const;
   virtual DocumentModelPointMatch modelPointMatch() const;
   virtual DocumentModelSegments modelSegments() const;
@@ -129,6 +131,8 @@ public:
   virtual void removePointGraph (const QString &identifier);
   virtual void removePointsInCurvesGraphs (CurvesGraphs &curvesGraphs);
   virtual void saveXml (QXmlStreamWriter &writer) const;
+  virtual QString selectedCurveName () const;
+  virtual void setCurveAxes (const Curve &curveAxes);
   virtual void setCurvesGraphs (const CurvesGraphs &curvesGraphs);
   virtual void setModelAxesChecker(const DocumentModelAxesChecker &modelAxesChecker);
   virtual void setModelColorFilter(const DocumentModelColorFilter &modelColorFilter);
@@ -137,9 +141,11 @@ public:
   virtual void setModelDigitizeCurve (const DocumentModelDigitizeCurve &modelDigitizeCurve);
   virtual void setModelExport(const DocumentModelExportFormat &modelExport);
   virtual void setModelGeneral (const DocumentModelGeneral &modelGeneral);
+  virtual void setModelGridDisplay(const DocumentModelGridDisplay &modelGridDisplay);
   virtual void setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval);
   void setModelPointMatch(const DocumentModelPointMatch &modelPointMatch);
   virtual void setModelSegments(const DocumentModelSegments &modelSegments);
+  virtual void setSelectedCurveName(const QString &selectedCurveName);
   virtual bool successfulRead () const;
   virtual void updatePointOrdinals (const Transformation &transformation);
 
@@ -147,6 +153,7 @@ private:
   CoordSystem();
 
   bool bytesIndicatePreVersion6 (const QByteArray &bytes) const;
+  void resetSelectedCurveNameIfNecessary ();
 
   // Read variables
   bool m_successfulRead;
@@ -164,12 +171,16 @@ private:
   DocumentModelDigitizeCurve m_modelDigitizeCurve;
   DocumentModelExportFormat m_modelExport;
   DocumentModelGeneral m_modelGeneral;
+  DocumentModelGridDisplay m_modelGridDisplay;
   DocumentModelGridRemoval m_modelGridRemoval;
   DocumentModelPointMatch m_modelPointMatch;
   DocumentModelSegments m_modelSegments;
 
   // Save the number of required axes points
   DocumentAxesPointsRequired m_documentAxesPointsRequired;
+
+  // Each coordinate systems manages its own selected curve name
+  QString m_selectedCurveName;
 };
 
 #endif // COORD_SYSTEM_H

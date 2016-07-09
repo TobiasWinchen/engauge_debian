@@ -10,6 +10,7 @@
 #include "GraphicsItemType.h"
 #include "GraphicsScene.h"
 #include "Logger.h"
+#include "ZValues.h"
 
 BackgroundStateAbstractBase::BackgroundStateAbstractBase(BackgroundStateContext &context,
                                                          GraphicsScene &scene) :
@@ -21,6 +22,7 @@ BackgroundStateAbstractBase::BackgroundStateAbstractBase(BackgroundStateContext 
   QPixmap dummy;
   m_imageItem = m_scene.addPixmap (dummy);
   m_imageItem->setVisible (false);
+  m_imageItem->setZValue (Z_VALUE_BACKGROUND);
   m_imageItem->setData (DATA_KEY_IDENTIFIER, "view");
   m_imageItem->setData (DATA_KEY_GRAPHICS_ITEM_TYPE, GRAPHICS_ITEM_TYPE_IMAGE);
 }

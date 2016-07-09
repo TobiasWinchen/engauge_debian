@@ -11,13 +11,16 @@
 #include "CoordSystemIndex.h"
 #include "DigitizeStateAbstractBase.h"
 #include "DocumentAxesPointsRequired.h"
+#include "GridLines.h"
 #include "MainWindowModel.h"
 #include <QCursor>
 #include <QMainWindow>
+#include <QMap>
 #include <QUrl>
 #include "Transformation.h"
 #include "ZoomControl.h"
 #include "ZoomFactor.h"
+#include "ZoomFactorInitial.h"
 
 class BackgroundStateContext;
 class ChecklistGuide;
@@ -33,6 +36,7 @@ class DlgSettingsCurveProperties;
 class DlgSettingsDigitizeCurve;
 class DlgSettingsExportFormat;
 class DlgSettingsGeneral;
+class DlgSettingsGridDisplay;
 class DlgSettingsGridRemoval;
 class DlgSettingsMainWindow;
 class DlgSettingsPointMatch;
@@ -43,6 +47,7 @@ class DocumentModelCoords;
 class DocumentModelDigitizeCurve;
 class DocumentModelExportFormat;
 class DocumentModelGeneral;
+class DocumentModelGridDisplay;
 class DocumentModelGridRemoval;
 class DocumentModelPointMatch;
 class DocumentModelSegments;
@@ -192,6 +197,9 @@ public:
   /// Update with new general properties.
   void updateSettingsGeneral(const DocumentModelGeneral &modelGeneral);
 
+  /// Update with new grid display properties.
+  void updateSettingsGridDisplay(const DocumentModelGridDisplay &modelGridDisplay);
+
   /// Update with new grid removal properties.
   void updateSettingsGridRemoval(const DocumentModelGridRemoval &modelGridRemoval);
 
@@ -245,6 +253,7 @@ private slots:
   void slotFileImportDraggedImage(QImage);
   void slotFileImportDraggedImageUrl(QUrl);
   void slotFileImportImage(QString, QImage);
+  void slotFileImportImageReplace();
   void slotFileOpen();
   void slotFileOpenDraggedDigFile (QString);
   void slotFilePrint();
@@ -270,6 +279,7 @@ private slots:
   void slotSettingsDigitizeCurve ();
   void slotSettingsExportFormat ();
   void slotSettingsGeneral ();
+  void slotSettingsGridDisplay ();
   void slotSettingsGridRemoval ();
   void slotSettingsMainWindow ();
   void slotSettingsPointMatch ();
@@ -277,6 +287,7 @@ private slots:
   void slotTimeoutRegressionErrorReport ();
   void slotTimeoutRegressionFileCmdScript ();
   void slotUndoTextChanged (const QString &);
+  void slotViewGridLines ();
   void slotViewGroupBackground(QAction*);
   void slotViewGroupCurves(QAction*);
   void slotViewGroupStatus(QAction*);
@@ -311,7 +322,8 @@ private:
 
   enum ImportType {
     IMPORT_TYPE_SIMPLE,
-    IMPORT_TYPE_ADVANCED
+    IMPORT_TYPE_ADVANCED,
+    IMPORT_TYPE_IMAGE_REPLACE
   };
 
   void applyZoomFactorAfterLoad();
@@ -338,8 +350,11 @@ private:
   void createStatusBar();
   void createToolBars();
   void createTutorial();
+  void createZoomMap ();
   ZoomFactor currentZoomFactor () const;
-  void exportAllCoordinateSystems();
+#ifndef OSX_RELEASE
+  void exportAllCoordinateSystemsAfterRegressionTests();
+#endif
   QString exportFilenameFromInputFilename (const QString &fileName) const;
   void fileExport(const QString &fileName,
                   ExportToFile exportStrategy);
@@ -352,11 +367,16 @@ private:
   void loadCoordSystemListFromCmdMediator(); /// Update the combobox that has the CoordSystem list
   void loadCurveListFromCmdMediator(); /// Update the combobox that has the curve names.
   void loadDocumentFile (const QString &fileName);
-  void loadErrorReportFile(const QString &initialPath,
-                           const QString &errorReportFile);
+  void loadErrorReportFile(const QString &errorReportFile);
   bool loadImage (const QString &fileName,
                   const QImage &image,
                   ImportType ImportType);
+  bool loadImageNewDocument (const QString &fileName,
+                             const QImage &image,
+                             ImportType ImportType);
+  bool loadImageReplacingImage (const QString &fileName,
+                                const QImage &image,
+                                ImportType ImportType);
   void loadInputFileForErrorReport(QDomDocument &domInputFile) const;
   void loadToolTips ();
   bool maybeSave();
@@ -372,19 +392,23 @@ private:
   void saveStartingDocumentSnapshot();
   void setCurrentFile(const QString &fileName);
   void setCurrentPathFromFile (const QString &fileName);
-  void setPixmap (const QPixmap &pixmap);
+  void setPixmap (const QString &curveSelected,
+                  const QPixmap &pixmap);
   void settingsRead ();
   void settingsReadEnvironment (QSettings &settings);
   void settingsReadMainWindow (QSettings &settings);
   void settingsWrite ();
-  bool setupAfterLoad (const QString &fileName,
-                       const QString &temporaryMessage,
-                       ImportType ImportType);
-  void startRegressionTestErrorReport (const QString &initialPath,
-                                       const QString &regressionInputFile);
+  bool setupAfterLoadNewDocument (const QString &fileName,
+                                  const QString &temporaryMessage,
+                                  ImportType ImportType);
+  bool setupAfterLoadReplacingImage (const QString &fileName,
+                                     const QString &temporaryMessage,
+                                     ImportType ImportType);
+  void startRegressionTestErrorReport (const QString &regressionInputFile);
   void startRegressionTestFileCmdScript ();
   void updateAfterCommandStatusBarCoords ();
   void updateControls (); // Update the widgets (typically in terms of show/hide state) depending on the application state.
+  void updateGridLines();
   void updateRecentFileList();
   void updateSettingsMainWindow();
   void updateTransformationAndItsDependencies();
@@ -404,6 +428,7 @@ private:
   QMenu *m_menuFile;
   QAction *m_actionImport;
   QAction *m_actionImportAdvanced;
+  QAction *m_actionImportImageReplace;
   QAction *m_actionOpen;
   QMenu *m_menuFileOpenRecent;
   QList<QAction*> m_actionRecentFiles;
@@ -440,6 +465,7 @@ private:
   QAction *m_actionViewDigitize;
   QAction *m_actionViewSettingsViews;
   QAction *m_actionViewToolTips;
+  QAction *m_actionViewGridLines;
   QMenu *m_menuViewBackground;
   QActionGroup *m_groupBackground;
   QAction *m_actionViewBackgroundNone;
@@ -479,6 +505,7 @@ private:
   QAction *m_actionSettingsDigitizeCurve;
   QAction *m_actionSettingsExport;
   QAction *m_actionSettingsGeneral;
+  QAction *m_actionSettingsGridDisplay;
   QAction *m_actionSettingsGridRemoval;
   QAction *m_actionSettingsMainWindow;
   QAction *m_actionSettingsPointMatch;
@@ -538,6 +565,7 @@ private:
   DlgSettingsDigitizeCurve * m_dlgSettingsDigitizeCurve;
   DlgSettingsExportFormat *m_dlgSettingsExportFormat;
   DlgSettingsGeneral *m_dlgSettingsGeneral;
+  DlgSettingsGridDisplay *m_dlgSettingsGridDisplay;
   DlgSettingsGridRemoval *m_dlgSettingsGridRemoval;
   DlgSettingsMainWindow *m_dlgSettingsMainWindow;
   DlgSettingsPointMatch *m_dlgSettingsPointMatch;
@@ -563,8 +591,18 @@ private:
   // from the command stack getting executed
   QTimer *m_timerRegressionErrorReport;
   FileCmdScript *m_fileCmdScript;
+  bool m_isErrorReportRegressionTest;
   QTimer *m_timerRegressionFileCmdScript;
   QString m_regressionFile;
+  QString m_startupDirectory; // Used to restore original directory just before outputing regression test results, since
+                              // directory changes when settings are read, and also when files are opened or imported.
+                              // Restoring the directory means relative paths in the regression scripts will work consistently
+
+  // Grid lines
+  GridLines m_gridLines;
+
+  // Map between zoom enumerations. This eliminates the need for a switch statement
+  QMap<ZoomFactorInitial, ZoomFactor> m_zoomMap;
 };
 
 #endif // MAIN_WINDOW_H

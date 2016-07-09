@@ -276,14 +276,14 @@ void CoordSystemContext::loadVersion6 (QXmlStreamReader &reader)
   m_coordSystems [m_coordSystemIndex]->loadVersion6 (reader);
 }
 
-void CoordSystemContext::loadVersion7 (QXmlStreamReader &reader,
-                                       DocumentAxesPointsRequired documentAxesPointsRequired)
+void CoordSystemContext::loadVersions7AndUp (QXmlStreamReader &reader,
+                                             DocumentAxesPointsRequired documentAxesPointsRequired)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::loadVersion7";
+  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::loadVersion7AndUp";
 
   int indexLast = m_coordSystems.count() - 1;
-  m_coordSystems [indexLast]->loadVersion7 (reader,
-                                            documentAxesPointsRequired);
+  m_coordSystems [indexLast]->loadVersions7AndUp (reader,
+                                                  documentAxesPointsRequired);
 }
 
 DocumentModelAxesChecker CoordSystemContext::modelAxesChecker() const
@@ -333,6 +333,13 @@ DocumentModelGeneral CoordSystemContext::modelGeneral() const
   LOG4CPP_DEBUG_S ((*mainCat)) << "CoordSystemContext::modelGeneral";
 
   return m_coordSystems [m_coordSystemIndex]->modelGeneral();
+}
+
+DocumentModelGridDisplay CoordSystemContext::modelGridDisplay() const
+{
+  LOG4CPP_DEBUG_S ((*mainCat)) << "CoordSystemContext::modelGridDisplay";
+
+  return m_coordSystems [m_coordSystemIndex]->modelGridDisplay();
 }
 
 DocumentModelGridRemoval CoordSystemContext::modelGridRemoval() const
@@ -439,6 +446,11 @@ void CoordSystemContext::saveXml (QXmlStreamWriter &writer) const
   }
 }
 
+QString CoordSystemContext::selectedCurveName () const
+{
+  return m_coordSystems [m_coordSystemIndex]->selectedCurveName();
+}
+
 void CoordSystemContext::setCoordSystemIndex(CoordSystemIndex coordSystemIndex)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::setCoordSystemIndex"
@@ -449,19 +461,18 @@ void CoordSystemContext::setCoordSystemIndex(CoordSystemIndex coordSystemIndex)
   m_coordSystemIndex = coordSystemIndex;
 }
 
+void CoordSystemContext::setCurveAxes (const Curve &curveAxes)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::setCurveAxes";
+
+  m_coordSystems [m_coordSystemIndex]->setCurveAxes(curveAxes);
+}
+
 void CoordSystemContext::setCurvesGraphs (const CurvesGraphs &curvesGraphs)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::setCurvesGraphs";
 
   m_coordSystems [m_coordSystemIndex]->setCurvesGraphs(curvesGraphs);
-}
-
-void CoordSystemContext::setCurvesGraphs (CoordSystemIndex coordSystemIndex,
-                                          const CurvesGraphs &curvesGraphs)
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::setCurvesGraphs";
-
-  m_coordSystems [coordSystemIndex]->setCurvesGraphs(curvesGraphs);
 }
 
 void CoordSystemContext::setModelAxesChecker(const DocumentModelAxesChecker &modelAxesChecker)
@@ -513,6 +524,13 @@ void CoordSystemContext::setModelGeneral (const DocumentModelGeneral &modelGener
   m_coordSystems [m_coordSystemIndex]->setModelGeneral(modelGeneral);
 }
 
+void CoordSystemContext::setModelGridDisplay(const DocumentModelGridDisplay &modelGridDisplay)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::setModelGridDisplay";
+
+  m_coordSystems [m_coordSystemIndex]->setModelGridDisplay(modelGridDisplay);
+}
+
 void CoordSystemContext::setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::setModelGridRemoval";
@@ -532,6 +550,11 @@ void CoordSystemContext::setModelSegments(const DocumentModelSegments &modelSegm
   LOG4CPP_INFO_S ((*mainCat)) << "CoordSystemContext::setModelSegments";
 
   m_coordSystems [m_coordSystemIndex]->setModelSegments(modelSegments);
+}
+
+void CoordSystemContext::setSelectedCurveName(const QString &selectedCurveName)
+{
+  m_coordSystems [m_coordSystemIndex]->setSelectedCurveName(selectedCurveName);
 }
 
 bool CoordSystemContext::successfulRead () const

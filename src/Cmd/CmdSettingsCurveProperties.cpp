@@ -83,18 +83,22 @@ void CmdSettingsCurveProperties::cmdRedo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsCurveProperties::cmdRedo";
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
   document().updatePointOrdinals (mainWindow().transformation());
   mainWindow().updateSettingsCurveStyles(m_modelCurveStylesAfter);
   mainWindow().updateAfterCommand();
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsCurveProperties::cmdUndo ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSettingsCurveProperties::cmdUndo";
 
+  saveOrCheckPostCommandDocumentStateHash (document ());
   document().updatePointOrdinals (mainWindow().transformation());
   mainWindow().updateSettingsCurveStyles(m_modelCurveStylesBefore);
   mainWindow().updateAfterCommand();
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdSettingsCurveProperties::saveXml (QXmlStreamWriter &writer) const

@@ -18,6 +18,7 @@
 #include "DocumentModelDigitizeCurve.h"
 #include "DocumentModelExportFormat.h"
 #include "DocumentModelGeneral.h"
+#include "DocumentModelGridDisplay.h"
 #include "DocumentModelGridRemoval.h"
 #include "DocumentModelPointMatch.h"
 #include "DocumentModelSegments.h"
@@ -137,6 +138,9 @@ public:
   void editPointAxis (const QPointF &posGraph,
                       const QString &identifier);
 
+  /// Initialize grid display. This is called immediately after the transformation has been defined for the first time
+  void initializeGridDisplay (const Transformation &transformation);
+
   /// See Curve::isXOnly
   bool isXOnly (const QString &pointIdentifier) const;
 
@@ -179,6 +183,9 @@ public:
 
   /// Get method for DocumentModelGeneral.
   DocumentModelGeneral modelGeneral() const;
+
+  /// Get method for DocumentModelGridDisplay.
+  DocumentModelGridDisplay modelGridDisplay() const;
 
   /// Get method for DocumentModelGridRemoval.
   DocumentModelGridRemoval modelGridRemoval() const;
@@ -227,15 +234,17 @@ public:
   /// Save document to xml
   void saveXml (QXmlStreamWriter &writer) const;
 
+  /// Currently selected curve name. This is used to set the selected curve combobox in MainWindow
+  QString selectedCurveName () const;
+
   /// Set the index of current active CoordSystem
   void setCoordSystemIndex(CoordSystemIndex coordSystemIndex);
 
-  /// Let CmdAbstract classes overwrite CurvesGraphs.
-  void setCurvesGraphs (const CurvesGraphs &curvesGraphs);
+  /// Let CmdAbstract classes overwrite axes Curve.
+  void setCurveAxes (const Curve &curveAxes);
 
   /// Let CmdAbstract classes overwrite CurvesGraphs.
-  void setCurvesGraphs (CoordSystemIndex coordSystemIndex,
-                        const CurvesGraphs &curvesGraphs);
+  void setCurvesGraphs (const CurvesGraphs &curvesGraphs);
 
   /// Set the number of axes points required. This is called during the Document creation process, after imported images have
   /// been previewed or loaded files have had at least some xml parsing
@@ -262,6 +271,9 @@ public:
   /// Set method for DocumentModelGeneral.
   void setModelGeneral (const DocumentModelGeneral &modelGeneral);
 
+  /// Set method for DocumentModelGridDisplay.
+  void setModelGridDisplay(const DocumentModelGridDisplay &modelGridDisplay);
+
   /// Set method for DocumentModelGridRemoval.
   void setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval);
 
@@ -270,6 +282,12 @@ public:
 
   /// Set method for DocumentModelSegments.
   void setModelSegments(const DocumentModelSegments &modelSegments);
+
+  /// Set method for the background pixmap
+  void setPixmap (const QImage &image);
+
+  /// Save curve name that is selected for the current coordinate system, for the next time the coordinate system reappears
+  void setSelectedCurveName (const QString &selectedCurveName);
 
   /// Return true if startup loading succeeded. If the loading failed then reasonForUnsuccessfulRed will explain why
   bool successfulRead () const;
@@ -287,7 +305,7 @@ private:
   void loadImage(QXmlStreamReader &reader);
   void loadPreVersion6 (QDataStream &str);
   void loadVersion6 (QFile *file);
-  void loadVersion7 (QFile *file);
+  void loadVersions7AndUp (QFile *file);
   int versionFromFile (QFile *file) const;
 
   // Metadata

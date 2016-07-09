@@ -19,6 +19,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSpinBox>
+#include "QtToString.h"
 #include "Settings.h"
 #include "ZoomControl.h"
 #include "ZoomFactorInitial.h"
@@ -99,15 +100,34 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
     QList<QLocale::Country> countries = QLocale::countriesForLanguage(lang);
     for (int indexCountry = 0; indexCountry < countries.count(); indexCountry++) {
       QLocale::Country country = countries.at(indexCountry);
-      QString label = localeLabel (lang,
-                                   country);
       QLocale locale (lang, country);
+      QString label = QLocaleToString (locale);
       m_cmbLocale->addItem (label, locale);
     }
   }
   m_cmbLocale->model()->sort(COLUMN0); // Sort the new entries
   connect (m_cmbLocale, SIGNAL (currentIndexChanged (int)), this, SLOT (slotLocale (int)));
   layout->addWidget (m_cmbLocale, row++, 2);
+
+#ifdef ENGAUGE_PDF
+  QLabel *labelPdfResolution = new QLabel (tr ("Import PDF resolution (dots per inch):"));
+  layout->addWidget (labelPdfResolution, row, 1);
+
+  m_cmbPdfResolution = new QComboBox;
+  m_cmbPdfResolution->setWhatsThis (tr ("Import PDF Resolution\n\n"
+                                        "Imported Portable Document Format (PDF) files will be converted to this pixel resolution "
+                                        "in dots per inch (DPI), where each pixel is one dot. A higher value increases the picture resolution "
+                                        "and may also improve numeric digitizing accuracy. However, a very high value can make the image so "
+                                        "large that Engauge will slow down."));
+  m_cmbPdfResolution->addItem ("75", 75);
+  m_cmbPdfResolution->addItem ("100", 100);
+  m_cmbPdfResolution->addItem ("150", 150);
+  m_cmbPdfResolution->addItem ("200", 200);
+  m_cmbPdfResolution->addItem ("250", 250);
+  m_cmbPdfResolution->addItem ("300", 300);
+  connect (m_cmbPdfResolution, SIGNAL (currentTextChanged (QString)), this, SLOT (slotPdfResolution (QString)));
+  layout->addWidget (m_cmbPdfResolution, row++, 2);
+#endif
 
   QLabel *labelRecent = new QLabel (tr ("Recent file list:"));
   layout->addWidget (labelRecent, row, 1);
@@ -194,22 +214,15 @@ void DlgSettingsMainWindow::loadMainWindowModel (CmdMediator &cmdMediator,
   m_cmbZoomFactor->setCurrentIndex (index);
   index = m_cmbZoomControl->findData (m_modelMainWindowAfter->zoomControl());
   m_cmbZoomControl->setCurrentIndex (index);
-  QString locLabel = localeLabel (m_modelMainWindowAfter->locale().language(),
-                                  m_modelMainWindowBefore->locale().country());
+  QString locLabel = QLocaleToString (m_modelMainWindowAfter->locale());
   index = m_cmbLocale->findText (locLabel);
   m_cmbLocale->setCurrentIndex(index);
   m_chkTitleBarFormat->setChecked (m_modelMainWindowAfter->mainTitleBarFormat() == MAIN_TITLE_BAR_FORMAT_PATH);
+  index = m_cmbPdfResolution->findData (m_modelMainWindowAfter->pdfResolution());
+  m_cmbPdfResolution->setCurrentIndex(index);
 
   updateControls ();
   enableOk (false); // Disable Ok button since there not yet any changes
-}
-
-QString DlgSettingsMainWindow::localeLabel (QLocale::Language lang,
-                                            QLocale::Country country) const
-{
-  return QString ("%1/%2")
-      .arg (QLocale::languageToString (lang))
-      .arg (QLocale::countryToString(country));
 }
 
 void DlgSettingsMainWindow::slotLocale (int index)
@@ -217,6 +230,14 @@ void DlgSettingsMainWindow::slotLocale (int index)
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::slotLocale";
 
   m_modelMainWindowAfter->setLocale (m_cmbLocale->itemData (index).toLocale());
+  updateControls();
+}
+
+void DlgSettingsMainWindow::slotPdfResolution(const QString)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWIndow::slotPdfResolution";
+
+  m_modelMainWindowAfter->setPdfResolution(m_cmbPdfResolution->currentData().toInt());
   updateControls();
 }
 

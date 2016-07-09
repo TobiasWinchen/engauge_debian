@@ -56,6 +56,10 @@ const QString SETTINGS_GENERAL_CURSOR_SIZE ("cursorSize");
 const QString SETTINGS_GENERAL_EXTRA_PRECISION ("extraPrecision");
 const QString SETTINGS_GROUP_GENERAL ("GeneralEngauge"); // "General" group name is reserved for ungrouped settings
 
+// Import group
+const QString SETTINGS_IMPORT_PDF_RESOLUTION ("PdfResolution");
+const QString SETTINGS_GROUP_IMPORT ("Import");
+
 // Export group
 const QString SETTINGS_EXPORT_CURVE_NAMES_NOT_EXPORTED ("curveNamesNotExported");
 const QString SETTINGS_EXPORT_DELIMITER ("delimiter");
@@ -70,3 +74,7 @@ const QString SETTINGS_EXPORT_POINTS_SELECTION_FUNCTIONS ("pointsSelectionFuncti
 const QString SETTINGS_EXPORT_POINTS_SELECTION_RELATIONS ("pointsSelectionRelations");
 const QString SETTINGS_EXPORT_X_LABEL ("xLabel");
 const QString SETTINGS_GROUP_EXPORT ("Export");
+
+// Pdf group
+const QString SETTINGS_PDF_POS ("pos");
+const QString SETTINGS_GROUP_PDF ("Pdf");

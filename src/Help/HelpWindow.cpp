@@ -8,7 +8,8 @@
 #include "HelpWindow.h"
 #include "Logger.h"
 #include <QApplication>
-#include <QFile>
+#include <QDir>
+#include <QFileInfo>
 #include <QHelpContentWidget>
 #include <QHelpEngine>
 #include <QHelpIndexWidget>
@@ -24,6 +25,7 @@ HelpWindow::HelpWindow(QWidget *parent) :
   setMinimumWidth (MIN_WIDTH);
   setMinimumHeight (MIN_HEIGHT);
 
+#ifndef OSX_RELEASE
   QHelpEngine *helpEngine = new QHelpEngine (helpPath());
   helpEngine->setupData();
 
@@ -34,7 +36,10 @@ HelpWindow::HelpWindow(QWidget *parent) :
                 tr ("Index"));
 
   HelpBrowser *browser = new HelpBrowser (helpEngine);
+
+  // URL is constructed from <namespace>, <virtualFolder> and <file> in engauge.qhp
   browser->setSource (QUrl ("qthelp://engaugedigitizer.net/doc/index.html"));
+
   connect (helpEngine->contentWidget (), SIGNAL (linkActivated (QUrl)), browser, SLOT (setSource (QUrl)));
   connect (helpEngine->indexWidget (), SIGNAL (linkActivated (QUrl, QString)), browser, SLOT (setSource (QUrl)));
 
@@ -43,12 +48,15 @@ HelpWindow::HelpWindow(QWidget *parent) :
   splitter->insertWidget (1, browser);
 
   setWidget (splitter);
+#endif
 }
 
+#ifndef OSX_RELEASE
 QString HelpWindow::helpPath() const
 {
   // Possible locations of help file. Each entry is first tried as is, and then with
-  // applicationDirPath as a prefix. Each entry should probably start with a slash
+  // applicationDirPath as a prefix. Each entry should probably start with a slash. This
+  // search approach offers some flexibility in the help file location
   QStringList paths;
 #ifdef HELPDIR
 #define QUOTE(string) _QUOTE(string)
@@ -66,14 +74,14 @@ QString HelpWindow::helpPath() const
 
     QString pathAsIs = *itr;
 
-    QFile fileAsIs (pathAsIs);
+    QFileInfo fileAsIs (pathAsIs);
     if (fileAsIs.exists()) {
       return pathAsIs;
     }
 
     QString pathWithPrefix = QApplication::applicationDirPath() + pathAsIs;
 
-    QFile fileWithPrefix (pathWithPrefix);
+    QFileInfo fileWithPrefix (pathWithPrefix);
     if (fileWithPrefix.exists()) {
       return pathWithPrefix;
     }
@@ -81,3 +89,4 @@ QString HelpWindow::helpPath() const
 
   return ""; // Empty file, since help file was never found, will simply result in empty help contents
 }
+#endif

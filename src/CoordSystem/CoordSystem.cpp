@@ -51,6 +51,8 @@ CoordSystem::CoordSystem (DocumentAxesPointsRequired documentAxesPointsRequired)
                                             ColorFilterSettings::defaultFilter (),
                                             CurveStyle (LineStyle::defaultGraphCurve (m_curvesGraphs.numCurves ()),
                                                         PointStyle::defaultGraphCurve (m_curvesGraphs.numCurves ()))));
+
+  resetSelectedCurveNameIfNecessary ();
 }
 
 void CoordSystem::addGraphCurveAtEnd (const QString &curveName)
@@ -59,6 +61,8 @@ void CoordSystem::addGraphCurveAtEnd (const QString &curveName)
                                              ColorFilterSettings::defaultFilter (),
                                              CurveStyle (LineStyle::defaultGraphCurve(m_curvesGraphs.numCurves()),
                                                          PointStyle::defaultGraphCurve(m_curvesGraphs.numCurves()))));
+
+  resetSelectedCurveNameIfNecessary ();
 }
 
 void CoordSystem::addPointAxisWithGeneratedIdentifier (const QPointF &posScreen,
@@ -406,17 +410,28 @@ void CoordSystem::loadPreVersion6 (QDataStream &str,
   str >> int32; // Foreground threshold high
   str >> dbl; // Gap separation
 
-  str >> int32; // Grid display is initialized flag
-  str >> int32; // X count
-  str >> int32; // Y count
-  str >> int32; // X parameter
-  str >> int32; // Y parameter
-  str >> dbl; // X start
-  str >> dbl; // Y start
-  str >> dbl; // X step
-  str >> dbl; // Y step
-  str >> dbl; // X stop
-  str >> dbl; // Y stop
+  str >> int32;
+  m_modelGridDisplay.setStable(int32);
+  str >> int32;
+  m_modelGridDisplay.setCountX(int32);
+  str >> int32;
+  m_modelGridDisplay.setCountY(int32);
+  str >> int32;
+  m_modelGridDisplay.setDisableX((GridCoordDisable) int32);
+  str >> int32;
+  m_modelGridDisplay.setDisableY((GridCoordDisable) int32);
+  str >> dbl;
+  m_modelGridDisplay.setStartX (dbl);
+  str >> dbl;
+  m_modelGridDisplay.setStartY (dbl);
+  str >> dbl;
+  m_modelGridDisplay.setStepX (dbl);
+  str >> dbl;
+  m_modelGridDisplay.setStepY (dbl);
+  str >> dbl;
+  m_modelGridDisplay.setStopX (dbl);
+  str >> dbl;
+  m_modelGridDisplay.setStopY (dbl);
 
   str >> int32;
   m_modelSegments.setMinLength(int32);
@@ -461,6 +476,8 @@ void CoordSystem::loadPreVersion6 (QDataStream &str,
   if (m_curveAxes->numPoints () > 2) {
     m_modelGridRemoval.setStable();
   }
+
+  resetSelectedCurveNameIfNecessary ();
 }
 
 void CoordSystem::loadVersion6 (QXmlStreamReader &reader)
@@ -518,12 +535,14 @@ void CoordSystem::loadVersion6 (QXmlStreamReader &reader)
       }
     }
   }
+
+  resetSelectedCurveNameIfNecessary ();
 }
 
-void CoordSystem::loadVersion7 (QXmlStreamReader &reader,
-                                DocumentAxesPointsRequired documentAxesPointsRequired)
+void CoordSystem::loadVersions7AndUp (QXmlStreamReader &reader,
+                                      DocumentAxesPointsRequired documentAxesPointsRequired)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystem::loadVersion7";
+  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystem::loadVersions7AndUp";
 
   m_documentAxesPointsRequired = documentAxesPointsRequired;
 
@@ -558,6 +577,8 @@ void CoordSystem::loadVersion7 (QXmlStreamReader &reader,
         m_modelExport.loadXml (reader);
       } else if (tag == DOCUMENT_SERIALIZE_GENERAL || tag == DOCUMENT_SERIALIZE_COMMON) {
         m_modelGeneral.loadXml (reader);
+      } else if (tag == DOCUMENT_SERIALIZE_GRID_DISPLAY) {
+        m_modelGridDisplay.loadXml (reader);
       } else if (tag == DOCUMENT_SERIALIZE_GRID_REMOVAL) {
         m_modelGridRemoval.loadXml (reader);
       } else if (tag == DOCUMENT_SERIALIZE_IMAGE) {
@@ -573,6 +594,8 @@ void CoordSystem::loadVersion7 (QXmlStreamReader &reader,
       }
     }
   }
+
+  resetSelectedCurveNameIfNecessary ();
 }
 
 DocumentModelAxesChecker CoordSystem::modelAxesChecker() const
@@ -614,6 +637,11 @@ DocumentModelExportFormat CoordSystem::modelExport() const
 DocumentModelGeneral CoordSystem::modelGeneral() const
 {
   return m_modelGeneral;
+}
+
+DocumentModelGridDisplay CoordSystem::modelGridDisplay() const
+{
+  return m_modelGridDisplay;
 }
 
 DocumentModelGridRemoval CoordSystem::modelGridRemoval() const
@@ -709,6 +737,8 @@ void CoordSystem::printStream (QString indentation,
                              str);
   m_modelGeneral.printStream (indentation,
                               str);
+  m_modelGridDisplay.printStream (indentation,
+                                  str);
   m_modelGridRemoval.printStream (indentation,
                                   str);
   m_modelPointMatch.printStream (indentation,
@@ -748,6 +778,17 @@ void CoordSystem::removePointsInCurvesGraphs (CurvesGraphs &curvesGraphs)
   curvesGraphs.iterateThroughCurvesPoints (ftorWithCallback);
 }
 
+void CoordSystem::resetSelectedCurveNameIfNecessary ()
+{
+  if (m_selectedCurveName.isEmpty () ||
+      curveForCurveName (m_selectedCurveName) == 0) {
+
+    // Selected curve name is empty, or the curve has been removed so we pick another. The first is arbitrarily picked
+    m_selectedCurveName = m_curvesGraphs.curvesGraphsNames().first();
+  }
+
+}
+
 void CoordSystem::saveXml (QXmlStreamWriter &writer) const
 {
   writer.writeStartElement(DOCUMENT_SERIALIZE_COORD_SYSTEM);
@@ -758,6 +799,7 @@ void CoordSystem::saveXml (QXmlStreamWriter &writer) const
   m_modelDigitizeCurve.saveXml (writer);
   m_modelExport.saveXml (writer);
   m_modelAxesChecker.saveXml (writer);
+  m_modelGridDisplay.saveXml (writer);
   m_modelGridRemoval.saveXml (writer);
   m_modelPointMatch.saveXml (writer);
   m_modelSegments.saveXml (writer);
@@ -766,11 +808,30 @@ void CoordSystem::saveXml (QXmlStreamWriter &writer) const
   writer.writeEndElement();
 }
 
+QString CoordSystem::selectedCurveName () const
+{
+  return m_selectedCurveName;
+}
+
+void CoordSystem::setCurveAxes (const Curve &curveAxes)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "CoordSystem::setCurveAxes";
+
+  if (m_curveAxes != 0) {
+    delete m_curveAxes;
+    m_curveAxes = 0;
+  }
+
+  m_curveAxes = new Curve (curveAxes);
+}
+
 void CoordSystem::setCurvesGraphs (const CurvesGraphs &curvesGraphs)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CoordSystem::setCurvesGraphs";
 
   m_curvesGraphs = curvesGraphs;
+
+  resetSelectedCurveNameIfNecessary ();
 }
 
 void CoordSystem::setModelAxesChecker(const DocumentModelAxesChecker &modelAxesChecker)
@@ -829,6 +890,11 @@ void CoordSystem::setModelGeneral (const DocumentModelGeneral &modelGeneral)
   m_modelGeneral = modelGeneral;
 }
 
+void CoordSystem::setModelGridDisplay(const DocumentModelGridDisplay &modelGridDisplay)
+{
+  m_modelGridDisplay = modelGridDisplay;
+}
+
 void CoordSystem::setModelGridRemoval(const DocumentModelGridRemoval &modelGridRemoval)
 {
   m_modelGridRemoval = modelGridRemoval;
@@ -842,6 +908,11 @@ void CoordSystem::setModelPointMatch(const DocumentModelPointMatch &modelPointMa
 void CoordSystem::setModelSegments(const DocumentModelSegments &modelSegments)
 {
   m_modelSegments = modelSegments;
+}
+
+void CoordSystem::setSelectedCurveName(const QString &selectedCurveName)
+{
+  m_selectedCurveName = selectedCurveName;
 }
 
 bool CoordSystem::successfulRead () const

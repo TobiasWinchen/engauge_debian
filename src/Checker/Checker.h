@@ -9,6 +9,8 @@
 
 #include "CheckerMode.h"
 #include "DocumentAxesPointsRequired.h"
+#include "GridLine.h"
+#include "GridLines.h"
 #include <QColor>
 #include <QList>
 #include <QPainterPath>
@@ -23,15 +25,11 @@ class QGraphicsScene;
 class QPolygonF;
 class Transformation;
 
-typedef QList<QGraphicsItem *> SideSegments;
-
 /// Box shape that is drawn through the three axis points, to temporarily (usually) or permanently (rarely)
 /// highlight the local up/down/left/right directions when all axis points have been defined. The goal of the checker
 /// is to make it obvious when a mistake has happened so the screen-to-graph transformation is
 /// currently wrong - since the expected up/down/left/right directions will be awry which will distort the checker
 /// somehow. Unfortunately, errors in scale are not revealed by the checker.
-///
-/// For polar coordinates, the box will appear as an annular segment.
 class Checker
 {
 public:
@@ -74,53 +72,15 @@ private:
                                double &xMin,
                                double &xMax,
                                double &yMin) const;
-  void bindItemToScene(QGraphicsItem *item) const;
-
-  // Create side, either along constant X/theta or constant Y/radius side. Line goes from pointFromGraph to pointToGraph.
-  // If the coordinates are polar, we go clockwise from pointFromGraph to pointToGraph (as set up by adjustPolarAngleRange).
-  void createSide (int pointRadius,
-                   const QList<Point> &points,
-                   const DocumentModelCoords &modelCoords,
-                   double xFrom,
-                   double yFrom,
-                   double xTo,
-                   double yTo,
-                   const Transformation &transformation,
-                   SideSegments &sideSegments);
-  void createTransformAlign (const Transformation &transformation,
-                             double radiusLinearCartesian,
-                             const QPointF &posOriginScreen,
-                             QTransform &transformAlign,
-                             double &ellipseXAxis,
-                             double &ellipseYAxis) const;
-  void deleteSide (SideSegments &sideSegments);
-  QGraphicsItem *ellipseItem(const Transformation &transformation,
-                             double radiusLinearCartesian,
-                             const QPointF &posStartScreen,
-                             const QPointF &posEndScreen) const;
-  void finishActiveSegment (const DocumentModelCoords &modelCoords,
-                            const QPointF &posStartScreen,
-                            const QPointF &posEndScreen,
-                            double yFrom,
-                            double yTo,
-                            const Transformation &transformation,
-                            SideSegments &sideSegments) const;
-  QGraphicsItem *lineItem (const QPointF &posStartScreen,
-                           const QPointF &posEndScreen) const;
-  double minScreenDistanceFromPoints (const QPointF &posScreen,
-                                      const QList<Point> &points);
 
   // Low level routine to set line color
-  void setLineColor (SideSegments &sideSegments,
+  void setLineColor (GridLine &gridLine,
                      const QPen &pen);
-
-  void setVisibleSide (SideSegments &sideSegments,
-                       bool visible);
 
   QGraphicsScene &m_scene;
 
-  // These segments are QGraphicsLineItem line segments or QGraphicsEllipseItem arc segments. Together they
-  // make up a box shape in cartesian coordinates.
+  // These grid lines are QGraphicsLineItem line segments or QGraphicsEllipseItem arc segments. Together they
+  // make up a box (cartesian) or annular (polar) shape in cartesian coordinates.
   //
   // A major complication is that drawing the box with just four lines from corner to corner results in extremely
   // thick lines through the axes points, which obscures the axis point unacceptably. So, each side is drawn with
@@ -128,10 +88,7 @@ private:
   // 1) corner1 to either point1 or corner2 (whichever comes first)
   // 2) unused, or point1 to either point2 or corner2 (whichever comes first)
   // 3) unused point2 to corner2
-  SideSegments m_sideLeft;
-  SideSegments m_sideTop;
-  SideSegments m_sideRight;
-  SideSegments m_sideBottom;
+  GridLines m_gridLines;
 };
 
 #endif // CHECKER_H

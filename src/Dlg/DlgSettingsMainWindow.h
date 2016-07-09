@@ -38,6 +38,7 @@ public:
 private slots:
   void slotTitleBarFormat(bool);
   void slotLocale (int index);
+  void slotPdfResolution (const QString);
   void slotRecentFileClear ();
   void slotZoomControl (const QString);
   void slotZoomFactor (const QString);
@@ -49,8 +50,6 @@ private:
 
   void createControls (QGridLayout *layout,
                        int &row);
-  QString localeLabel (QLocale::Language lang,
-                       QLocale::Country country) const;
   void updateControls();
 
   QComboBox *m_cmbZoomFactor;
@@ -58,6 +57,7 @@ private:
   QComboBox *m_cmbLocale;
   QPushButton *m_btnRecentClear;
   QCheckBox *m_chkTitleBarFormat;
+  QComboBox *m_cmbPdfResolution;
 
   MainWindowModel *m_modelMainWindowBefore;
   MainWindowModel *m_modelMainWindowAfter;

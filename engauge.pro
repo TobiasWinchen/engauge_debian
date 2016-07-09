@@ -1,34 +1,44 @@
 # engauge.pro : Builds make files for engauge executable
 #
 # Comments:
-# 1) Set environment variable ENGAUGE_RELEASE=1 to create a release version  without debug information. Releases use
-#    dynamic linking to allow plugins (like Qt Help Collection and some image format libraries)
-# 2) Remove 'debug' in the CONFIG= line to build without debug information, when not creating a release
-# 3) Add 'jpeg2000' to the CONFIG= line to include support for JPEG2000 input files. Requires JPEG2000_INCLUDE and JPEG2000_LIB 
-#    environment variables. At some point, Qt may provide its own support for this format, at which point this can be skipped
-# 4) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
-#    include/library files in an automated and platform-independent manner, so it will not be removed
-# 5) Set environment variable HELPDIR to override the default directory for the help files. On the command line, use
+# 1) This builds 'release' executables by default, to greatly reduce the chances of a 'debug' build getting deployed.
+#    To get a 'debug' build, add 'CONFIG=debug' to the qmake command line:
+#        qmake CONFIG=debug
+# 2) Add 'jpeg2000' to the qmake command line to include support for JPEG2000 input files. Requires:
+#        1) previous installation of OpenJPEG 2.1 development package
+#        2) OPENJPEG_INCLUDE environment variable pointing to directory with openjpeg.h
+#        3) OPENJPEG_LIB environment variable pointing to directory with libopenjp2.so
+#    Sample command lines:
+#        qmake CONFIG+=jpeg2000
+#        qmake "CONFIG+=debug jpeg2000"
+#    At some point, Qt may provide its own support for this format, at which point this can be skipped
+# 3) Add 'pdf' to the qmake command line to include support for PDF input files. Requires
+#        1) previous installation of the poppler-qt5 development package. Engauge has been tested with versions 0.24.5 and 0.44.0
+#        2) POPPLER_INCLUDE environment variable pointing to directory containing Document.h
+#        3) POPPLER_LIB environment variable pointing to directory containing libpoppler-qt5.so
+#    Sample command lines:
+#        qmake CONFIG+=pdf
+#        qmake "CONFIG+=debug pdf"
+# 4) Set environment variable HELPDIR to override the default directory for the help files. On the command line, use
 #    qmake "DEFINES+=HELPDIR=<directory>". The <directory> is absolute or relative to the application executable directory
+# 5) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
+#    include/library files in an automated and platform-independent manner, so it will not be removed
 #
 # More comments are in the INSTALL file, and below
 
-# Comment out this CONFIG line in OSX to produce an OSX application bundle
-CONFIG = qt warn_on thread debug
 QT += core gui help network printsupport widgets xml
 
-_ENGAUGE_RELEASE = $$(ENGAUGE_RELEASE)
-isEmpty(_ENGAUGE_RELEASE) {
+CONFIG(debug,debug|release){
+  # Debug version:
 } else {
-CONFIG -= debug
-# Comments:
-# 1) Release version has warnings enabled so they can be removed
-# 2) Full coverage requires disabling of ENGAUGE_ASSERT by setting QT_NO_DEBUG
-# 3) -Wuninitialized requires O1, O2 or O3 optimization
-DEFINES += QT_NO_DEBUG
-*-g++* {
-QMAKE_CXXFLAGS_WARN_ON += -Wreturn-type -O1 -Wuninitialized -Wunused-variable
-}
+  # Release version:
+  # 1) Release version has warnings enabled so they can be removed as a convenience for downstream package maintainers
+  # 2) Full coverage requires disabling of ENGAUGE_ASSERT by setting QT_NO_DEBUG
+  # 3) -Wuninitialized requires O1, O2 or O3 optimization
+  DEFINES += QT_NO_DEBUG
+  *-g++* {
+    QMAKE_CXXFLAGS_WARN_ON += -Wreturn-type -O1 -Wuninitialized -Wunused-variable
+  }
 }
 
 OBJECTS_DIR = src/.objs
@@ -49,6 +59,7 @@ HEADERS  += \
     src/Callback/CallbackBoundingRects.h \
     src/Callback/CallbackCheckAddPointAxis.h \
     src/Callback/CallbackCheckEditPointAxis.h \
+    src/Callback/CallbackDocumentHash.h \
     src/Callback/CallbackGatherXThetaValuesFunctions.h \
     src/Callback/CallbackNextOrdinal.h \
     src/Callback/CallbackPointOrdinal.h \
@@ -79,6 +90,8 @@ HEADERS  += \
     src/Cmd/CmdMediator.h \
     src/Cmd/CmdMoveBy.h \
     src/Cmd/CmdPaste.h \
+    src/Cmd/CmdPointChangeBase.h \
+    src/Cmd/CmdRedoForTest.h \
     src/Cmd/CmdSelectCoordSystem.h \
     src/Cmd/CmdSettingsAxesChecker.h \
     src/Cmd/CmdSettingsColorFilter.h \
@@ -88,16 +101,30 @@ HEADERS  += \
     src/Cmd/CmdSettingsDigitizeCurve.h \
     src/Cmd/CmdSettingsExportFormat.h \
     src/Cmd/CmdSettingsGeneral.h \
+    src/Cmd/CmdSettingsGridDisplay.h \
     src/Cmd/CmdSettingsGridRemoval.h \
     src/Cmd/CmdSettingsPointMatch.h \
     src/Cmd/CmdSettingsSegments.h \
     src/Cmd/CmdStackShadow.h \
+    src/Cmd/CmdUndoForTest.h \
     src/Color/ColorConstants.h \
     src/Color/ColorFilter.h \
     src/Color/ColorFilterEntry.h \
     src/Color/ColorFilterHistogram.h \
     src/Color/ColorFilterMode.h \
     src/Color/ColorFilterSettings.h \
+    src/Color/ColorFilterSettingsStrategyAbstractBase.h \
+    src/Color/ColorFilterSettingsStrategyForeground.h \
+    src/Color/ColorFilterSettingsStrategyHue.h \
+    src/Color/ColorFilterSettingsStrategyIntensity.h \
+    src/Color/ColorFilterSettingsStrategySaturation.h \
+    src/Color/ColorFilterSettingsStrategyValue.h \
+    src/Color/ColorFilterStrategyAbstractBase.h \
+    src/Color/ColorFilterStrategyForeground.h \
+    src/Color/ColorFilterStrategyHue.h \
+    src/Color/ColorFilterStrategyIntensity.h \
+    src/Color/ColorFilterStrategySaturation.h \
+    src/Color/ColorFilterStrategyValue.h \
     src/Color/ColorPalette.h \
     src/Coord/CoordScale.h \
     src/Coord/CoordsType.h \
@@ -148,6 +175,7 @@ HEADERS  += \
     src/Dlg/DlgSettingsDigitizeCurve.h \
     src/Dlg/DlgSettingsExportFormat.h \
     src/Dlg/DlgSettingsGeneral.h \
+    src/Dlg/DlgSettingsGridDisplay.h \
     src/Dlg/DlgSettingsGridRemoval.h \
     src/Dlg/DlgSettingsMainWindow.h \
     src/Dlg/DlgSettingsPointMatch.h \
@@ -159,6 +187,8 @@ HEADERS  += \
     src/Dlg/DlgValidatorNumber.h \
     src/Document/Document.h \
     src/Document/DocumentAxesPointsRequired.h \
+    src/Document/DocumentHash.h \
+    src/Document/DocumentHashGenerator.h \
     src/Document/DocumentModelAbstractBase.h \
     src/Document/DocumentModelAxesChecker.h \
     src/Document/DocumentModelColorFilter.h \
@@ -166,6 +196,7 @@ HEADERS  += \
     src/Document/DocumentModelDigitizeCurve.h \
     src/Document/DocumentModelExportFormat.h \
     src/Document/DocumentModelGeneral.h \
+    src/Document/DocumentModelGridDisplay.h \
     src/Document/DocumentModelGridRemoval.h \
     src/Document/DocumentModelPointMatch.h \
     src/Document/DocumentModelSegments.h \
@@ -175,6 +206,7 @@ HEADERS  += \
     src/Export/ExportAlignLinear.h \
     src/Export/ExportAlignLog.h \
     src/Export/ExportDelimiter.h \
+    src/Export/ExportImageForRegression.h \
     src/Export/ExportLayoutFunctions.h \
     src/Export/ExportPointsIntervalUnits.h \
     src/Export/ExportPointsSelectionFunctions.h \
@@ -227,6 +259,11 @@ HEADERS  += \
     src/Grid/GridClassifier.h \
     src/Grid/GridCoordDisable.h \
     src/Grid/GridHealer.h \
+    src/Grid/GridInitializer.h \
+    src/Grid/GridLine.h \
+    src/Grid/GridLineFactory.h \
+    src/Grid/GridLines.h \
+    src/Grid/GridLineStyle.h \
     src/Grid/GridRemoval.h \
     src/Help/HelpBrowser.h \
     src/Help/HelpWindow.h \
@@ -244,6 +281,7 @@ HEADERS  += \
     src/Network/NetworkClient.h \
     src/Ordinal/OrdinalGenerator.h \
     src/Ordinal/OrdinalToGraphicsPoint.h \
+    src/Pdf/PdfResolution.h \
     src/Point/Point.h \
     src/Point/PointComparator.h \
     src/Point/PointIdentifiers.h \
@@ -299,7 +337,8 @@ HEADERS  += \
     src/Zoom/ZoomControl.h \
     src/Zoom/ZoomFactor.h \
     src/Zoom/ZoomFactorInitial.h \
-    src/Zoom/ZoomLabels.h
+    src/Zoom/ZoomLabels.h \
+    src/util/ZValues.h
 
 SOURCES += \
     src/Background/BackgroundImage.cpp \
@@ -315,6 +354,7 @@ SOURCES += \
     src/Callback/CallbackBoundingRects.cpp \
     src/Callback/CallbackCheckAddPointAxis.cpp \
     src/Callback/CallbackCheckEditPointAxis.cpp \
+    src/Callback/CallbackDocumentHash.cpp \
     src/Callback/CallbackGatherXThetaValuesFunctions.cpp \
     src/Callback/CallbackNextOrdinal.cpp \
     src/Callback/CallbackPointOrdinal.cpp \
@@ -344,6 +384,8 @@ SOURCES += \
     src/Cmd/CmdMediator.cpp \
     src/Cmd/CmdMoveBy.cpp \
     src/Cmd/CmdPaste.cpp \
+    src/Cmd/CmdRedoForTest.cpp \
+    src/Cmd/CmdPointChangeBase.cpp \
     src/Cmd/CmdSelectCoordSystem.cpp \
     src/Cmd/CmdSettingsAxesChecker.cpp \
     src/Cmd/CmdSettingsColorFilter.cpp \
@@ -353,14 +395,28 @@ SOURCES += \
     src/Cmd/CmdSettingsDigitizeCurve.cpp \
     src/Cmd/CmdSettingsExportFormat.cpp \
     src/Cmd/CmdSettingsGeneral.cpp \
+    src/Cmd/CmdSettingsGridDisplay.cpp \
     src/Cmd/CmdSettingsGridRemoval.cpp \
     src/Cmd/CmdSettingsPointMatch.cpp \
     src/Cmd/CmdSettingsSegments.cpp \
     src/Cmd/CmdStackShadow.cpp \
+    src/Cmd/CmdUndoForTest.cpp \
     src/Color/ColorFilter.cpp \
     src/Color/ColorFilterHistogram.cpp \
     src/Color/ColorFilterMode.cpp \
     src/Color/ColorFilterSettings.cpp \
+    src/Color/ColorFilterSettingsStrategyAbstractBase.cpp \
+    src/Color/ColorFilterSettingsStrategyForeground.cpp \
+    src/Color/ColorFilterSettingsStrategyHue.cpp \
+    src/Color/ColorFilterSettingsStrategyIntensity.cpp \
+    src/Color/ColorFilterSettingsStrategySaturation.cpp \
+    src/Color/ColorFilterSettingsStrategyValue.cpp \
+    src/Color/ColorFilterStrategyAbstractBase.cpp \
+    src/Color/ColorFilterStrategyForeground.cpp \
+    src/Color/ColorFilterStrategyHue.cpp \
+    src/Color/ColorFilterStrategyIntensity.cpp \
+    src/Color/ColorFilterStrategySaturation.cpp \
+    src/Color/ColorFilterStrategyValue.cpp \
     src/Color/ColorPalette.cpp \
     src/Coord/CoordScale.cpp \
     src/Coord/CoordsType.cpp \
@@ -410,6 +466,7 @@ SOURCES += \
     src/Dlg/DlgSettingsDigitizeCurve.cpp \
     src/Dlg/DlgSettingsExportFormat.cpp \
     src/Dlg/DlgSettingsGeneral.cpp \
+    src/Dlg/DlgSettingsGridDisplay.cpp \
     src/Dlg/DlgSettingsGridRemoval.cpp \
     src/Dlg/DlgSettingsMainWindow.cpp \
     src/Dlg/DlgSettingsPointMatch.cpp \
@@ -420,6 +477,7 @@ SOURCES += \
     src/Dlg/DlgValidatorFactory.cpp \
     src/Dlg/DlgValidatorNumber.cpp \
     src/Document/Document.cpp \
+    src/Document/DocumentHashGenerator.cpp \
     src/Document/DocumentModelAbstractBase.cpp \
     src/Document/DocumentModelAxesChecker.cpp \
     src/Document/DocumentModelColorFilter.cpp \
@@ -427,6 +485,7 @@ SOURCES += \
     src/Document/DocumentModelDigitizeCurve.cpp \
     src/Document/DocumentModelExportFormat.cpp \
     src/Document/DocumentModelGeneral.cpp \
+    src/Document/DocumentModelGridDisplay.cpp \
     src/Document/DocumentModelGridRemoval.cpp \
     src/Document/DocumentModelPointMatch.cpp \
     src/Document/DocumentModelSegments.cpp \
@@ -439,6 +498,7 @@ SOURCES += \
     src/Export/ExportFileFunctions.cpp \
     src/Export/ExportFileRelations.cpp \
     src/Export/ExportHeader.cpp \
+    src/Export/ExportImageForRegression.cpp \
     src/Export/ExportLayoutFunctions.cpp \
     src/Export/ExportOrdinalsSmooth.cpp \
     src/Export/ExportOrdinalsStraight.cpp \
@@ -482,6 +542,10 @@ SOURCES += \
     src/Grid/GridClassifier.cpp \
     src/Grid/GridCoordDisable.cpp \
     src/Grid/GridHealer.cpp \
+    src/Grid/GridInitializer.cpp \
+    src/Grid/GridLine.cpp \
+    src/Grid/GridLineFactory.cpp \
+    src/Grid/GridLines.cpp \
     src/Grid/GridRemoval.cpp \
     src/Help/HelpBrowser.cpp \
     src/Help/HelpWindow.cpp \
@@ -498,6 +562,7 @@ SOURCES += \
     src/util/mmsubs.cpp \
     src/Network/NetworkClient.cpp \
     src/Ordinal/OrdinalGenerator.cpp \
+    src/Pdf/PdfResolution.cpp \
     src/Point/Point.cpp \
     src/Point/PointIdentifiers.cpp \
     src/Point/PointMatchAlgorithm.cpp \
@@ -546,39 +611,51 @@ SOURCES += \
     src/View/ViewProfileScale.cpp \
     src/View/ViewSegmentFilter.cpp \
     src/util/Xml.cpp \
-    src/Zoom/ZoomLabels.cpp
+    src/Zoom/ZoomLabels.cpp \
+    src/util/ZValues.cpp
 
 macx-* {
-CONFIG += app_bundle
-QMAKE_CXXFLAGS += "-stdlib=libc++"
-QMAKE_LFLAGS += "-stdlib=libc++"
-INCLUDEPATH += \
-/usr/local/Cellar/fftw/3.3.4_1/include \
-/usr/local/Cellar/log4cpp/1.1.1/include \
-/usr/local/Cellar/qt5/5.5.1_2/lib/QtCore.framework/Versions/5/Headers \
-/usr/local/Cellar/qt5/5.5.1_2/lib/QtHelp.framework/Versions/5/Headers \
-/usr/local/Cellar/qt5/5.5.1_2/lib/QtNetwork.framework/Versions/5/Headers \
-/usr/local/Cellar/qt5/5.5.1_2/lib/QtPrintSupport.framework/Versions/5/Headers \
-/usr/local/Cellar/qt5/5.5.1_2/lib/QtWidgets.framework/Versions/5/Headers \
-/usr/local/Cellar/qt5/5.5.1_2/lib/QtXml.framework/Versions/5/Headers
-LIBS += -L/$$(HOME)/fftw-3.3.4/lib -L$$(HOME)/log4cpp/lib -framework CoreFoundation
+  CONFIG(debug,debug|release){
+    CONFIG -= app_bundle
+    TARGET = engauge
+    DESTDIR = bin
+    QMAKE_CXXFLAGS += "-DOSX_DEBUG -stdlib=libc++ -gdwarf-2"
+  } else {
+    CONFIG += app_bundle
+    TARGET = "Engauge Digitizer"
+    QMAKE_CXXFLAGS += "-DOSX_RELEASE -stdlib=libc++ -gdwarf-2"
+  }
+
+  QMAKE_LFLAGS += "-stdlib=libc++ -gdwarf-2"
+  INCLUDEPATH += $$(FFTW_HOME)/include \
+                 $$(LOG4CPP_HOME)/include \
+                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtCore.framework/Versions/5/Headers \
+                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtHelp.framework/Versions/5/Headers \
+                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtNetwork.framework/Versions/5/Headers \
+                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtPrintSupport.framework/Versions/5/Headers \
+                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtWidgets.framework/Versions/5/Headers \
+                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtXml.framework/Versions/5/Headers
+  LIBS += -L/$$(FFTW_HOME)/lib -L$$(LOG4CPP_HOME)/lib -framework CoreFoundation
 } else {
-TEMPLATE = app
-TARGET = bin/engauge
+  CONFIG += qt warn_on thread
+  TEMPLATE = app
+  TARGET = engauge
+  DESTDIR = bin
 }
 
 win32-* {
-CONFIG += windows
+  CONFIG += windows
 }
 
 win32-msvc* {
-QMAKE_CXXFLAGS += -EHsc
-LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell32.lib
+  QMAKE_CXXFLAGS += -EHsc /F 32000000
+  LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell32.lib
 } else {
-win32-g++* {
-LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
-}
-LIBS += -llog4cpp -lfftw3
+  win32-g++* {
+    LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
+    QMAKE_LFLAGS += -Wl,--stack,32000000
+  }
+  LIBS += -lfftw3 -llog4cpp
 }
 
 INCLUDEPATH += src \
@@ -613,6 +690,7 @@ INCLUDEPATH += src \
                src/Mime \
                src/Network \
                src/Ordinal \
+               src/Pdf \
                src/Plot \
                src/Point \
                src/Segment \
@@ -627,50 +705,74 @@ INCLUDEPATH += src \
                src/Zoom
 
 win32-* {
-INCLUDEPATH += $$(FFTW_HOME)/include \
-               $$(LOG4CPP_HOME)/include
+  INCLUDEPATH += $$(FFTW_HOME)/include \
+                 $$(LOG4CPP_HOME)/include
 }
 
-RESOURCES += \
-    src/engauge.qrc
+RESOURCES += src/engauge.qrc
+
+CONFIG(debug,debug|release) {
+  message("Build type:       debug")
+} else {
+  message("Build type:       release")
+}
 
 jpeg2000 {
-    CONFIG(debug,debug|release) {
-      message(Building dynamic debug version with internal support for JPEG2000 files)
+    message("JPEG2000 support: yes")
+    _OPENJPEG_INCLUDE = $$(OPENJPEG_INCLUDE)
+    _OPENJPEG_LIB = $$(OPENJPEG_LIB)
+    isEmpty(_OPENJPEG_INCLUDE) {
+      error("OPENJPEG_INCLUDE and OPENJPEG_LIB environment variables must be defined")
     } else {
-      message(Building static release version with internal support for JPEG2000 files)
-    }
-    _JPEG2000_INCLUDE = $$(JPEG2000_INCLUDE)
-    _JPEG2000_LIB = $$(JPEG2000_LIB)
-    isEmpty(_JPEG2000_INCLUDE) {
-      error("JPEG2000_INCLUDE and JPEG2000_LIB environment variables must be defined")
-    } else {
-      isEmpty(_JPEG2000_LIB) {
-        error("JPEG2000_INCLUDE and JPEG2000_LIB environment variables must be defined")
+      isEmpty(_OPENJPEG_LIB) {
+        error("OPENJPEG_INCLUDE and OPENJPEG_LIB environment variables must be defined")
       }
     }
     DEFINES += "ENGAUGE_JPEG2000"
-    INCLUDEPATH += Jpeg2000 \
-                   $$(JPEG2000_INCLUDE)
-    LIBS += -L$$(JPEG2000_LIB) -lopenjp2
-
+    INCLUDEPATH += $$(OPENJPEG_INCLUDE) \
+                   src/Jpeg2000
+    LIBS += -L$$(OPENJPEG_LIB) -lopenjp2
     HEADERS += src/Jpeg2000/Jpeg2000.h \
                src/Jpeg2000/Jpeg2000Callbacks.h \
                src/Jpeg2000/Jpeg2000Color.h \
                src/Jpeg2000/Jpeg2000Convert.h \
                src/Jpeg2000/Jpeg2000FormatDefs.h
-
     SOURCES += src/Jpeg2000/Jpeg2000.cpp \
                src/Jpeg2000/Jpeg2000Callbacks.cpp \
                src/Jpeg2000/Jpeg2000Color.cpp \
                src/Jpeg2000/Jpeg2000Convert.cpp
+    QMAKE_LFLAGS += -Wl,-rpath=\'\$\$ORIGIN\'
+    QMAKE_POST_LINK += cp $$(OPENJPEG_LIB)/libopenjp2.so.7 bin
 
 } else {
-    CONFIG(debug,debug|release) {
-      message(Building debug version without internal support for JPEG2000 files)
+    message("JPEG2000 support: no")
+}
+
+pdf {
+    message("PDF support:      yes")
+    _POPPLER_INCLUDE = $$(POPPLER_INCLUDE)
+    _POPPLER_LIB = $$(POPPLER_LIB)
+    isEmpty(_POPPLER_INCLUDE) {
+      error("POPPLER_INCLUDE and POPPLER_LIB environment variables must be defined")
     } else {
-      message(Building release version without internal support for JPEG2000 files)
+      isEmpty(_POPPLER_LIB) {
+        error("POPPLER_INCLUDE and POPPLER_LIB environment variables must be defined")
+      }
     }
+    DEFINES += "ENGAUGE_PDF"
+    LIBS += -L$$(POPPLER_LIB) -lpoppler-qt5
+    INCLUDEPATH += $$(POPPLER_INCLUDE)
+    HEADERS += src/Dlg/DlgPdfFrame.h \
+               src/Pdf/Pdf.h \
+               src/Pdf/PdfFrame.h \
+               src/Pdf/PdfFrameHandle.h
+    SOURCES += src/Dlg/DlgPdfFrame.cpp \
+               src/Pdf/Pdf.cpp \
+               src/Pdf/PdfFrame.cpp \
+               src/Pdf/PdfFrameHandle.cpp
+
+} else {
+    message("PDF support:      no")
 }
 
 # People interested in translating a language can contact the developers for help. 

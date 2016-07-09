@@ -52,7 +52,9 @@ void CmdSelectCoordSystem::cmdRedo ()
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSelectCoordSystem::cmdRedo"
                               << " index=" << m_coordSystemIndexBefore << "->" << m_coordSystemIndexAfter;
 
+  saveOrCheckPreCommandDocumentStateHash (document ());
   mainWindow().updateCoordSystem (m_coordSystemIndexAfter);
+  saveOrCheckPostCommandDocumentStateHash (document ());
 }
 
 void CmdSelectCoordSystem::cmdUndo ()
@@ -60,7 +62,9 @@ void CmdSelectCoordSystem::cmdUndo ()
   LOG4CPP_INFO_S ((*mainCat)) << "CmdSelectCoordSystem::cmdUndo"
                               << " index=" << m_coordSystemIndexAfter << "->" << m_coordSystemIndexBefore;
 
+  saveOrCheckPostCommandDocumentStateHash (document ());
   mainWindow().updateCoordSystem (m_coordSystemIndexBefore);
+  saveOrCheckPreCommandDocumentStateHash (document ());
 }
 
 void CmdSelectCoordSystem::saveXml (QXmlStreamWriter &writer) const

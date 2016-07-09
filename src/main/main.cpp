@@ -44,7 +44,7 @@ void parseCmdLine (int argc,
                    bool &isDebug,
                    QString &errorReportFile,
                    QString &fileCmdScriptFile,
-                   bool &isRegressionTest,
+                   bool &isErrorReportRegressionTest,
                    bool &isGnuplot,
                    QStringList &loadStartupFiles);
 
@@ -57,8 +57,10 @@ bool checkFileExists (const QString &file)
 
 QString engaugeLogFilename()
 {
+  QString pathAndFile; // Return empty value in OSX which is unused
+
+#ifndef OSX_RELEASE
   QProcessEnvironment env;
-  QString pathAndFile;
 
   // Make multiple attempts until a directory is found where the log file can be written
   if (!engaugeLogFilenameAttempt (QCoreApplication::applicationDirPath(), pathAndFile)) {
@@ -68,6 +70,7 @@ QString engaugeLogFilename()
       }
     }
   }
+#endif
 
   return pathAndFile;
 }
@@ -102,7 +105,7 @@ int main(int argc, char *argv[])
   TranslatorContainer translatorContainer (app); // Must exist until execution terminates
 
   // Command line
-  bool isDebug, isGnuplot, isRegressionTest;
+  bool isDebug, isGnuplot, isErrorReportRegressionTest;
   QString errorReportFile, fileCmdScriptFile;
   QStringList loadStartupFiles;
   parseCmdLine (argc,
@@ -110,7 +113,7 @@ int main(int argc, char *argv[])
                 isDebug,
                 errorReportFile,
                 fileCmdScriptFile,
-                isRegressionTest,
+                isErrorReportRegressionTest,
                 isGnuplot,
                 loadStartupFiles);
 
@@ -123,7 +126,7 @@ int main(int argc, char *argv[])
   // Create and show main window
   MainWindow w (errorReportFile,
                 fileCmdScriptFile,
-                isRegressionTest,
+                isErrorReportRegressionTest,
                 isGnuplot,
                 loadStartupFiles);
   w.show();
@@ -137,7 +140,7 @@ void parseCmdLine (int argc,
                    bool &isDebug,
                    QString &errorReportFile,
                    QString &fileCmdScriptFile,
-                   bool &isRegressionTest,
+                   bool &isErrorReportRegressionTest,
                    bool &isGnuplot,
                    QStringList &loadStartupFiles)
 {
@@ -152,7 +155,7 @@ void parseCmdLine (int argc,
   isDebug = false;
   errorReportFile = "";
   fileCmdScriptFile = "";
-  isRegressionTest = false;
+  isErrorReportRegressionTest = false;
   isGnuplot = false;
 
   for (int i = 1; i < argc; i++) {
@@ -176,7 +179,7 @@ void parseCmdLine (int argc,
     } else if (strcmp (argv [i], DASH_HELP.toLatin1().data()) == 0) {
       showUsage = true; // User requested help
     } else if (strcmp (argv [i], DASH_REGRESSION.toLatin1().data()) == 0) {
-      isRegressionTest = true;
+      isErrorReportRegressionTest = true;
     } else if (strncmp (argv [i], DASH.toLatin1().data(), 1) == 0) {
       showUsage = true; // User entered an unrecognized token
     } else {

@@ -22,6 +22,7 @@
 #include "QtToString.h"
 #include "Spline.h"
 #include "Transformation.h"
+#include "ZValues.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ typedef QMap<double, double> XOrThetaToOrdinal;
 GraphicsLinesForCurve::GraphicsLinesForCurve(const QString &curveName) :
   m_curveName (curveName)
 {
+  setZValue (Z_VALUE_CURVE);
   setData (DATA_KEY_GRAPHICS_ITEM_TYPE,
            GRAPHICS_ITEM_TYPE_LINE);
   setData (DATA_KEY_IDENTIFIER,
@@ -82,33 +84,37 @@ QPainterPath GraphicsLinesForCurve::drawLinesSmooth ()
                               point->pos ().y()));
   }
 
-  // Spline through points
-  Spline spline (t, xy);
+  // Spline class requires at least one point
+  if (xy.size() > 0) {
 
-  // Drawing from point i-1 to this point i uses the control points from point i-1
-  int segmentEndingAtPointI = 0;
+    // Spline through points
+    Spline spline (t, xy);
 
-  // Create QPainterPath through the points
-  bool isFirst = true;
-  for (itr = m_graphicsPoints.begin(); itr != m_graphicsPoints.end(); itr++) {
+    // Drawing from point i-1 to this point i uses the control points from point i-1
+    int segmentEndingAtPointI = 0;
 
-    const GraphicsPoint *point = itr.value();
+    // Create QPainterPath through the points
+    bool isFirst = true;
+    for (itr = m_graphicsPoints.begin(); itr != m_graphicsPoints.end(); itr++) {
 
-    if (isFirst) {
-      isFirst = false;
-      path.moveTo (point->pos());
-    } else {
+      const GraphicsPoint *point = itr.value();
 
-      QPointF p1 (spline.p1 (segmentEndingAtPointI).x(),
-                  spline.p1 (segmentEndingAtPointI).y());
-      QPointF p2 (spline.p2 (segmentEndingAtPointI).x(),
-                  spline.p2 (segmentEndingAtPointI).y());
+      if (isFirst) {
+        isFirst = false;
+        path.moveTo (point->pos());
+      } else {
 
-      path.cubicTo (p1,
-                    p2,
-                    point->pos ());
+        QPointF p1 (spline.p1 (segmentEndingAtPointI).x(),
+                    spline.p1 (segmentEndingAtPointI).y());
+        QPointF p2 (spline.p2 (segmentEndingAtPointI).x(),
+                    spline.p2 (segmentEndingAtPointI).y());
 
-      ++segmentEndingAtPointI;
+        path.cubicTo (p1,
+                      p2,
+                      point->pos ());
+
+        ++segmentEndingAtPointI;
+      }
     }
   }
 
