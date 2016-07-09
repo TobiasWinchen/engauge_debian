@@ -1,3 +1,6 @@
+Description: Fix handling of libpoppler in build system 
+Last-Update: 2016-07-09
+
 --- a/engauge.pro
 +++ b/engauge.pro
 @@ -746,16 +746,11 @@

@@ -2,7 +2,7 @@ engauge-digitizer (8.3-1) unstable; urgency=medium
 
   * New upstream release
     - New grid line removal dialog (Closes: #426421) 
-    - Export format for raw data format of multiple curves available (Closes: 426579)
+    - Raw data export format for multiple curves available (Closes: 426579)
     - Crosshair customizable (Closes: #426340) 
   * Updated description in control to be consistent with appdata
   * Removed obsolete dependency on libpng  
