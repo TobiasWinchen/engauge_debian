@@ -1,2 +1,1 @@
-add_search_path_for_help.diff
-add_qmake_hardening_flags_to_project.diff
+020_add_qmake_hardening_flags_to_project.diff

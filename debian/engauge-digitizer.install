@@ -1,2 +1,3 @@
 bin/engauge		usr/bin
 debian/engauge-digitizer.desktop usr/share/applications
+dev/gnome/engauge-digitizer.appdata.xml usr/share/appdata

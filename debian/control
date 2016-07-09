@@ -2,7 +2,7 @@ Source: engauge-digitizer
 Section: science
 Priority: optional
 Maintainer: Tobias Winchen <tobias@winchen.de> 
-Build-Depends: dpkg-dev (>= 1.16.1~), debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qttools5-dev, qttools5-dev-tools, libqt5sql5-sqlite, libfftw3-dev, libpng-dev, libjpeg-dev, liblog4cpp5-dev
+Build-Depends: dpkg-dev (>= 1.16.1~), debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qttools5-dev, qttools5-dev-tools, libqt5sql5-sqlite, libfftw3-dev, libjpeg-dev, liblog4cpp5-dev
 Standards-Version: 3.9.8
 Vcs-Git: git://github.com/winchen/engauge_debian.git
 Vcs-Browser: https://github.com/winchen/engauge_debian
@@ -13,19 +13,32 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: engauge-digitizer-doc
 Description: interactively extracts numbers from bitmap graphs or maps
- This digitizing software converts an image file showing a graph or map into
- xy data (coordinates). Some people use it for obtaining the original data
- from graphs in scientific publications.
+ The Engauge Digitizer tool assists in interactively extracting numbers
+ from images of graphs. Conceptually, it is thus the opposite of a
+ graphing tool that converts data points to graphs. It provides assistance
+ in enhancing the image quality and matching the data points. Engauge
+ Digitizer is used by individuals such as grad students and researchers as
+ well engineers and employees in large government and commercial
+ organizations for processing single files  but also managing databases of
+ thousands of image files.
  .
- Features:
+ Features of Engauge Digitizer include:
     * Automatic grid line removal
-    * Automatic point matching
+    * Automatic point and axis matching
     * Automatic curve tracing
-    * Automatic axes matching
-    * Handles cartesian, polar, linear and logarithmic graphs
+    * Image processing for separating important details from background
+      information 
+    * A wizard providing an interactive tutorial to explain the basic steps 
+    * Multiple coordinate systems in the same image can be digitized in
+      advanced mode
+    * Cubic spline interpolation between points gives more accurate curves with
+      fewer points 
+    * Handling of Cartesian, polar, linear and logarithmic graphs
     * Support for drag-and-drop and copy-and-paste
-    * Context sensitive help, user manual and tutorials explain every feature
-    * Preview windows give immediate feedback while modifying settings
+    * Context sensitive help, user manual and tutorials explaining every
+      feature
+    * Preview windows to give immediate feedback while modifying settings
+    * Automated line and point extraction to rapidly digitizes data 
 
 Package: engauge-digitizer-doc
 Section: doc
