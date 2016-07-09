@@ -6,7 +6,7 @@ engauge-digitizer (8.3-1) unstable; urgency=medium
     - Crosshair customizable (Closes: #426340) 
   * Updated description in control to be consistent with appdata
   * Removed obsolete dependency on libpng  
-  * Enabled support for jpeg2000 
+  * Enabled support for jpeg2000 and pdf formats 
   * Patch add_search_path_for_help included upstream 
   * Added appdata information
   * Use provided .desktop file
