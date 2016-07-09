@@ -8,6 +8,7 @@ engauge-digitizer (8.3-1) unstable; urgency=medium
   * Updated description in control to be consistent with appdata
   * Removed obsolete dependency on libpng  
   * Patch add_search_path_for_help included upstream 
+  * Use provided .desktop file
 
  -- Tobias Winchen <tobias@winchen.de>  Sat, 09 Jul 2016 10:50:04 +0200
 
