@@ -1,1 +1,2 @@
 020_add_qmake_hardening_flags_to_project.diff
+030_fix_check_for_openjpg_lib.diff

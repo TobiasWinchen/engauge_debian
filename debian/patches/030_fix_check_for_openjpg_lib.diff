@@ -1,0 +1,29 @@
+--- a/engauge.pro
++++ b/engauge.pro
+@@ -723,15 +723,11 @@
+     _OPENJPEG_LIB = $$(OPENJPEG_LIB)
+     isEmpty(_OPENJPEG_INCLUDE) {
+       error("OPENJPEG_INCLUDE and OPENJPEG_LIB environment variables must be defined")
+-    } else {
+-      isEmpty(_OPENJPEG_LIB) {
+-        error("OPENJPEG_INCLUDE and OPENJPEG_LIB environment variables must be defined")
+-      }
+-    }
+-    DEFINES += "ENGAUGE_JPEG2000"
++    } 
++		DEFINES += "ENGAUGE_JPEG2000"
+     INCLUDEPATH += $$(OPENJPEG_INCLUDE) \
+                    src/Jpeg2000
+-    LIBS += -L$$(OPENJPEG_LIB) -lopenjp2
++    LIBS += -lopenjp2
+     HEADERS += src/Jpeg2000/Jpeg2000.h \
+                src/Jpeg2000/Jpeg2000Callbacks.h \
+                src/Jpeg2000/Jpeg2000Color.h \
+@@ -742,7 +738,6 @@
+                src/Jpeg2000/Jpeg2000Color.cpp \
+                src/Jpeg2000/Jpeg2000Convert.cpp
+     QMAKE_LFLAGS += -Wl,-rpath=\'\$\$ORIGIN\'
+-    QMAKE_POST_LINK += cp $$(OPENJPEG_LIB)/libopenjp2.so.7 bin
+ 
+ } else {
+     message("JPEG2000 support: no")

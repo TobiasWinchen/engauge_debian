@@ -3,12 +3,13 @@
 DPKG_EXPORT_BUILDFLAGS = 1
 
 export QT_SELECT := qt5
+export OPENJPEG_INCLUDE := /usr/include/openjpeg-2.1/
 
 %:
 	dh $@ --parallel
 
 override_dh_auto_configure:
-	ENGAUGE_RELEASE=1	qmake engauge.pro
+	ENGAUGE_RELEASE=1	 qmake engauge.pro CONFIG+=jpeg2000
 
 override_dh_auto_build:
 	# build documentation
