@@ -6,11 +6,14 @@
 
 #include "DlgSettingsMainWindow.h"
 #include "EngaugeAssert.h"
+#include "ImportCropping.h"
+#include "ImportCroppingUtilBase.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include "MainWindowModel.h"
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QGraphicsScene>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -109,6 +112,21 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
   connect (m_cmbLocale, SIGNAL (currentIndexChanged (int)), this, SLOT (slotLocale (int)));
   layout->addWidget (m_cmbLocale, row++, 2);
 
+  QLabel *labelImportCropping = new QLabel (tr ("Import cropping:"));
+  layout->addWidget (labelImportCropping, row, 1);
+
+  m_cmbImportCropping = new QComboBox;
+  m_cmbImportCropping->setWhatsThis (tr ("Import Cropping\n\n"
+                                         "Enables or disables cropping of the imported image when importing. Cropping the image is useful "
+                                         "for removing unimportant information around a graph, but less useful when the graph already fills "
+                                         "the entire image."));
+  ImportCroppingUtilBase importCroppingUtil;
+  m_cmbImportCropping->addItem (importCroppingUtil.importCroppingToString (IMPORT_CROPPING_NEVER), IMPORT_CROPPING_NEVER);
+  m_cmbImportCropping->addItem (importCroppingUtil.importCroppingToString (IMPORT_CROPPING_MULTIPAGE_PDFS), IMPORT_CROPPING_MULTIPAGE_PDFS);
+  m_cmbImportCropping->addItem (importCroppingUtil.importCroppingToString (IMPORT_CROPPING_ALWAYS), IMPORT_CROPPING_ALWAYS);
+  connect (m_cmbImportCropping, SIGNAL (currentIndexChanged (int)), this, SLOT (slotImportCropping (int)));
+  layout->addWidget (m_cmbImportCropping, row++, 2);
+
 #ifdef ENGAUGE_PDF
   QLabel *labelPdfResolution = new QLabel (tr ("Import PDF resolution (dots per inch):"));
   layout->addWidget (labelPdfResolution, row, 1);
@@ -128,6 +146,30 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
   connect (m_cmbPdfResolution, SIGNAL (currentTextChanged (QString)), this, SLOT (slotPdfResolution (QString)));
   layout->addWidget (m_cmbPdfResolution, row++, 2);
 #endif
+
+  QLabel *labelMaximumGridLines = new QLabel (tr ("Maximum grid lines:"));
+  layout->addWidget (labelMaximumGridLines, row, 1);
+
+  m_spinMaximumGridLines = new QSpinBox;
+  m_spinMaximumGridLines->setMinimum (2);
+  m_spinMaximumGridLines->setWhatsThis (tr ("Maximum Grid Lines\n\n"
+                                            "Maximum number of grid lines to be processed. This limit is applied when the step value is too "
+                                            "small for the start and stop values, which would result in too many grid lines visually and "
+                                            "possibly extremely long processing time (since each grid line would have to be processed)"));
+  connect (m_spinMaximumGridLines, SIGNAL (valueChanged (int)), this, (SLOT (slotMaximumGridLines (int))));
+  layout->addWidget (m_spinMaximumGridLines, row++, 2);
+
+  QLabel *labelHighlightOpacity = new QLabel (tr ("Highlight opacity:"));
+  layout->addWidget (labelHighlightOpacity, row, 1);
+
+  m_spinHighlightOpacity = new QDoubleSpinBox;
+  m_spinHighlightOpacity->setRange (0, 1);
+  m_spinHighlightOpacity->setSingleStep (0.1);
+  m_spinHighlightOpacity->setWhatsThis (tr ("Highligh Opacity\n\n"
+                                            "Opacity to be applied when the cursor is over a curve or axis point in Select mode. The change in "
+                                            "appearance shows when the point can be selected."));
+  connect (m_spinHighlightOpacity, SIGNAL (valueChanged (double)), this, SLOT (slotHighlightOpacity(double)));
+  layout->addWidget (m_spinHighlightOpacity, row++, 2);
 
   QLabel *labelRecent = new QLabel (tr ("Recent file list:"));
   layout->addWidget (labelRecent, row, 1);
@@ -217,12 +259,32 @@ void DlgSettingsMainWindow::loadMainWindowModel (CmdMediator &cmdMediator,
   QString locLabel = QLocaleToString (m_modelMainWindowAfter->locale());
   index = m_cmbLocale->findText (locLabel);
   m_cmbLocale->setCurrentIndex(index);
+  index = m_cmbImportCropping->findData (m_modelMainWindowAfter->importCropping());
+  m_cmbImportCropping->setCurrentIndex (index);
   m_chkTitleBarFormat->setChecked (m_modelMainWindowAfter->mainTitleBarFormat() == MAIN_TITLE_BAR_FORMAT_PATH);
   index = m_cmbPdfResolution->findData (m_modelMainWindowAfter->pdfResolution());
   m_cmbPdfResolution->setCurrentIndex(index);
+  m_spinMaximumGridLines->setValue (m_modelMainWindowAfter->maximumGridLines());
+  m_spinHighlightOpacity->setValue (m_modelMainWindowAfter->highlightOpacity());
 
   updateControls ();
   enableOk (false); // Disable Ok button since there not yet any changes
+}
+
+void DlgSettingsMainWindow::slotHighlightOpacity(double)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::slotHighlightOpacity";
+
+  m_modelMainWindowAfter->setHighlightOpacity (m_spinHighlightOpacity->value());
+  updateControls();
+}
+
+void DlgSettingsMainWindow::slotImportCropping (int index)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::slotImportCropping";
+
+  m_modelMainWindowAfter->setImportCropping ((ImportCropping) m_cmbImportCropping->itemData (index).toInt ());
+  updateControls();
 }
 
 void DlgSettingsMainWindow::slotLocale (int index)
@@ -231,6 +293,14 @@ void DlgSettingsMainWindow::slotLocale (int index)
 
   m_modelMainWindowAfter->setLocale (m_cmbLocale->itemData (index).toLocale());
   updateControls();
+}
+
+void DlgSettingsMainWindow::slotMaximumGridLines (int limit)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWIndow::slotMaximumGridLines";
+
+  m_modelMainWindowAfter->setMaximumGridLines (limit);
+  updateControls ();
 }
 
 void DlgSettingsMainWindow::slotPdfResolution(const QString)

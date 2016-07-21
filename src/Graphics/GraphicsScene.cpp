@@ -11,6 +11,7 @@
 #include "DataKey.h"
 #include "EngaugeAssert.h"
 #include "EnumsToQt.h"
+#include "GeometryWindow.h"
 #include "GraphicsItemType.h"
 #include "GraphicsPoint.h"
 #include "GraphicsPointFactory.h"
@@ -43,7 +44,8 @@ void GraphicsScene::addTemporaryPoint (const QString &identifier,
 
 GraphicsPoint *GraphicsScene::createPoint (const QString &identifier,
                                            const PointStyle &pointStyle,
-                                           const QPointF &posScreen)
+                                           const QPointF &posScreen,
+                                           GeometryWindow *geometryWindow)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "GraphicsScene::createPoint"
                               << " identifier=" << identifier.toLatin1().data();
@@ -56,9 +58,9 @@ GraphicsPoint *GraphicsScene::createPoint (const QString &identifier,
   GraphicsPoint *point = pointFactory.createPoint (*this,
                                                    identifier,
                                                    posScreen,
-                                                   pointStyle);
+                                                   pointStyle,
+                                                   geometryWindow);
 
-  point->setToolTip (identifier);
   point->setData (DATA_KEY_GRAPHICS_ITEM_TYPE, GRAPHICS_ITEM_TYPE_POINT);
 
   return point;
@@ -198,32 +200,6 @@ void GraphicsScene::resetPositionHasChangedFlags()
   }
 }
 
-QStringList GraphicsScene::selectedPointIdentifiers () const
-{
-  const QList<QGraphicsItem*> &items = QGraphicsScene::selectedItems();
-
-  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsScene::selectedPointIdentifiers"
-                              << " selectedItems=" << items.count();
-
-  QStringList selectedIds;
-  QList<QGraphicsItem*>::const_iterator itr;
-  for (itr = items.begin(); itr != items.end(); itr++) {
-
-    const QGraphicsItem* item = *itr;
-
-    // Skip the image and only keep the Points
-    bool isPoint = (item->data (DATA_KEY_GRAPHICS_ITEM_TYPE).toInt () == GRAPHICS_ITEM_TYPE_POINT);
-    if (isPoint) {
-
-      // Add Point to the list
-      selectedIds << item->data(DATA_KEY_IDENTIFIER).toString ();
-
-    }
-  }
-
-  return  selectedIds;
-}
-
 void GraphicsScene::showCurves (bool show,
                                 bool showAll,
                                 const QString &curveNameWanted)
@@ -267,14 +243,19 @@ void GraphicsScene::showCurves (bool show,
   }
 }
 
-void GraphicsScene::updateAfterCommand (CmdMediator &cmdMediator)
+void GraphicsScene::updateAfterCommand (CmdMediator &cmdMediator,
+                                        double highlightOpacity,
+                                        GeometryWindow *geometryWindow)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "GraphicsScene::updateAfterCommand";
+
+  m_graphicsLinesForCurves.updateHighlightOpacity (highlightOpacity);
 
   updateCurves (cmdMediator);
 
   // Update the points
-  updatePointMembership (cmdMediator);
+  updatePointMembership (cmdMediator,
+                         geometryWindow);
 }
 
 void GraphicsScene::updateCurves (CmdMediator &cmdMediator)
@@ -313,13 +294,15 @@ void GraphicsScene::updateGraphicsLinesToMatchGraphicsPoints (const CurveStyles 
   }
 }
 
-void GraphicsScene::updatePointMembership (CmdMediator &cmdMediator)
+void GraphicsScene::updatePointMembership (CmdMediator &cmdMediator,
+                                           GeometryWindow *geometryWindow)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "GraphicsScene::updatePointMembership";
 
   CallbackSceneUpdateAfterCommand ftor (m_graphicsLinesForCurves,
                                         *this,
-                                        cmdMediator.document ());
+                                        cmdMediator.document (),
+                                        geometryWindow);
   Functor2wRet<const QString &, const Point &, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
                                                                                                      &CallbackSceneUpdateAfterCommand::callback);
 

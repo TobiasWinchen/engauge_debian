@@ -8,11 +8,14 @@
 #define GRAPHICS_POINT_H
 
 #include "GraphicsPointAbstractBase.h"
-#include "GraphicsPoint.h"
 #include <QColor>
 #include <QPointF>
 
+extern const double DEFAULT_HIGHLIGHT_OPACITY;
+extern const double MAX_OPACITY;
+
 class CurveStyle;
+class GeometryWindow;
 class GraphicsPointEllipse;
 class GraphicsPointPolygon;
 class PointStyle;
@@ -45,7 +48,8 @@ public:
                 const QPointF &posScreen,
                 const QColor &color,
                 unsigned int radius,
-                double lineWidth);
+                double lineWidth,
+                GeometryWindow *geometryWindow);
 
   /// Constructor of polygon point.
   GraphicsPoint(QGraphicsScene &scene,
@@ -53,13 +57,17 @@ public:
                 const QPointF &posScreen,
                 const QColor &color,
                 const QPolygonF &polygon,
-                double lineWidth);
+                double lineWidth,
+                GeometryWindow *geometryWindow);
 
   /// Destructor. This remove the graphics item from the scene
   ~GraphicsPoint ();
 
   /// Proxy method for QGraphicsItem::data
   QVariant data (int key) const;
+
+  /// Get method for highlight opacity
+  double highlightOpacity () const;
 
   /// Proxy method for QGraphicsItem::pos.
   QPointF pos () const;
@@ -75,14 +83,14 @@ public:
   /// Proxy method for QGraphicsItem::setData
   void setData (int key, const QVariant &data);
 
+  /// Set method for highlight opacity
+  void setHighlightOpacity (double highlightOpacity);
+
   /// Update the point style
   void setPointStyle (const PointStyle &pointStyle);
 
   /// Update the position
   void setPos (const QPointF pos);
-
-  /// Proxy method for QGraphicsItem::setToolTip
-  void setToolTip (const QString &toolTip);
 
   /// Mark point as wanted. Marking as unwanted is done by the reset function
   void setWanted ();
@@ -117,6 +125,10 @@ private:
 
   // Housekeeping
   bool m_wanted;
+
+  double m_highlightOpacity;
+
+  GeometryWindow *m_geometryWindow; // Can receive hover signals. Null if unused
 };
 
 #endif // GRAPHICS_POINT_H

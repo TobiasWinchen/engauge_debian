@@ -73,6 +73,7 @@ void DlgSettingsExportFormat::createCurveSelection (QGridLayout *layout, int &ro
   layout->addWidget (labelExcluded, row++, 2);
 
   m_listIncluded = new QListWidget;
+  m_listIncluded->setSortingEnabled (false); // Preserve order from Document
   m_listIncluded->setWhatsThis (tr ("List of curves to be included in the exported file.\n\n"
                                     "The order of the curves here does not affect the order in the exported file. That "
                                     "order is determined by the Curves settings."));
@@ -81,6 +82,7 @@ void DlgSettingsExportFormat::createCurveSelection (QGridLayout *layout, int &ro
   connect (m_listIncluded, SIGNAL (itemSelectionChanged ()), this, SLOT (slotListIncluded()));
 
   m_listExcluded = new QListWidget;
+  m_listExcluded->setSortingEnabled (false); // Preserve order from Document
   m_listExcluded->setWhatsThis (tr ("List of curves to be excluded from the exported file"));
   m_listExcluded->setSelectionMode (QAbstractItemView::MultiSelection);
   layout->addWidget (m_listExcluded, row++, 2, 4, 1);
@@ -126,6 +128,11 @@ void DlgSettingsExportFormat::createDelimiters (QHBoxLayout *layoutMisc)
   m_btnDelimitersTabs->setWhatsThis (tr ("Exported file will have tabs between adjacent values, unless overridden by commas in CSV files."));
   layoutDelimiters->addWidget (m_btnDelimitersTabs);
   connect (m_btnDelimitersTabs, SIGNAL (released ()), this, SLOT (slotDelimitersTabs()));
+
+  m_btnDelimitersSemicolons = new QRadioButton (exportDelimiterToString (EXPORT_DELIMITER_SEMICOLON));
+  m_btnDelimitersSemicolons->setWhatsThis (tr ("Exported file will have semicolons between adjacent values, unless overridden by commas in CSV files."));
+  layoutDelimiters->addWidget (m_btnDelimitersSemicolons);
+  connect (m_btnDelimitersSemicolons, SIGNAL (released ()), this, SLOT (slotDelimitersSemicolons()));
 
   m_chkOverrideCsvTsv = new QCheckBox (tr ("Override in CSV/TSV files"));
   m_chkOverrideCsvTsv->setWhatsThis (tr ("Comma-separated value (CSV) files and tab-separated value (TSV) files will use commas and tabs "
@@ -555,6 +562,7 @@ void DlgSettingsExportFormat::load (CmdMediator &cmdMediator)
   m_btnDelimitersCommas->setChecked (delimiter == EXPORT_DELIMITER_COMMA);
   m_btnDelimitersSpaces->setChecked (delimiter == EXPORT_DELIMITER_SPACE);
   m_btnDelimitersTabs->setChecked (delimiter == EXPORT_DELIMITER_TAB);
+  m_btnDelimitersSemicolons->setChecked (delimiter == EXPORT_DELIMITER_SEMICOLON);
 
   m_chkOverrideCsvTsv->setChecked (m_modelExportAfter->overrideCsvTsv());
 
@@ -588,6 +596,15 @@ void DlgSettingsExportFormat::slotDelimitersCommas()
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotDelimitersCommas";
 
   m_modelExportAfter->setDelimiter(EXPORT_DELIMITER_COMMA);
+  updateControls();
+  updatePreview();
+}
+
+void DlgSettingsExportFormat::slotDelimitersSemicolons()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotDelimitersSemicolons";
+
+  m_modelExportAfter->setDelimiter(EXPORT_DELIMITER_SEMICOLON);
   updateControls();
   updatePreview();
 }
@@ -906,9 +923,6 @@ void DlgSettingsExportFormat::updateControls ()
   bool isGoodState = goodIntervalFunctions() &&
                      goodIntervalRelations();
   enableOk (isGoodState);
-
-  m_listIncluded->sortItems (Qt::AscendingOrder);
-  m_listExcluded->sortItems (Qt::AscendingOrder);
 
   int selectedForInclude = m_listExcluded->selectedItems().count();
   int selectedForExclude = m_listIncluded->selectedItems().count();

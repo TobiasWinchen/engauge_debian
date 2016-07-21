@@ -16,6 +16,7 @@ class CmdMediator;
 class Curve;
 class CurvesGraphs;
 class CurveStyles;
+class GeometryWindow;
 class GraphicsPoint;
 class MainWindow;
 class PointStyle;
@@ -41,7 +42,8 @@ public:
   /// Create one QGraphicsItem-based object that represents one Point. It is NOT added to m_graphicsLinesForCurves (see addPoint)
   GraphicsPoint *createPoint (const QString &identifier,
                               const PointStyle &pointStyle,
-                              const QPointF &posScreen);
+                              const QPointF &posScreen,
+                              GeometryWindow *geometryWindow);
 
   /// Hide all graphics items, except background image, in preparation for preview during IMPORT_TYPE_ADVANCED
   void hideAllItemsExceptImage();
@@ -66,9 +68,6 @@ public:
   /// Reset positionHasChanged flag for all items. Typically this is done as part of mousePressEvent.
   void resetPositionHasChangedFlags();
 
-  /// Return a list of identifiers for the currently selected points.
-  QStringList selectedPointIdentifiers () const;
-
   /// Show or hide all Curves (if showAll is true) or just the selected Curve (if showAll is false);
   void showCurves (bool show,
                    bool showAll = false,
@@ -76,7 +75,9 @@ public:
 
   /// Update the Points and their Curves after executing a command. After a mouse drag, the lines are already updated and
   /// updating would be done on out of date information (since that would be brought up to date by the NEXT command)
-  void updateAfterCommand (CmdMediator &cmdMediator);
+  void updateAfterCommand (CmdMediator &cmdMediator,
+                           double highlightOpacity,
+                           GeometryWindow *geometryWindow);
 
   /// Update curve styles after settings changed.
   void updateCurveStyles(const CurveStyles &modelCurveStyles);
@@ -97,7 +98,8 @@ private:
   void updateCurves (CmdMediator &cmdMediator);
 
   /// Update Points using a multi-pass algorithm.
-  void updatePointMembership (CmdMediator &cmdMediator);
+  void updatePointMembership (CmdMediator &cmdMediator,
+                              GeometryWindow *geometryWindow);
 
   /// Curve name to GraphicsLinesForCurve
   GraphicsLinesForCurves m_graphicsLinesForCurves;

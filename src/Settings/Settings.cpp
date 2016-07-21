@@ -19,12 +19,16 @@ const QString SETTINGS_BACKGROUND_IMAGE ("backgroundImage");
 const QString SETTINGS_CHECKLIST_GUIDE_DOCK_AREA ("checklistGuideDockArea");
 const QString SETTINGS_CHECKLIST_GUIDE_DOCK_GEOMETRY ("checklistGuideDockGeometry");
 const QString SETTINGS_CHECKLIST_GUIDE_WIZARD ("checklistGuideWizard");
+const QString SETTINGS_GEOMETRY_WINDOW_DOCK_AREA ("geometryWIndowDockArea");
+const QString SETTINGS_GEOMETRY_WINDOW_DOCK_GEOMETRY ("geometryWindowGeometry");
 const QString SETTINGS_GROUP_MAIN_WINDOW ("MainWindow"); // Capitalize both M and W since this is a group string
 const QString SETTINGS_HELP_POS ("helpPos");
 const QString SETTINGS_HELP_SIZE ("helpSize");
+const QString SETTINGS_HIGHLIGHT_OPACITY ("highlightOpacity");
 const QString SETTINGS_LOCALE_COUNTRY ("country");
 const QString SETTINGS_LOCALE_LANGUAGE ("language");
 const QString SETTINGS_MAIN_TITLE_BAR_FORMAT ("titleBarFormat");
+const QString SETTINGS_MAXIMUM_GRID_LINES ("maximumGridLines");
 const QString SETTINGS_POS ("pos");
 const QString SETTINGS_RECENT_FILE_LIST ("recentFileList");
 const QString SETTINGS_SIZE ("size");
@@ -57,8 +61,9 @@ const QString SETTINGS_GENERAL_EXTRA_PRECISION ("extraPrecision");
 const QString SETTINGS_GROUP_GENERAL ("GeneralEngauge"); // "General" group name is reserved for ungrouped settings
 
 // Import group
-const QString SETTINGS_IMPORT_PDF_RESOLUTION ("PdfResolution");
 const QString SETTINGS_GROUP_IMPORT ("Import");
+const QString SETTINGS_IMPORT_CROPPING ("Cropping");
+const QString SETTINGS_IMPORT_PDF_RESOLUTION ("PdfResolution");
 
 // Export group
 const QString SETTINGS_EXPORT_CURVE_NAMES_NOT_EXPORTED ("curveNamesNotExported");
@@ -75,6 +80,6 @@ const QString SETTINGS_EXPORT_POINTS_SELECTION_RELATIONS ("pointsSelectionRelati
 const QString SETTINGS_EXPORT_X_LABEL ("xLabel");
 const QString SETTINGS_GROUP_EXPORT ("Export");
 
-// Pdf group
-const QString SETTINGS_PDF_POS ("pos");
-const QString SETTINGS_GROUP_PDF ("Pdf");
+// Dialogs for import cropping group
+const QString SETTINGS_GROUP_IMPORT_CROPPING ("ImportCropping");
+const QString SETTINGS_IMPORT_CROPPING_POS ("pos");

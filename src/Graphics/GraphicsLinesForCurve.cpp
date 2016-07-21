@@ -7,6 +7,7 @@
 #include "DataKey.h"
 #include "EngaugeAssert.h"
 #include "EnumsToQt.h"
+#include "GeometryWindow.h"
 #include "GraphicsItemType.h"
 #include "GraphicsLinesForCurve.h"
 #include "GraphicsPoint.h"
@@ -320,7 +321,8 @@ void GraphicsLinesForCurve::renumberOrdinals ()
 
 void GraphicsLinesForCurve::updateAfterCommand (GraphicsScene &scene,
                                                 const PointStyle &pointStyle,
-                                                const Point &point)
+                                                const Point &point,
+                                                GeometryWindow *geometryWindow)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsLinesForCurve::updateAfterCommand"
                                << " curve=" << m_curveName.toLatin1().data()
@@ -343,7 +345,8 @@ void GraphicsLinesForCurve::updateAfterCommand (GraphicsScene &scene,
     // Point does not exist in scene so create it
     graphicsPoint = scene.createPoint (point.identifier (),
                                        pointStyle,
-                                       point.posScreen());
+                                       point.posScreen(),
+                                       geometryWindow);
     m_graphicsPoints [point.ordinal ()] = graphicsPoint;
 
   }
@@ -362,6 +365,20 @@ void GraphicsLinesForCurve::updateCurveStyle (const CurveStyle &curveStyle)
 
      GraphicsPoint *point = itr.value();
      point->updateCurveStyle (curveStyle);
+  }
+}
+
+void GraphicsLinesForCurve::updateHighlightOpacity (double highlightOpacity)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsLinesForCurve::updateCurveStyle"
+                              << " curve=" << m_curveName.toLatin1().data()
+                              << " highlightOpacity=" << highlightOpacity;
+
+  OrdinalToGraphicsPoint::const_iterator itr;
+  for (itr = m_graphicsPoints.begin(); itr != m_graphicsPoints.end(); itr++) {
+
+     GraphicsPoint *point = itr.value();
+     point->setHighlightOpacity (highlightOpacity);
   }
 }
 

@@ -4,12 +4,17 @@
  * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
  ******************************************************************************************************/
 
+#include "CmdEditPointAxis.h"
+#include "CmdEditPointGraph.h"
 #include "CmdMediator.h"
 #include "CmdMoveBy.h"
 #include "DataKey.h"
 #include "DigitizeStateContext.h"
 #include "DigitizeStateSelect.h"
+#include "DlgEditPointAxis.h"
+#include "DlgEditPointGraph.h"
 #include "EngaugeAssert.h"
+#include "GraphicsItemsExtractor.h"
 #include "GraphicsItemType.h"
 #include "GraphicsScene.h"
 #include "GraphicsView.h"
@@ -18,8 +23,10 @@
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QImage>
+#include <QMessageBox>
 #include <QObject>
 #include <QtToString.h>
+#include "Version.h"
 
 const QString MOVE_TEXT_DOWN (QObject::tr ("Move down"));
 const QString MOVE_TEXT_LEFT (QObject::tr ("Move left"));
@@ -40,6 +47,21 @@ QString DigitizeStateSelect::activeCurve () const
   return context().mainWindow().selectedGraphCurve();
 }
 
+void DigitizeStateSelect::addHoverHighlighting()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::addHoverHighlighting";
+
+  QList<QGraphicsItem*> items = context().mainWindow().scene().items();
+  QList<QGraphicsItem*>::iterator itr;
+  for (itr = items.begin (); itr != items.end (); itr++) {
+
+    QGraphicsItem *item = *itr;
+    if (item->data (DATA_KEY_GRAPHICS_ITEM_TYPE) == GRAPHICS_ITEM_TYPE_POINT) {
+       item->setAcceptHoverEvents(true);
+    }
+  }
+}
+
 void DigitizeStateSelect::begin (CmdMediator *cmdMediator,
                                  DigitizeState /* previousState */)
 {
@@ -48,7 +70,7 @@ void DigitizeStateSelect::begin (CmdMediator *cmdMediator,
   setCursor(cmdMediator);
   context().setDragMode(QGraphicsView::RubberBandDrag);
 
-  setCursorForPoints ();
+  addHoverHighlighting();
   context().mainWindow().updateViewsOfSettings(activeCurve ());
 }
 
@@ -63,7 +85,130 @@ void DigitizeStateSelect::end ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::end";
 
-  unsetCursorForPoints ();
+  removeHoverHighlighting();
+}
+
+void DigitizeStateSelect::handleContextMenuEventAxis (CmdMediator *cmdMediator,
+                                                      const QString &pointIdentifier)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::handleContextMenuEventAxis "
+                              << " point=" << pointIdentifier.toLatin1 ().data ();
+
+  QPointF posScreen = cmdMediator->document().positionScreen (pointIdentifier);
+  QPointF posGraphBefore = cmdMediator->document().positionGraph (pointIdentifier);
+  bool isXOnly = cmdMediator->document().isXOnly (pointIdentifier);
+
+  // Ask user for coordinates
+  double x = posGraphBefore.x();
+  double y = posGraphBefore.y();
+
+  DlgEditPointAxis *dlg = new DlgEditPointAxis (context().mainWindow(),
+                                                cmdMediator->document().modelCoords(),
+                                                context().mainWindow().modelMainWindow(),
+                                                context().mainWindow().transformation(),
+                                                cmdMediator->document().documentAxesPointsRequired(),
+                                                isXOnly,
+                                                &x,
+                                                &y);
+  int rtn = dlg->exec ();
+
+  QPointF posGraphAfter = dlg->posGraph (isXOnly); // This call returns new values for isXOnly and the graph position
+  delete dlg;
+
+  if (rtn == QDialog::Accepted) {
+
+    // User wants to edit this axis point, but let's perform sanity checks first
+
+    bool isError;
+    QString errorMessage;
+
+    context().mainWindow().cmdMediator()->document().checkEditPointAxis(pointIdentifier,
+                                                                        posScreen,
+                                                                        posGraphAfter,
+                                                                        isError,
+                                                                        errorMessage);
+
+    if (isError) {
+
+      QMessageBox::warning (0,
+                            engaugeWindowTitle(),
+                            errorMessage);
+
+    } else {
+
+      // Create a command to edit the point
+      CmdEditPointAxis *cmd = new CmdEditPointAxis (context().mainWindow(),
+                                                    cmdMediator->document(),
+                                                    pointIdentifier,
+                                                    posGraphBefore,
+                                                    posGraphAfter,
+                                                    isXOnly);
+      context().appendNewCmd(cmdMediator,
+                             cmd);
+    }
+  }
+}
+
+void DigitizeStateSelect::handleContextMenuEventGraph (CmdMediator *cmdMediator,
+                                                       const QStringList &pointIdentifiers)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::handleContextMenuEventGraph "
+                              << "points=" << pointIdentifiers.join(",").toLatin1 ().data ();
+
+  double *x = 0, *y = 0;
+
+  if (pointIdentifiers.count() == 1) {
+
+    // There is exactly one point so pass its coordinates to the dialog
+    x = new double;
+    y = new double;
+
+    QPointF posScreenBefore = cmdMediator->document().positionScreen (pointIdentifiers.first());
+    QPointF posGraphBefore;
+    context().mainWindow().transformation().transformScreenToRawGraph (posScreenBefore,
+                                                                       posGraphBefore);
+
+    // Ask user for coordinates
+    *x = posGraphBefore.x();
+    *y = posGraphBefore.y();
+  }
+
+  DlgEditPointGraph *dlg = new DlgEditPointGraph (context().mainWindow(),
+                                                  cmdMediator->document().modelCoords(),
+                                                  context().mainWindow().modelMainWindow(),
+                                                  context().mainWindow().transformation(),
+                                                  x,
+                                                  y);
+  if (x != 0) {
+    delete x;
+    x = 0;
+  }
+
+  if (y != 0) {
+    delete y;
+    y = 0;
+  }
+
+  int rtn = dlg->exec ();
+
+  bool isXGiven, isYGiven;
+  double xGiven, yGiven;
+  dlg->posGraph (isXGiven, xGiven, isYGiven, yGiven); // One or both coordinates are returned
+  delete dlg;
+
+  if (rtn == QDialog::Accepted) {
+
+    // Create a command to edit the point
+    CmdEditPointGraph *cmd = new CmdEditPointGraph (context().mainWindow(),
+                                                    cmdMediator->document(),
+                                                    pointIdentifiers,
+                                                    isXGiven,
+                                                    isYGiven,
+                                                    xGiven,
+                                                    yGiven);
+    context().appendNewCmd(cmdMediator,
+                           cmd);
+  }
 }
 
 void DigitizeStateSelect::handleCurveChange(CmdMediator * /* cmdMediator */)
@@ -174,11 +319,13 @@ void DigitizeStateSelect::keyPressArrow (CmdMediator *cmdMediator,
   }
 
   // Create command to move points
+  GraphicsItemsExtractor graphicsItemsExtractor;
+  const QList<QGraphicsItem*> &items  = context().mainWindow().scene ().selectedItems();
   CmdMoveBy *cmd = new CmdMoveBy (context().mainWindow(),
                                   cmdMediator->document(),
                                   deltaScreen,
                                   moveText,
-                                  context().mainWindow().scene ().selectedPointIdentifiers ());
+                                  graphicsItemsExtractor.selectedPointIdentifiers (items));
   context().appendNewCmd (cmdMediator,
                           cmd);
 }
@@ -207,9 +354,9 @@ QString DigitizeStateSelect::moveTextFromDeltaScreen (const QPointF &deltaScreen
   return moveText;
 }
 
-void DigitizeStateSelect::setCursorForPoints()
+void DigitizeStateSelect::removeHoverHighlighting()
 {
-  QCursor cursor (Qt::OpenHandCursor);
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::removeHoverHighlighting";
 
   QList<QGraphicsItem*> items = context().mainWindow().scene().items();
   QList<QGraphicsItem*>::iterator itr;
@@ -217,7 +364,23 @@ void DigitizeStateSelect::setCursorForPoints()
 
     QGraphicsItem *item = *itr;
     if (item->data (DATA_KEY_GRAPHICS_ITEM_TYPE) == GRAPHICS_ITEM_TYPE_POINT) {
-      item->setCursor (cursor);
+       item->setAcceptHoverEvents(false);
+    }
+  }
+}
+
+void DigitizeStateSelect::setHoverHighlighting(const MainWindowModel &modelMainWindow)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::addHoverHighlighting";
+
+  // Set the opacity for all points. It should be already set for pre-existing points
+  QList<QGraphicsItem*> items = context().mainWindow().scene().items();
+  QList<QGraphicsItem*>::iterator itr;
+  for (itr = items.begin (); itr != items.end (); itr++) {
+
+    QGraphicsItem *item = *itr;
+    if (item->data (DATA_KEY_GRAPHICS_ITEM_TYPE) == GRAPHICS_ITEM_TYPE_POINT) {
+       item->setOpacity (modelMainWindow.highlightOpacity());
     }
   }
 }
@@ -227,17 +390,11 @@ QString DigitizeStateSelect::state() const
   return "DigitizeStateSelect";
 }
 
-void DigitizeStateSelect::unsetCursorForPoints()
+void DigitizeStateSelect::updateAfterPointAddition ()
 {
-  QList<QGraphicsItem*> items = context().mainWindow().scene().items();
-  QList<QGraphicsItem*>::iterator itr;
-  for (itr = items.begin (); itr != items.end (); itr++) {
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::updateAfterPointAddition";
 
-    QGraphicsItem *item = *itr;
-    if (item->data (DATA_KEY_GRAPHICS_ITEM_TYPE) == GRAPHICS_ITEM_TYPE_POINT) {
-      item->unsetCursor ();
-    }
-  }
+  addHoverHighlighting ();
 }
 
 void DigitizeStateSelect::updateModelDigitizeCurve (CmdMediator * /* cmdMediator */,

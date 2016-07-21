@@ -89,6 +89,8 @@ void DigitizeStatePointMatch::createTemporaryPoint (CmdMediator *cmdMediator,
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "DigitizeStatePointMatch::createTemporaryPoint";
 
+  GeometryWindow *NULL_GEOMETRY_WINDOW = 0;
+
   const DocumentModelPointMatch &modelPointMatch = cmdMediator->document().modelPointMatch();
 
   // Get point style for current graph, and then override with candidate color
@@ -99,7 +101,8 @@ void DigitizeStatePointMatch::createTemporaryPoint (CmdMediator *cmdMediator,
   // Temporary point that user can see while DlgEditPoint is active
   GraphicsPoint *point = context().mainWindow().scene().createPoint(Point::temporaryPointIdentifier (),
                                                                     pointStyle,
-                                                                    posScreen);
+                                                                    posScreen,
+                                                                    NULL_GEOMETRY_WINDOW);
 
   context().mainWindow().scene().removeTemporaryPointIfExists(); // Only one temporary point at a time is allowed
 
@@ -165,6 +168,20 @@ QList<PointMatchPixel> DigitizeStatePointMatch::extractSamplePointPixels (const 
   }
 
   return samplePointPixels;
+}
+
+void DigitizeStatePointMatch::handleContextMenuEventAxis (CmdMediator * /* cmdMediator */,
+                                                          const QString &pointIdentifier)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStatePointMatch::handleContextMenuEventAxis "
+                              << " point=" << pointIdentifier.toLatin1 ().data ();
+}
+
+void DigitizeStatePointMatch::handleContextMenuEventGraph (CmdMediator * /* cmdMediator */,
+                                                           const QStringList &pointIdentifiers)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStatePointMatch ::handleContextMenuEventGraph "
+                              << "points=" << pointIdentifiers.join(",").toLatin1 ().data ();
 }
 
 void DigitizeStatePointMatch::handleCurveChange(CmdMediator * /* cmdMediator */)
@@ -336,6 +353,11 @@ void DigitizeStatePointMatch::promoteCandidatePointToPermanentPoint(CmdMediator 
 QString DigitizeStatePointMatch::state() const
 {
   return "DigitizeStatePointMatch";
+}
+
+void DigitizeStatePointMatch::updateAfterPointAddition ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStatePointMatch::updateAfterPointAddition";
 }
 
 void DigitizeStatePointMatch::updateModelDigitizeCurve (CmdMediator * /* cmdMediator */,

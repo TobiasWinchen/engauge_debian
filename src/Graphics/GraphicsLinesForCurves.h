@@ -10,6 +10,7 @@
 #include <QHash>
 
 class CurveStyles;
+class GeometryWindow;
 class GraphicsLinesForCurve;
 class GraphicsPoint;
 class GraphicsScene;
@@ -66,13 +67,17 @@ public:
   void updateAfterCommand (GraphicsScene &scene,
                            const CurveStyles &curveStyles,
                            const QString &curveName,
-                           const Point &point);
+                           const Point &point,
+                           GeometryWindow *geometryWindow);
 
   /// Update the curve style for every curve
   void updateCurveStyles (const CurveStyles &modelCurveStyles);
 
   /// Calls to moveLinesWithDraggedPoint have finished so update the lines correspondingly
   void updateGraphicsLinesToMatchGraphicsPoints (const CurveStyles &curveStyles);
+
+  /// Update the highlight opacity value. This may or may not affect the current display immediately depending on the state
+  void updateHighlightOpacity (double highlightOpacity);
 
   /// See GraphicsScene::updateOrdinalsAfterDrag
   void updatePointOrdinalsAfterDrag (const CurveStyles &curveStyles,

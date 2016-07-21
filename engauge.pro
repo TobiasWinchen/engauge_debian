@@ -14,7 +14,7 @@
 #    At some point, Qt may provide its own support for this format, at which point this can be skipped
 # 3) Add 'pdf' to the qmake command line to include support for PDF input files. Requires
 #        1) previous installation of the poppler-qt5 development package. Engauge has been tested with versions 0.24.5 and 0.44.0
-#        2) POPPLER_INCLUDE environment variable pointing to directory containing Document.h
+#        2) POPPLER_INCLUDE environment variable pointing to directory containing poppler-qt5.h
 #        3) POPPLER_LIB environment variable pointing to directory containing libpoppler-qt5.so
 #    Sample command lines:
 #        qmake CONFIG+=pdf
@@ -86,6 +86,7 @@ HEADERS  += \
     src/Cmd/CmdCut.h \
     src/Cmd/CmdDelete.h \
     src/Cmd/CmdEditPointAxis.h \
+    src/Cmd/CmdEditPointGraph.h \
     src/Cmd/CmdFactory.h \
     src/Cmd/CmdMediator.h \
     src/Cmd/CmdMoveBy.h \
@@ -159,12 +160,15 @@ HEADERS  += \
     src/DigitizeState/DigitizeStateSegment.h \
     src/DigitizeState/DigitizeStateSelect.h \
     src/Dlg/DlgAbout.h \
-    src/Dlg/DlgEditPoint.h \
+    src/Dlg/DlgEditPointAxis.h \
+    src/Dlg/DlgEditPointGraph.h \
+    src/Dlg/DlgEditPointGraphLineEdit.h \
     src/Dlg/DlgErrorReport.h \
     src/Dlg/DlgFilterCommand.h \
     src/Dlg/DlgFilterThread.h \
     src/Dlg/DlgFilterWorker.h \
     src/Dlg/DlgImportAdvanced.h \
+    src/Dlg/DlgImportCroppingNonPdf.h \
     src/Dlg/DlgRequiresTransform.h \
     src/Dlg/DlgSettingsAbstractBase.h \
     src/Dlg/DlgSettingsAxesChecker.h \
@@ -241,11 +245,20 @@ HEADERS  += \
     src/Format/FormatDegreesMinutesSecondsNonPolarTheta.h \
     src/Format/FormatDegreesMinutesSecondsPolarTheta.h \
     src/Callback/functor.h \
+    src/Geometry/GeometryModel.h \
+    src/Geometry/GeometryStrategyAbstractBase.h \
+    src/Geometry/GeometryStrategyContext.h \
+    src/Geometry/GeometryStrategyFunctionSmooth.h \
+    src/Geometry/GeometryStrategyFunctionStraight.h \
+    src/Geometry/GeometryStrategyRelationSmooth.h \
+    src/Geometry/GeometryStrategyRelationStraight.h \
+    src/Geometry/GeometryWindow.h \
     src/Ghosts/GhostEllipse.h \
     src/Ghosts/GhostPath.h \
     src/Ghosts/GhostPolygon.h \
     src/Ghosts/Ghosts.h \
     src/Graphics/GraphicsArcItem.h \
+    src/Graphics/GraphicsItemsExtractor.h \
     src/Graphics/GraphicsItemType.h \
     src/Graphics/GraphicsLinesForCurve.h \
     src/Graphics/GraphicsLinesForCurves.h \
@@ -262,11 +275,15 @@ HEADERS  += \
     src/Grid/GridInitializer.h \
     src/Grid/GridLine.h \
     src/Grid/GridLineFactory.h \
+    src/Grid/GridLineLimiter.h \
     src/Grid/GridLines.h \
     src/Grid/GridLineStyle.h \
     src/Grid/GridRemoval.h \
     src/Help/HelpBrowser.h \
     src/Help/HelpWindow.h \
+    src/Import/ImportCropping.h \
+    src/Import/ImportCroppingUtilBase.h \
+    src/Import/ImportCroppingUtilNonPdf.h \
     src/Line/LineStyle.h \
     src/Load/LoadFileInfo.h \
     src/Load/LoadImageFromUrl.h \
@@ -279,6 +296,9 @@ HEADERS  += \
     src/Mime/MimePoints.h \
     src/util/mmsubs.h \
     src/Network/NetworkClient.h \
+    src/NonPdf/NonPdf.h \
+    src/NonPdf/NonPdfCropping.h \
+    src/NonPdf/NonPdfFrameHandle.h \
     src/Ordinal/OrdinalGenerator.h \
     src/Ordinal/OrdinalToGraphicsPoint.h \
     src/Pdf/PdfResolution.h \
@@ -380,6 +400,7 @@ SOURCES += \
     src/Cmd/CmdCut.cpp \
     src/Cmd/CmdDelete.cpp \
     src/Cmd/CmdEditPointAxis.cpp \
+    src/Cmd/CmdEditPointGraph.cpp \
     src/Cmd/CmdFactory.cpp \
     src/Cmd/CmdMediator.cpp \
     src/Cmd/CmdMoveBy.cpp \
@@ -450,12 +471,15 @@ SOURCES += \
     src/DigitizeState/DigitizeStateSegment.cpp \
     src/DigitizeState/DigitizeStateSelect.cpp \
     src/Dlg/DlgAbout.cpp \
-    src/Dlg/DlgEditPoint.cpp \
+    src/Dlg/DlgEditPointAxis.cpp \
+    src/Dlg/DlgEditPointGraph.cpp \
+    src/Dlg/DlgEditPointGraphLineEdit.cpp \
     src/Dlg/DlgErrorReport.cpp \
     src/Dlg/DlgFilterCommand.cpp \
     src/Dlg/DlgFilterThread.cpp \
     src/Dlg/DlgFilterWorker.cpp \
     src/Dlg/DlgImportAdvanced.cpp \
+    src/Dlg/DlgImportCroppingNonPdf.cpp \
     src/Dlg/DlgRequiresTransform.cpp \
     src/Dlg/DlgSettingsAbstractBase.cpp \
     src/Dlg/DlgSettingsAxesChecker.cpp \
@@ -525,11 +549,20 @@ SOURCES += \
     src/Format/FormatDegreesMinutesSecondsBase.cpp \
     src/Format/FormatDegreesMinutesSecondsNonPolarTheta.cpp \
     src/Format/FormatDegreesMinutesSecondsPolarTheta.cpp \
+    src/Geometry/GeometryModel.cpp \
+    src/Geometry/GeometryStrategyAbstractBase.cpp \
+    src/Geometry/GeometryStrategyContext.cpp \
+    src/Geometry/GeometryStrategyFunctionSmooth.cpp \
+    src/Geometry/GeometryStrategyFunctionStraight.cpp \
+    src/Geometry/GeometryStrategyRelationSmooth.cpp \
+    src/Geometry/GeometryStrategyRelationStraight.cpp \
+    src/Geometry/GeometryWindow.cpp \
     src/Ghosts/GhostEllipse.cpp \
     src/Ghosts/GhostPath.cpp \
     src/Ghosts/GhostPolygon.cpp \
     src/Ghosts/Ghosts.cpp \
     src/Graphics/GraphicsArcItem.cpp \
+    src/Graphics/GraphicsItemsExtractor.cpp \
     src/Graphics/GraphicsLinesForCurve.cpp \
     src/Graphics/GraphicsLinesForCurves.cpp \
     src/Graphics/GraphicsPoint.cpp \
@@ -545,10 +578,13 @@ SOURCES += \
     src/Grid/GridInitializer.cpp \
     src/Grid/GridLine.cpp \
     src/Grid/GridLineFactory.cpp \
+    src/Grid/GridLineLimiter.cpp \
     src/Grid/GridLines.cpp \
     src/Grid/GridRemoval.cpp \
     src/Help/HelpBrowser.cpp \
     src/Help/HelpWindow.cpp \
+    src/Import/ImportCroppingUtilBase.cpp \
+    src/Import/ImportCroppingUtilNonPdf.cpp \
     src/Line/LineStyle.cpp \
     src/Load/LoadFileInfo.cpp \
     src/Load/LoadImageFromUrl.cpp \
@@ -561,6 +597,9 @@ SOURCES += \
     src/Mime/MimePoints.cpp \
     src/util/mmsubs.cpp \
     src/Network/NetworkClient.cpp \
+    src/NonPdf/NonPdf.cpp \
+    src/NonPdf/NonPdfCropping.cpp \
+    src/NonPdf/NonPdfFrameHandle.cpp \
     src/Ordinal/OrdinalGenerator.cpp \
     src/Pdf/PdfResolution.cpp \
     src/Point/Point.cpp \
@@ -677,11 +716,13 @@ INCLUDEPATH += src \
                src/FileCmd \
                src/Filter \
                src/Format \
+               src/Geometry \
                src/Ghosts \
                src/Graphics \
                src/Grid \
                src/Help \
                src/img \
+               src/Import \
                src/include \
                src/Line \
                src/Load \
@@ -689,6 +730,7 @@ INCLUDEPATH += src \
                src/main \
                src/Mime \
                src/Network \
+               src/NonPdf \
                src/Ordinal \
                src/Pdf \
                src/Plot \
@@ -762,13 +804,15 @@ pdf {
     DEFINES += "ENGAUGE_PDF"
     LIBS += -L$$(POPPLER_LIB) -lpoppler-qt5
     INCLUDEPATH += $$(POPPLER_INCLUDE)
-    HEADERS += src/Dlg/DlgPdfFrame.h \
+    HEADERS += src/Dlg/DlgImportCroppingPdf.h \
+               src/Import/ImportCroppingUtilPdf.h \
                src/Pdf/Pdf.h \
-               src/Pdf/PdfFrame.h \
+               src/Pdf/PdfCropping.h \
                src/Pdf/PdfFrameHandle.h
-    SOURCES += src/Dlg/DlgPdfFrame.cpp \
+    SOURCES += src/Dlg/DlgImportCroppingPdf.cpp \
+               src/Import/ImportCroppingUtilPdf.cpp \
                src/Pdf/Pdf.cpp \
-               src/Pdf/PdfFrame.cpp \
+               src/Pdf/PdfCropping.cpp \
                src/Pdf/PdfFrameHandle.cpp
 
 } else {

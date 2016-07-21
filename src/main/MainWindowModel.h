@@ -8,6 +8,7 @@
 #define MAIN_WINDOW_MODEL_H
 
 #include "DocumentModelAbstractBase.h"
+#include "ImportCropping.h"
 #include "MainTitleBarFormat.h"
 #include <QLocale>
 #include <QString>
@@ -34,11 +35,20 @@ public:
 
   virtual void loadXml(QXmlStreamReader &reader);
 
+  /// Get method for highlight opacity
+  double highlightOpacity() const;
+
+  /// Get method for import cropping
+  ImportCropping importCropping () const;
+
   /// Get method for locale
   QLocale locale() const;
 
   /// Get method for MainWindow titlebar filename format
   MainTitleBarFormat mainTitleBarFormat () const;
+
+  /// Maximum number of grid lines
+  int maximumGridLines () const;
 
   /// Get method for resolution of imported PDF files, in dots per inch
   int pdfResolution () const;
@@ -49,6 +59,9 @@ public:
 
   virtual void saveXml(QXmlStreamWriter &writer) const;
 
+  /// Set method for highlight opacity
+  void setHighlightOpacity (double highlightOpacity);
+
   /// Set method for locale given attributes
   void setLocale (QLocale::Language language,
                   QLocale::Country country);
@@ -56,8 +69,14 @@ public:
   /// Set method for locale given locale object
   void setLocale (const QLocale &locale);
 
+  /// Set method for import cropping
+  void setImportCropping (ImportCropping importCropping);
+
   /// Set method for MainWindow titlebar filename format
   void setMainTitleBarFormat (MainTitleBarFormat mainTitleBarFormat);
+
+  /// Set method for maximum number of grid lines
+  void setMaximumGridLines (int maximumGridLines);
 
   /// Set method for resolution of imported PDF files, in dots per inch
   void setPdfResolution (int resolution);
@@ -81,6 +100,9 @@ private:
   ZoomFactorInitial m_zoomFactorInitial;
   MainTitleBarFormat m_mainTitleBarFormat;
   int m_pdfResolution;
+  ImportCropping m_importCropping;
+  int m_maximumGridLines;
+  double m_highlightOpacity;
 
 };
 
