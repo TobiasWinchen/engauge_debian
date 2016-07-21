@@ -3,7 +3,7 @@ Last-Update: 2016-07-09
 
 --- a/engauge.pro
 +++ b/engauge.pro
-@@ -746,16 +746,11 @@
+@@ -788,16 +788,11 @@
  pdf {
      message("PDF support:      yes")
      _POPPLER_INCLUDE = $$(POPPLER_INCLUDE)
@@ -20,5 +20,5 @@ Last-Update: 2016-07-09
 -    LIBS += -L$$(POPPLER_LIB) -lpoppler-qt5
 +    LIBS += -lpoppler-qt5
      INCLUDEPATH += $$(POPPLER_INCLUDE)
-     HEADERS += src/Dlg/DlgPdfFrame.h \
-                src/Pdf/Pdf.h \
+     HEADERS += src/Dlg/DlgImportCroppingPdf.h \
+                src/Import/ImportCroppingUtilPdf.h \
