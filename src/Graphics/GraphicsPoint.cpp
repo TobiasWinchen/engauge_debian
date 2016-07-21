@@ -7,6 +7,7 @@
 #include "CurveStyle.h"
 #include "DataKey.h"
 #include "EnumsToQt.h"
+#include "GeometryWindow.h"
 #include "GraphicsItemType.h"
 #include "GraphicsPoint.h"
 #include "GraphicsPointEllipse.h"
@@ -17,11 +18,14 @@
 #include <QGraphicsPolygonItem>
 #include <QGraphicsScene>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QObject>
 #include <QPen>
 #include <QTextStream>
 #include "QtToString.h"
 #include "ZValues.h"
 
+const double DEFAULT_HIGHLIGHT_OPACITY = 0.35; // 0=transparent to 1=opaque. Values above 0.5 are very hard to notice
+const double MAX_OPACITY = 1.0;
 const double ZERO_WIDTH = 0.0;
 
 GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
@@ -29,7 +33,8 @@ GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
                              const QPointF &posScreen,
                              const QColor &color,
                              unsigned int radius,
-                             double lineWidth) :
+                             double lineWidth,
+                             GeometryWindow *geometryWindow) :
   GraphicsPointAbstractBase (),
   m_scene (scene),
   m_graphicsItemEllipse (0),
@@ -40,7 +45,9 @@ GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
   m_posScreen (posScreen),
   m_color (color),
   m_lineWidth (lineWidth),
-  m_wanted (true)
+  m_wanted (true),
+  m_highlightOpacity (DEFAULT_HIGHLIGHT_OPACITY),
+  m_geometryWindow (geometryWindow)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::GraphicsPoint"
                                << " identifier=" << identifier.toLatin1 ().data ();
@@ -53,7 +60,8 @@ GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
                              const QPointF &posScreen,
                              const QColor &color,
                              const QPolygonF &polygon,
-                             double lineWidth) :
+                             double lineWidth,
+                             GeometryWindow *geometryWindow) :
   GraphicsPointAbstractBase (),
   m_scene (scene),
   m_graphicsItemEllipse (0),
@@ -64,7 +72,9 @@ GraphicsPoint::GraphicsPoint(QGraphicsScene &scene,
   m_posScreen (posScreen),
   m_color (color),
   m_lineWidth (lineWidth),
-  m_wanted (true)
+  m_wanted (true),
+  m_highlightOpacity (DEFAULT_HIGHLIGHT_OPACITY),
+  m_geometryWindow (geometryWindow)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::GraphicsPoint "
                                << " identifier=" << identifier.toLatin1 ().data ();
@@ -122,9 +132,11 @@ void GraphicsPoint::createPointEllipse (unsigned int radius)
   m_graphicsItemEllipse->setFlags (QGraphicsItem::ItemIsSelectable |
                                    QGraphicsItem::ItemIsMovable |
                                    QGraphicsItem::ItemSendsGeometryChanges);
-
-  m_graphicsItemEllipse->setToolTip (m_identifier);
   m_graphicsItemEllipse->setData (DATA_KEY_GRAPHICS_ITEM_TYPE, GRAPHICS_ITEM_TYPE_POINT);
+  if (m_geometryWindow != 0) {
+    QObject::connect (m_graphicsItemEllipse, SIGNAL (signalPointHoverEnter (QString)), m_geometryWindow, SLOT (slotPointHoverEnter (QString)));
+    QObject::connect (m_graphicsItemEllipse, SIGNAL (signalPointHoverLeave (QString)), m_geometryWindow, SLOT (slotPointHoverLeave (QString)));
+  }
 
   // Shadow item is not selectable so it needs no stored data. Do NOT
   // call QGraphicsScene::addItem since the QGraphicsItem::setParentItem call adds the item
@@ -137,6 +149,8 @@ void GraphicsPoint::createPointEllipse (unsigned int radius)
 
   m_shadowZeroWidthEllipse->setPen (QPen (QBrush (m_color), ZERO_WIDTH));
   m_shadowZeroWidthEllipse->setEnabled (true);
+
+  m_graphicsItemEllipse->setShadow (m_shadowZeroWidthEllipse);
 }
 
 void GraphicsPoint::createPointPolygon (const QPolygonF &polygon)
@@ -157,9 +171,11 @@ void GraphicsPoint::createPointPolygon (const QPolygonF &polygon)
   m_graphicsItemPolygon->setFlags (QGraphicsItem::ItemIsSelectable |
                                    QGraphicsItem::ItemIsMovable |
                                    QGraphicsItem::ItemSendsGeometryChanges);
-
-  m_graphicsItemPolygon->setToolTip (m_identifier);
   m_graphicsItemPolygon->setData (DATA_KEY_GRAPHICS_ITEM_TYPE, GRAPHICS_ITEM_TYPE_POINT);
+  if (m_geometryWindow != 0) {
+    QObject::connect (m_graphicsItemPolygon, SIGNAL (signalPointHoverEnter (QString)), m_geometryWindow, SLOT (slotPointHoverEnter (QString)));
+    QObject::connect (m_graphicsItemPolygon, SIGNAL (signalPointHoverLeave (QString)), m_geometryWindow, SLOT (slotPointHoverLeave (QString)));
+  }
 
   // Shadow item is not selectable so it needs no stored data. Do NOT
   // call QGraphicsScene::addItem since the QGraphicsItem::setParentItem call adds the item
@@ -169,6 +185,8 @@ void GraphicsPoint::createPointPolygon (const QPolygonF &polygon)
 
   m_shadowZeroWidthPolygon->setPen (QPen (QBrush (m_color), ZERO_WIDTH));
   m_shadowZeroWidthPolygon->setEnabled (true);
+
+  m_graphicsItemPolygon->setShadow (m_shadowZeroWidthPolygon);
 }
 
 QVariant GraphicsPoint::data (int key) const
@@ -178,6 +196,11 @@ QVariant GraphicsPoint::data (int key) const
   } else {
     return m_graphicsItemEllipse->data (key);
   }
+}
+
+double GraphicsPoint::highlightOpacity () const
+{
+  return m_highlightOpacity;
 }
 
 QPointF GraphicsPoint::pos () const
@@ -237,6 +260,15 @@ void GraphicsPoint::setData (int key, const QVariant &data)
   }
 }
 
+void GraphicsPoint::setHighlightOpacity (double highlightOpacity)
+{
+  LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsPoint::setHighlightOpacity"
+                               << " identifier=" << m_identifier.toLatin1().data()
+                               << " highlightOpacity=" << highlightOpacity;
+
+  m_highlightOpacity = highlightOpacity;
+}
+
 void GraphicsPoint::setPointStyle(const PointStyle &pointStyle)
 {
   // Setting pen and radius of parent graphics items below also affects the child shadows
@@ -291,15 +323,6 @@ void GraphicsPoint::setPos (const QPointF pos)
     return m_graphicsItemPolygon->setPos (pos);
   } else {
     return m_graphicsItemEllipse->setPos (pos);
-  }
-}
-
-void GraphicsPoint::setToolTip (const QString &toolTip)
-{
-  if (m_graphicsItemEllipse == 0) {
-    m_graphicsItemPolygon->setToolTip (toolTip);
-  } else {
-    m_graphicsItemEllipse->setToolTip (toolTip);
   }
 }
 

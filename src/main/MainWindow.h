@@ -53,6 +53,7 @@ class DocumentModelPointMatch;
 class DocumentModelSegments;
 class ExportToFile;
 class FileCmdScript;
+class GeometryWindow;
 class Ghosts;
 class GraphicsScene;
 class GraphicsView;
@@ -89,12 +90,14 @@ public:
   /// \param fileCmdScriptFile Optional file command script file to be read at startup. Empty if unused. Incompatible with errorReportFile
   /// \param isRegressionTest True if errorReportFile or fileCmdScript is for regression testing, in which case it is executed and the program exits
   /// \param isGnuplot True if diagnostic gnuplot files are generated for math-intense sections of the code. Used for development and debugging
+  /// \param isReset True to reset all settings that would otherwise be restored from the previous execution of Engauge
   /// \param loadStartupFiles Zero or more Engauge document files to load at startup. A separate instance of Engauge is created for each file
   /// \param parent Optional parent widget for this widget
   MainWindow(const QString &errorReportFile,
              const QString &fileCmdScriptFile,
              bool isRegressionTest,
              bool isGnuplot,
+             bool isReset,
              QStringList loadStartupFiles,
              QWidget *parent = 0);
   ~MainWindow();
@@ -232,7 +235,8 @@ private slots:
   void slotCmbBackground(int);
   void slotCmbCoordSystem(int);
   void slotCmbCurve(int);
-  void slotContextMenuEvent (QString);
+  void slotContextMenuEventAxis (QString);
+  void slotContextMenuEventGraph (QStringList);
   void slotDigitizeAxis ();
   void slotDigitizeColorPicker ();
   void slotDigitizeCurve ();
@@ -259,10 +263,10 @@ private slots:
   void slotFilePrint();
   bool slotFileSave(); /// Slot method that is sometimes called directly with return value expected
   bool slotFileSaveAs(); /// Slot method that is sometimes called directly with return value expected
+  void slotGeometryWindowClosed();
   void slotHelpAbout();
   void slotHelpTutorial();
   void slotKeyPress (Qt::Key, bool);
-  void slotLeave ();
   void slotLoadStartupFiles ();
   void slotMouseMove (QPointF);
   void slotMousePress (QPointF);
@@ -270,7 +274,6 @@ private slots:
   void slotRecentFileAction ();
   void slotRecentFileClear ();
   void slotRedoTextChanged (const QString &);
-  void slotSetOverrideCursor (QCursor);
   void slotSettingsAxesChecker ();
   void slotSettingsColorFilter ();
   void slotSettingsCoords ();
@@ -295,6 +298,7 @@ private slots:
   void slotViewToolBarChecklistGuide ();
   void slotViewToolBarCoordSystem ();
   void slotViewToolBarDigitize ();
+  void slotViewToolBarGeometryWindow ();
   void slotViewToolBarSettingsViews ();
   void slotViewToolTips ();
   void slotViewZoom16To1 ();
@@ -326,6 +330,11 @@ private:
     IMPORT_TYPE_IMAGE_REPLACE
   };
 
+  void addDockWindow (QDockWidget *dockWidget,
+                      QSettings &settings,
+                      const QString &settingsTokenArea,
+                      const QString &settingsTokenGeometry,
+                      Qt::DockWidgetArea dockWidgetArea);
   void applyZoomFactorAfterLoad();
   virtual void closeEvent(QCloseEvent *event);
   void createActions();
@@ -337,6 +346,7 @@ private:
   void createActionsView ();
   void createCentralWidget ();
   void createCommandStackShadow ();
+  void createDockableWidgets ();
   void createHelpWindow ();
   void createIcons();
   void createLoadImageFromUrl ();
@@ -394,7 +404,7 @@ private:
   void setCurrentPathFromFile (const QString &fileName);
   void setPixmap (const QString &curveSelected,
                   const QPixmap &pixmap);
-  void settingsRead ();
+  void settingsRead (bool isReset);
   void settingsReadEnvironment (QSettings &settings);
   void settingsReadMainWindow (QSettings &settings);
   void settingsWrite ();
@@ -407,8 +417,11 @@ private:
   void startRegressionTestErrorReport (const QString &regressionInputFile);
   void startRegressionTestFileCmdScript ();
   void updateAfterCommandStatusBarCoords ();
+  void updateChecklistGuide ();
   void updateControls (); // Update the widgets (typically in terms of show/hide state) depending on the application state.
+  void updateGeometryWindow ();
   void updateGridLines();
+  void updateHighlightOpacity();
   void updateRecentFileList();
   void updateSettingsMainWindow();
   void updateTransformationAndItsDependencies();
@@ -463,6 +476,7 @@ private:
   QAction *m_actionViewChecklistGuide;
   QAction *m_actionViewCoordSystem;
   QAction *m_actionViewDigitize;
+  QAction *m_actionViewGeometryWindow;
   QAction *m_actionViewSettingsViews;
   QAction *m_actionViewToolTips;
   QAction *m_actionViewGridLines;
@@ -536,6 +550,7 @@ private:
   ViewSegmentFilter *m_viewSegmentFilter;
   QToolBar *m_toolSettingsViews;
   ChecklistGuide *m_dockChecklistGuide;
+  GeometryWindow *m_dockGeometryWindow;
 
   QComboBox *m_cmbCoordSystem;
   QPushButton *m_btnPrintAll;

@@ -12,6 +12,7 @@
 #include <QGraphicsPathItem>
 
 class CurveStyle;
+class GeometryWindow;
 class GraphicsPoint;
 class GraphicsScene;
 class LineStyle;
@@ -59,13 +60,17 @@ public:
   /// Update the GraphicsScene with the specified Point from the Document. If it does not exist yet in the scene, we add it
   void updateAfterCommand (GraphicsScene &scene,
                            const PointStyle &pointStyle,
-                           const Point &point);
+                           const Point &point,
+                           GeometryWindow *geometryWindow);
 
   /// Update the curve style for this curve
   void updateCurveStyle (const CurveStyle &curveStyle);
 
   /// Calls to moveLinesWithDraggedPoint have finished so update the lines correspondingly
   void updateGraphicsLinesToMatchGraphicsPoints (const LineStyle &lineStyle);
+
+  /// Update the highlight opacity value. This may or may not affect the current display immediately depending on the state
+  void updateHighlightOpacity (double highlightOpacity);
 
   /// See GraphicsScene::updateOrdinalsAfterDrag. Pretty much the same steps as Curve::updatePointOrdinals
   void updatePointOrdinalsAfterDrag (const LineStyle &lineStyle,

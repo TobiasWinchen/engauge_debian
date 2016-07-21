@@ -10,6 +10,12 @@
 #include "DigitizeStateAbstractBase.h"
 
 /// Digitizing state for selecting one or more Points in the Document.
+///
+/// Originally this class set the cursor for each QGraphicsItem at the beginning of the state, but that
+/// triggered Qt bug 4190 which has the description 'If you have set the cursor for some QGraphicsItems
+/// you can no longer change the cursor for the view in for example a mouseReleaseEvent'. In turn, that
+/// lead to Engauge issue #155. Unfortunately, this means the user no longer has need feedback that suggests
+/// the user can do something with the QGraphicsItems.
 class DigitizeStateSelect : public DigitizeStateAbstractBase
 {
 public:
@@ -22,6 +28,10 @@ public:
                      DigitizeState previousState);
   virtual QCursor cursor (CmdMediator *cmdMediator) const;
   virtual void end();
+  virtual void handleContextMenuEventAxis (CmdMediator *cmdMediator,
+                                           const QString &pointIdentifier);
+  virtual void handleContextMenuEventGraph (CmdMediator *cmdMediator,
+                                            const QStringList &pointIdentifiers);
   virtual void handleCurveChange(CmdMediator *cmdMediator);
   virtual void handleKeyPress (CmdMediator *cmdMediator,
                                Qt::Key key,
@@ -33,6 +43,7 @@ public:
   virtual void handleMouseRelease (CmdMediator *cmdMediator,
                                    QPointF posScreen);
   virtual QString state() const;
+  virtual void updateAfterPointAddition ();
   virtual void updateModelDigitizeCurve (CmdMediator *cmdMediator,
                                          const DocumentModelDigitizeCurve &modelDigitizeCurve);
   virtual void updateModelSegments(const DocumentModelSegments &modelSegments);
@@ -40,11 +51,12 @@ public:
 private:
   DigitizeStateSelect();
 
+  void addHoverHighlighting();
   void keyPressArrow (CmdMediator *cmdMediator,
                       Qt::Key key);
   QString moveTextFromDeltaScreen (const QPointF &deltaScreen);
-  void setCursorForPoints();
-  void unsetCursorForPoints();
+  void removeHoverHighlighting();
+  void setHoverHighlighting(const MainWindowModel &modelMainWindow);
   double zoomedToUnzoomedScreenX () const;
   double zoomedToUnzoomedScreenY () const;
 

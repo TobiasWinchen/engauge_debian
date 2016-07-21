@@ -12,6 +12,7 @@
 
 class QCheckBox;
 class QComboBox;
+class QDoubleSpinBox;
 class QGridLayout;
 class QPushButton;
 class QSpinBox;
@@ -36,10 +37,13 @@ public:
                             const MainWindowModel &modelMainWindow);
 
 private slots:
-  void slotTitleBarFormat(bool);
+  void slotHighlightOpacity (double);
+  void slotImportCropping (int index);
   void slotLocale (int index);
+  void slotMaximumGridLines (int limit);
   void slotPdfResolution (const QString);
   void slotRecentFileClear ();
+  void slotTitleBarFormat(bool);
   void slotZoomControl (const QString);
   void slotZoomFactor (const QString);
 
@@ -55,9 +59,12 @@ private:
   QComboBox *m_cmbZoomFactor;
   QComboBox *m_cmbZoomControl;
   QComboBox *m_cmbLocale;
+  QComboBox *m_cmbImportCropping;
   QPushButton *m_btnRecentClear;
   QCheckBox *m_chkTitleBarFormat;
   QComboBox *m_cmbPdfResolution;
+  QSpinBox *m_spinMaximumGridLines;
+  QDoubleSpinBox *m_spinHighlightOpacity;
 
   MainWindowModel *m_modelMainWindowBefore;
   MainWindowModel *m_modelMainWindowAfter;

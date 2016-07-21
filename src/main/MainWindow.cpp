@@ -52,11 +52,14 @@
 #include "ExportImageForRegression.h"
 #include "ExportToFile.h"
 #include "FileCmdScript.h"
+#include "GeometryWindow.h"
 #include "Ghosts.h"
+#include "GraphicsItemsExtractor.h"
 #include "GraphicsItemType.h"
 #include "GraphicsScene.h"
 #include "GraphicsView.h"
 #include "GridLineFactory.h"
+#include "GridLineLimiter.h"
 #include "HelpWindow.h"
 #ifdef ENGAUGE_JPEG2000
 #include "Jpeg2000.h"
@@ -67,6 +70,7 @@
 #include "MainTitleBarFormat.h"
 #include "MainWindow.h"
 #include "NetworkClient.h"
+#include "NonPdf.h"
 #ifdef ENGAUGE_PDF
 #include "Pdf.h"
 #endif // ENGAUGE_PDF
@@ -124,6 +128,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
                        const QString &fileCmdScriptFile,
                        bool isRegressionTest,
                        bool isGnuplot,
+                       bool isReset,
                        QStringList loadStartupFiles,
                        QWidget *parent) :
   QMainWindow(parent),
@@ -166,6 +171,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
   createStatusBar ();
   createMenus ();
   createToolBars ();
+  createDockableWidgets ();
   createHelpWindow ();
   createTutorial ();
   createScene ();
@@ -179,7 +185,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
   createZoomMap ();
   updateControls ();
 
-  settingsRead (); // This changes the current directory when not regression testing
+  settingsRead (isReset); // This changes the current directory when not regression testing
   setCurrentFile ("");
   setUnifiedTitleAndToolBarOnMac(true);
 
@@ -208,6 +214,36 @@ MainWindow::MainWindow(const QString &errorReportFile,
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::addDockWindow (QDockWidget *dockWidget,
+                                QSettings &settings,
+                                const QString &settingsTokenArea,
+                                const QString &settingsTokenGeometry,
+                                Qt::DockWidgetArea dockWidgetArea)
+{
+  // Checklist guide is docked or undocked. Default is docked so it does not get overlooked by the user (which
+  // can happen if it opens elsewhere). The user may not know it can be undocked, but at least can resize or
+  // hide it if he/she needs more room for the main window.
+  const bool DOCKED_EQUALS_NOT_FLOATING = false;
+  Qt::DockWidgetArea area = (Qt::DockWidgetArea) settings.value (settingsTokenArea,
+                                                                 Qt::NoDockWidgetArea).toInt();
+
+  if (area == Qt::NoDockWidgetArea) {
+
+    addDockWidget (dockWidgetArea,
+                   dockWidget); // Add on the right to prevent error message, then immediately make undocked
+    dockWidget->setFloating(DOCKED_EQUALS_NOT_FLOATING);
+    if (settings.contains (settingsTokenGeometry)) {
+      dockWidget->restoreGeometry (settings.value (settingsTokenGeometry).toByteArray());
+    }
+
+  } else {
+
+    addDockWidget (area,
+                   dockWidget);
+
+  }
 }
 
 void MainWindow::applyZoomFactorAfterLoad()
@@ -663,10 +699,18 @@ void MainWindow::createActionsView ()
   m_actionViewChecklistGuide = new QAction (tr ("Checklist Guide Toolbar"), this);
   m_actionViewChecklistGuide->setCheckable (true);
   m_actionViewChecklistGuide->setChecked (false);
-  m_actionViewChecklistGuide->setStatusTip (tr ("Show or hide the checklist guide toolbar."));
-  m_actionViewChecklistGuide->setWhatsThis (tr ("View Checklist Guide ToolBar\n\n"
-                                                "Show or hide the checklist guide toolbar"));
+  m_actionViewChecklistGuide->setStatusTip (tr ("Show or hide the checklist guide."));
+  m_actionViewChecklistGuide->setWhatsThis (tr ("View Checklist Guide\n\n"
+                                                "Show or hide the checklist guide"));
   connect (m_actionViewChecklistGuide, SIGNAL (changed ()), this, SLOT (slotViewToolBarChecklistGuide()));
+
+  m_actionViewGeometryWindow = new QAction (tr ("Geometry Window"), this);
+  m_actionViewGeometryWindow->setCheckable (true);
+  m_actionViewGeometryWindow->setChecked (false);
+  m_actionViewGeometryWindow->setStatusTip (tr ("Show or hide the geometry window."));
+  m_actionViewGeometryWindow->setWhatsThis (tr ("View Geometry Window\n\n"
+                                                "Show or hide the geometry window"));
+  connect (m_actionViewGeometryWindow, SIGNAL (changed ()), this, SLOT (slotViewToolBarGeometryWindow()));
 
   m_actionViewDigitize = new QAction (tr ("Digitizing Tools Toolbar"), this);
   m_actionViewDigitize->setCheckable (true);
@@ -880,6 +924,19 @@ void MainWindow::createCommandStackShadow ()
   m_cmdStackShadow = new CmdStackShadow;
 }
 
+void MainWindow::createDockableWidgets ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createDockableWidgets";
+
+  // Checklist guide starts out hidden. It will be positioned in settingsRead
+  m_dockChecklistGuide = new ChecklistGuide (this);
+  connect (m_dockChecklistGuide, SIGNAL (signalChecklistClosed()), this, SLOT (slotChecklistClosed()));
+
+  // Geometry window starts out hidden since there is nothing to show initially. It will be positioned in settingsRead
+  m_dockGeometryWindow = new GeometryWindow (this);
+  connect (m_dockGeometryWindow, SIGNAL (signalGeometryWindowClosed()), this, SLOT (slotGeometryWindowClosed()));
+}
+
 void MainWindow::createHelpWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createHelpWindow";
@@ -971,6 +1028,7 @@ void MainWindow::createMenus()
   m_menuView->addAction (m_actionViewBackground);
   m_menuView->addAction (m_actionViewDigitize);
   m_menuView->addAction (m_actionViewChecklistGuide);
+  m_menuView->addAction (m_actionViewGeometryWindow);
   m_menuView->addAction (m_actionViewSettingsViews);
   m_menuView->addAction (m_actionViewCoordSystem);
   m_menuView->insertSeparator (m_actionViewToolTips);
@@ -1226,10 +1284,6 @@ void MainWindow::createToolBars ()
   m_toolCoordSystem->addWidget (m_btnShowAll);
   m_toolCoordSystem->addWidget (m_btnPrintAll);
   addToolBar (m_toolCoordSystem);
-
-  // Checklist guide starts out hidden. It will be positioned in settingsRead
-  m_dockChecklistGuide = new ChecklistGuide (this);
-  connect (m_dockChecklistGuide, SIGNAL (signalChecklistClosed()), this, SLOT (slotChecklistClosed()));
 }
 
 void MainWindow::createTutorial ()
@@ -1371,10 +1425,7 @@ void MainWindow::fileExport(const QString &fileName,
                                  transformation (),
                                  str);
 
-    // Update checklist guide status
-    m_isDocumentExported = true; // Set for next line and for all checklist guide updates after this
-    m_dockChecklistGuide->update (*m_cmdMediator,
-                                  m_isDocumentExported);
+    updateChecklistGuide ();
 
   } else {
 
@@ -1427,6 +1478,7 @@ void MainWindow::fileImport (const QString &fileName,
     PdfReturn pdfReturn = pdf.load (fileName,
                                     image,
                                     m_modelMainWindow.pdfResolution(),
+                                    m_modelMainWindow.importCropping(),
                                     m_isErrorReportRegressionTest);
     if (pdfReturn == PDF_RETURN_CANCELED) {
 
@@ -1440,7 +1492,19 @@ void MainWindow::fileImport (const QString &fileName,
 #endif // ENGAUGE_PDF
 
   if (!loaded) {
-    loaded = image.load (fileName);
+    NonPdf nonPdf;
+    NonPdfReturn nonPdfReturn = nonPdf.load (fileName,
+                                             image,
+                                             m_modelMainWindow.importCropping(),
+                                             m_isErrorReportRegressionTest);
+    if (nonPdfReturn == NON_PDF_RETURN_CANCELED) {
+
+      // User canceled so exit immediately
+      return;
+
+    }
+
+    loaded = (nonPdfReturn == NON_PDF_RETURN_SUCCESS);
   }
 
   if (!loaded) {
@@ -2298,9 +2362,14 @@ void MainWindow::setPixmap (const QString &curveSelected,
                                        curveSelected);
 }
 
-void MainWindow::settingsRead ()
+void MainWindow::settingsRead (bool isReset)
 {
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
+
+  if (isReset) {
+    // Delete all settings. Default values are specified, later, for each settings as it is loaded
+    settings.clear ();
+  }
 
   settingsReadEnvironment (settings);
   settingsReadMainWindow (settings);
@@ -2325,9 +2394,9 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                         QPoint (200, 200)).toPoint ());
 
   // Help window geometry
+#ifndef OSX_RELEASE
   QSize helpSize = settings.value (SETTINGS_HELP_SIZE,
                                    QSize (900, 600)).toSize();
-#ifndef OSX_RELEASE
   m_helpWindow->resize (helpSize);
   if (settings.contains (SETTINGS_HELP_POS)) {
     QPoint helpPos = settings.value (SETTINGS_HELP_POS).toPoint();
@@ -2381,28 +2450,16 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
   m_actionStatusTemporary->setChecked (statusBarMode == STATUS_BAR_MODE_TEMPORARY);
   m_actionStatusAlways->setChecked (statusBarMode == STATUS_BAR_MODE_ALWAYS);
 
-  // Checklist guide is docked or undocked. Default is docked so it does not get overlooked by the user (which
-  // can happen if it opens elsewhere). The user may not know it can be undocked, but at least can resize or
-  // hide it if he/she needs more room for the main window.
-  const bool DOCKED_EQUALS_NOT_FLOATING = false;
-  Qt::DockWidgetArea area = (Qt::DockWidgetArea) settings.value (SETTINGS_CHECKLIST_GUIDE_DOCK_AREA,
-                                                                 Qt::NoDockWidgetArea).toInt();
-
-  if (area == Qt::NoDockWidgetArea) {
-
-    addDockWidget (Qt::RightDockWidgetArea,
-                   m_dockChecklistGuide); // Add on the right to prevent error message, then immediately make undocked
-    m_dockChecklistGuide->setFloating(DOCKED_EQUALS_NOT_FLOATING);
-    if (settings.contains (SETTINGS_CHECKLIST_GUIDE_DOCK_GEOMETRY)) {
-      m_dockChecklistGuide->restoreGeometry (settings.value (SETTINGS_CHECKLIST_GUIDE_DOCK_GEOMETRY).toByteArray());
-    }
-
-  } else {
-
-    addDockWidget (area,
-                   m_dockChecklistGuide);
-
-  }
+  addDockWindow (m_dockChecklistGuide,
+                 settings,
+                 SETTINGS_CHECKLIST_GUIDE_DOCK_AREA,
+                 SETTINGS_CHECKLIST_GUIDE_DOCK_GEOMETRY,
+                 Qt::RightDockWidgetArea);
+  addDockWindow (m_dockGeometryWindow,
+                 settings,
+                 SETTINGS_GEOMETRY_WINDOW_DOCK_AREA,
+                 SETTINGS_GEOMETRY_WINDOW_DOCK_GEOMETRY,
+                 Qt::RightDockWidgetArea);
 
   // Main window settings. Preference for initial zoom factor is 100%, rather than fill mode, for issue #25. Some or all
   // settings are saved to the application AND saved to m_modelMainWindow for use in DlgSettingsMainWindow. Note that
@@ -2425,6 +2482,12 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                                                                                 QVariant (MAIN_TITLE_BAR_FORMAT_PATH)).toInt());
   m_modelMainWindow.setPdfResolution (settings.value (SETTINGS_IMPORT_PDF_RESOLUTION,
                                                       QVariant (DEFAULT_IMPORT_PDF_RESOLUTION)).toInt ());
+  m_modelMainWindow.setImportCropping ((ImportCropping) settings.value (SETTINGS_IMPORT_CROPPING,
+                                                                        QVariant (DEFAULT_IMPORT_CROPPING)).toInt ());
+  m_modelMainWindow.setMaximumGridLines (settings.value (SETTINGS_MAXIMUM_GRID_LINES,
+                                                         QVariant (DEFAULT_MAXIMUM_GRID_LINES)).toInt ());
+  m_modelMainWindow.setHighlightOpacity (settings.value (SETTINGS_HIGHLIGHT_OPACITY,
+                                                         QVariant (DEFAULT_HIGHLIGHT_OPACITY)).toDouble ());
 
   updateSettingsMainWindow();
 
@@ -2456,12 +2519,26 @@ void MainWindow::settingsWrite ()
     settings.setValue (SETTINGS_CHECKLIST_GUIDE_DOCK_AREA, dockWidgetArea (m_dockChecklistGuide));
 
   }
+  if (m_dockGeometryWindow->isFloating()) {
+
+    settings.setValue (SETTINGS_GEOMETRY_WINDOW_DOCK_AREA, Qt::NoDockWidgetArea);
+    settings.setValue (SETTINGS_GEOMETRY_WINDOW_DOCK_GEOMETRY, m_dockGeometryWindow->saveGeometry ());
+
+  } else {
+
+    settings.setValue (SETTINGS_GEOMETRY_WINDOW_DOCK_AREA, dockWidgetArea (m_dockGeometryWindow));
+
+  }
+  settings.setValue (SETTINGS_BACKGROUND_IMAGE, m_cmbBackground->currentData().toInt());
   settings.setValue (SETTINGS_CHECKLIST_GUIDE_WIZARD, m_actionHelpChecklistGuideWizard->isChecked ());
+  settings.setValue (SETTINGS_HIGHLIGHT_OPACITY, m_modelMainWindow.highlightOpacity());
+  settings.setValue (SETTINGS_IMPORT_CROPPING, m_modelMainWindow.importCropping());
   settings.setValue (SETTINGS_IMPORT_PDF_RESOLUTION, m_modelMainWindow.pdfResolution ());
   settings.setValue (SETTINGS_LOCALE_LANGUAGE, m_modelMainWindow.locale().language());
   settings.setValue (SETTINGS_LOCALE_COUNTRY, m_modelMainWindow.locale().country());
+  settings.setValue (SETTINGS_MAIN_TITLE_BAR_FORMAT, m_modelMainWindow.mainTitleBarFormat());
+  settings.setValue (SETTINGS_MAXIMUM_GRID_LINES, m_modelMainWindow.maximumGridLines());
   settings.setValue (SETTINGS_VIEW_BACKGROUND_TOOLBAR, m_actionViewBackground->isChecked());
-  settings.setValue (SETTINGS_BACKGROUND_IMAGE, m_cmbBackground->currentData().toInt());
   settings.setValue (SETTINGS_VIEW_DIGITIZE_TOOLBAR, m_actionViewDigitize->isChecked ());
   settings.setValue (SETTINGS_VIEW_STATUS_BAR, m_statusBar->statusBarMode ());
   settings.setValue (SETTINGS_VIEW_SETTINGS_VIEWS_TOOLBAR, m_actionViewSettingsViews->isChecked ());
@@ -2470,7 +2547,6 @@ void MainWindow::settingsWrite ()
   settings.setValue (SETTINGS_ZOOM_CONTROL, m_modelMainWindow.zoomControl());
   settings.setValue (SETTINGS_ZOOM_FACTOR, currentZoomFactor ());
   settings.setValue (SETTINGS_ZOOM_FACTOR_INITIAL, m_modelMainWindow.zoomFactorInitial());
-  settings.setValue (SETTINGS_MAIN_TITLE_BAR_FORMAT, m_modelMainWindow.mainTitleBarFormat());
   settings.endGroup ();
 }
 
@@ -2725,14 +2801,23 @@ void MainWindow::slotCmbCurve(int /* index */)
 
   updateViewedCurves();
   updateViewsOfSettings();
+  updateGeometryWindow();
 }
 
-void MainWindow::slotContextMenuEvent (QString pointIdentifier)
+void MainWindow::slotContextMenuEventAxis (QString pointIdentifier)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotContextMenuEvent point=" << pointIdentifier.toLatin1 ().data ();
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotContextMenuEventAxis point=" << pointIdentifier.toLatin1 ().data ();
 
-  m_digitizeStateContext->handleContextMenuEvent (m_cmdMediator,
-                                                  pointIdentifier);
+  m_digitizeStateContext->handleContextMenuEventAxis (m_cmdMediator,
+                                                      pointIdentifier);
+}
+
+void MainWindow::slotContextMenuEventGraph (QStringList pointIdentifiers)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotContextMenuEventGraph point=" << pointIdentifiers.join(",").toLatin1 ().data ();
+
+  m_digitizeStateContext->handleContextMenuEventGraph (m_cmdMediator,
+                                                       pointIdentifiers);
 }
 
 void MainWindow::slotDigitizeAxis ()
@@ -2805,9 +2890,13 @@ void MainWindow::slotEditCopy ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditCopy";
 
+  GraphicsItemsExtractor graphicsItemsExtractor;
+  const QList<QGraphicsItem*> &items = m_scene->selectedItems();
+  QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+
   CmdCopy *cmd = new CmdCopy (*this,
                               m_cmdMediator->document(),
-                              m_scene->selectedPointIdentifiers ());
+                              pointIdentifiers);
   m_digitizeStateContext->appendNewCmd (m_cmdMediator,
                                         cmd);
 }
@@ -2816,9 +2905,13 @@ void MainWindow::slotEditCut ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditCut";
 
+  GraphicsItemsExtractor graphicsItemsExtractor;
+  const QList<QGraphicsItem*> &items = m_scene->selectedItems();
+  QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+
   CmdCut *cmd = new CmdCut (*this,
                             m_cmdMediator->document(),
-                            m_scene->selectedPointIdentifiers ());
+                            pointIdentifiers);
   m_digitizeStateContext->appendNewCmd (m_cmdMediator,
                                         cmd);
 }
@@ -2827,9 +2920,13 @@ void MainWindow::slotEditDelete ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditDelete";
 
+  GraphicsItemsExtractor graphicsItemsExtractor;
+  const QList<QGraphicsItem*> &items = m_scene->selectedItems();
+  QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+
   CmdDelete *cmd = new CmdDelete (*this,
                                   m_cmdMediator->document(),
-                                  m_scene->selectedPointIdentifiers ());
+                                  pointIdentifiers);
   m_digitizeStateContext->appendNewCmd (m_cmdMediator,
                                         cmd);
 }
@@ -2887,6 +2984,9 @@ void MainWindow::slotFileClose()
 
     // Remove scroll bars if they exist
     m_scene->setSceneRect (QRectF (0, 0, 1, 1));
+
+    // Remove stale data from geometry window
+    m_dockGeometryWindow->clear ();
 
     // Deallocate Document
     delete m_cmdMediator;
@@ -3084,6 +3184,13 @@ bool MainWindow::slotFileSaveAs()
   return false;
 }
 
+void MainWindow::slotGeometryWindowClosed()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotGeometryWindowClosed";
+
+  m_actionViewGeometryWindow->setChecked (false);
+}
+
 void MainWindow::slotHelpAbout()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotHelpAbout";
@@ -3110,13 +3217,6 @@ void MainWindow::slotKeyPress (Qt::Key key,
   m_digitizeStateContext->handleKeyPress (m_cmdMediator,
                                           key,
                                           atLeastOneSelectedItem);
-}
-
-void MainWindow::slotLeave ()
-{
-  LOG4CPP_DEBUG_S ((*mainCat)) << "MainWindow::slotLeave";
-
-  m_digitizeStateContext->handleLeave (m_cmdMediator);
 }
 
 void MainWindow::slotLoadStartupFiles ()
@@ -3239,14 +3339,6 @@ void MainWindow::slotRedoTextChanged (const QString &text)
     completeText += QString (" \"%1\"").arg (text);
   }
   m_actionEditRedo->setText (completeText);
-}
-
-void MainWindow::slotSetOverrideCursor (QCursor cursor)
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSetOverrideCursor";
-
-  m_digitizeStateContext->handleSetOverrideCursor (m_cmdMediator,
-                                                   cursor);
 }
 
 void MainWindow::slotSettingsAxesChecker ()
@@ -3532,6 +3624,17 @@ void MainWindow::slotViewToolBarDigitize ()
     m_toolDigitize->show();
   } else {
     m_toolDigitize->hide();
+  }
+}
+
+void MainWindow::slotViewToolBarGeometryWindow ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewToolBarGeometryWindow";
+
+  if (m_actionViewGeometryWindow->isChecked ()) {
+    m_dockGeometryWindow->show();
+  } else {
+    m_dockGeometryWindow->hide();
   }
 }
 
@@ -3934,19 +4037,22 @@ void MainWindow::updateAfterCommand ()
   // status bar are up to date. Point coordinates in Document are also updated
   updateAfterCommandStatusBarCoords ();
 
-  // Update the QGraphicsScene with the populated Curves. This requires the points in the Document to be already updated
-  // by updateAfterCommandStatusBarCoords
-  m_scene->updateAfterCommand (*m_cmdMediator);
+  updateHighlightOpacity ();
+
+  // Update graphics. Effectively, these steps do very little (just needed for highlight opacity)
+  m_digitizeStateContext->updateAfterPointAddition (); // May or may not be needed due to point addition
 
   updateControls ();
-
-  // Update checklist guide status
-  m_dockChecklistGuide->update (*m_cmdMediator,
-                                m_isDocumentExported);
+  updateChecklistGuide ();
+  updateGeometryWindow();
 
   // Final action at the end of a redo/undo is to checkpoint the Document and GraphicsScene to log files
   // so proper state can be verified
   writeCheckpointToLogFile ();
+
+  // Since focus may have drifted over to Geometry Window or some other control we se focus on the GraphicsView
+  // so the cursor is appropriate for the current state (otherwise it often ends up as default arrow)
+  m_view->setFocus ();
 }
 
 void MainWindow::updateAfterCommandStatusBarCoords ()
@@ -3954,7 +4060,7 @@ void MainWindow::updateAfterCommandStatusBarCoords ()
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateAfterCommandStatusBarCoords";
 
   // For some reason, mapFromGlobal(QCursor::pos) differs from event->pos by a little bit. We must compensate for
-  // this so cursor coordinates in status bar match the DlgEditPoint inputs initially. After the mouse moves
+  // this so cursor coordinates in status bar match the DlgEditPointAxis inputs initially. After the mouse moves
   // the problem disappears since event->pos is available and QCursor::pos is no longer needed
   const QPoint HACK_SO_GRAPH_COORDINATE_MATCHES_INPUT (1, 1);
 
@@ -3999,6 +4105,15 @@ void MainWindow::updateAfterMouseRelease ()
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateAfterMouseRelease";
 
   updateControls ();
+}
+
+void MainWindow::updateChecklistGuide ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateChecklistGuide";
+
+  m_isDocumentExported = true; // Set for next line and for all checklist guide updates after this
+  m_dockChecklistGuide->update (*m_cmdMediator,
+                                m_isDocumentExported);
 }
 
 void MainWindow::updateControls ()
@@ -4133,6 +4248,17 @@ void MainWindow::updateDigitizeStateIfSoftwareTriggered (DigitizeState digitizeS
   }
 }
 
+void MainWindow::updateGeometryWindow ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateGeometryWindow";
+
+  // Update geometry window
+  m_dockGeometryWindow->update (*m_cmdMediator,
+                                m_modelMainWindow,
+                                m_cmbCurve->currentText (),
+                                m_transformation);
+}
+
 void MainWindow::updateGraphicsLinesToMatchGraphicsPoints()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateGraphicsLinesToMatchGraphicsPoints";
@@ -4150,12 +4276,25 @@ void MainWindow::updateGridLines ()
 
   // Create new grid lines
   GridLineFactory factory (*m_scene,
-                           m_cmdMediator->document().modelCoords(),
-                           m_transformation);
+                           m_cmdMediator->document().modelCoords());
   factory.createGridLinesForEvenlySpacedGrid (m_cmdMediator->document().modelGridDisplay(),
+                                              m_modelMainWindow,
+                                              m_transformation,
                                               m_gridLines);
 
   m_gridLines.setVisible (m_actionViewGridLines->isChecked());
+}
+
+void MainWindow::updateHighlightOpacity ()
+{
+  if (m_cmdMediator != 0) {
+
+    // Update the QGraphicsScene with the populated Curves. This requires the points in the Document to be already updated
+    // by updateAfterCommandStatusBarCoords
+    m_scene->updateAfterCommand (*m_cmdMediator,
+                                 m_modelMainWindow.highlightOpacity(),
+                                 m_dockGeometryWindow);
+  }
 }
 
 void MainWindow::updateRecentFileList()
@@ -4298,6 +4437,12 @@ void MainWindow::updateSettingsMainWindow()
 
   }
 
+  if ((m_scene != 0) &&
+      (m_cmdMediator != 0)) {
+    m_scene->updateCurveStyles(m_cmdMediator->document().modelCurveStyles());
+  }
+
+  updateHighlightOpacity();
   updateWindowTitle();
 }
 

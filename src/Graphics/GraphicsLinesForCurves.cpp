@@ -172,7 +172,8 @@ void GraphicsLinesForCurves::resetOnLoad()
 void GraphicsLinesForCurves::updateAfterCommand (GraphicsScene &scene,
                                                  const CurveStyles &curveStyles,
                                                  const QString &curveName,
-                                                 const Point &point)
+                                                 const Point &point,
+                                                 GeometryWindow *geometryWindow)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "GraphicsLinesForCurves::updateAfterCommand"
                                << " point=" << point.identifier().toLatin1().data()
@@ -181,7 +182,8 @@ void GraphicsLinesForCurves::updateAfterCommand (GraphicsScene &scene,
   ENGAUGE_ASSERT (m_graphicsLinesForCurve.contains (curveName));
   m_graphicsLinesForCurve [curveName]->updateAfterCommand (scene,
                                                            curveStyles.pointStyle(curveName),
-                                                           point);
+                                                           point,
+                                                           geometryWindow);
 }
 
 void GraphicsLinesForCurves::updateCurveStyles (const CurveStyles &modelCurveStyles)
@@ -211,6 +213,20 @@ void GraphicsLinesForCurves::updateGraphicsLinesToMatchGraphicsPoints (const Cur
 
       m_graphicsLinesForCurve [curveName]->updateGraphicsLinesToMatchGraphicsPoints(curveStyles.lineStyle (curveName));
     }
+  }
+}
+
+void GraphicsLinesForCurves::updateHighlightOpacity (double highlightOpacity)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "GraphicsLinesForCurves::updateHighlightOpacity"
+                              << " highlightOpacity=" << highlightOpacity;
+
+  GraphicsLinesContainer::const_iterator itr;
+  for (itr = m_graphicsLinesForCurve.begin (); itr != m_graphicsLinesForCurve.end (); itr++) {
+
+    QString curveName = itr.key();
+
+    m_graphicsLinesForCurve [curveName]->updateHighlightOpacity (highlightOpacity);
   }
 }
 
