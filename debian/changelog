@@ -1,6 +1,7 @@
 engauge-digitizer (9.1-1) unstable; urgency=medium
 
   * New upstream release
+  * Added hardening=+all 
 
  -- Tobias Winchen <tobias@winchen.de>  Thu, 21 Jul 2016 10:21:27 +0200
 
