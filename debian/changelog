@@ -1,4 +1,4 @@
-engauge-digitizer (9.0-1) UNRELEASED; urgency=medium
+engauge-digitizer (9.1-1) unstable; urgency=medium
 
   * New upstream release
 
@@ -8,7 +8,7 @@ engauge-digitizer (8.3-1) unstable; urgency=medium
 
   * New upstream release
     - New grid line removal dialog (Closes: #426421) 
-    - Raw data export format for multiple curves available (Closes: 426579)
+    - Raw data export format for multiple curves available (Closes: #426579)
     - Crosshair customizable (Closes: #426340) 
   * Updated description in control to be consistent with appdata
   * Removed obsolete dependency on libpng  
