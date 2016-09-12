@@ -28,6 +28,8 @@
 #include "ZoomFactorInitial.h"
 #include "ZoomLabels.h"
 
+const int MINIMUM_DIALOG_WIDTH_MAIN_WINDOW = 550;
+
 DlgSettingsMainWindow::DlgSettingsMainWindow(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Main Window"),
                            "DlgSettingsMainWindow",
@@ -38,7 +40,8 @@ DlgSettingsMainWindow::DlgSettingsMainWindow(MainWindow &mainWindow) :
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::DlgSettingsMainWindow";
 
   QWidget *subPanel = createSubPanel ();
-  finishPanel (subPanel);
+  finishPanel (subPanel,
+               MINIMUM_DIALOG_WIDTH_MAIN_WINDOW);
 }
 
 DlgSettingsMainWindow::~DlgSettingsMainWindow()
@@ -262,8 +265,10 @@ void DlgSettingsMainWindow::loadMainWindowModel (CmdMediator &cmdMediator,
   index = m_cmbImportCropping->findData (m_modelMainWindowAfter->importCropping());
   m_cmbImportCropping->setCurrentIndex (index);
   m_chkTitleBarFormat->setChecked (m_modelMainWindowAfter->mainTitleBarFormat() == MAIN_TITLE_BAR_FORMAT_PATH);
+#ifdef ENGAUGE_PDF
   index = m_cmbPdfResolution->findData (m_modelMainWindowAfter->pdfResolution());
   m_cmbPdfResolution->setCurrentIndex(index);
+#endif
   m_spinMaximumGridLines->setValue (m_modelMainWindowAfter->maximumGridLines());
   m_spinHighlightOpacity->setValue (m_modelMainWindowAfter->highlightOpacity());
 
@@ -307,8 +312,10 @@ void DlgSettingsMainWindow::slotPdfResolution(const QString)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWIndow::slotPdfResolution";
 
+#ifdef ENGAUGE_PDF
   m_modelMainWindowAfter->setPdfResolution(m_cmbPdfResolution->currentData().toInt());
   updateControls();
+#endif
 }
 
 void DlgSettingsMainWindow::slotRecentFileClear()

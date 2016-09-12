@@ -2,10 +2,10 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
   <Product Name='Engauge Digitizer' 
            Manufacturer='Engauge Open Source Developers'
-           Id='1262BCFA-A719-4249-85CC-8C4085E08644'
+           Id='8BBC265C-852B-4582-B639-1736F20A57BD'
 	   UpgradeCode='00A6792B-65ED-4894-A48B-B95D63C62CC6'
 	   Language='1033' Codepage='1252' 
-           Version='9.1'>
+           Version='9.3'>
     <Package Id='*' Keywords='Installer' Description="Engauge Digitizer Installer"
 	     Comments='Engauge Digitizer is available from github.com' Manufacturer='Engauge Open Source Developers'
 	     InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
@@ -24,7 +24,7 @@
 	    </File>
 	    <File Id='freetype6'    Name='freetype6.dll'       DiskId='1' Source='Engauge Digitizer/freetype6.dll'       />
 	    <File Id='libfftw33'    Name='libfftw3-3.dll'      DiskId='1' Source='Engauge Digitizer/libfftw3-3.dll'      />
-	    <File Id='log4cpp'      Name='log4cpp.dll'         DiskId='1' Source='Engauge Digitizer/log4cpp.dll'         />
+	    <File Id='log4cpp'      Name='log4cpp.lib'         DiskId='1' Source='Engauge Digitizer/log4cpp.lib'         />
 	    <File Id='openjpeg'     Name='openjpeg.dll'        DiskId='1' Source='Engauge Digitizer/openjpeg.dll'        />
 	    <File Id='popplerqt5'   Name='poppler-qt5.dll'     DiskId='1' Source='Engauge Digitizer/poppler-qt5.dll'     />
 	    <File Id='clucene'      Name='Qt5CLucene.dll'      DiskId='1' Source='Engauge Digitizer/Qt5CLucene.dll'      />
