@@ -22,6 +22,7 @@
 #include <QSpinBox>
 #include "ViewPreview.h"
 
+const int MINIMUM_HEIGHT = 480;
 const int POINT_SIZE_MAX = 1024;
 const int POINT_SIZE_MIN = 5;
 
@@ -261,6 +262,13 @@ double DlgSettingsPointMatch::radiusAlongDiagonal () const
   double maxPointSize = m_modelPointMatchAfter->maxPointSize();
 
   return qSqrt (2.0) * maxPointSize / 2.0;
+}
+
+void DlgSettingsPointMatch::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
 }
 
 void DlgSettingsPointMatch::slotAcceptedPointColor (const QString &)

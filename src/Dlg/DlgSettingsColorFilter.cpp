@@ -31,6 +31,7 @@
 #include "ViewProfileScale.h"
 
 const int MINIMUM_DIALOG_WIDTH_COLOR_FILTER = 640;
+const int MINIMUM_HEIGHT = 500;
 
 DlgSettingsColorFilter::DlgSettingsColorFilter(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Color Filter"),
@@ -287,6 +288,13 @@ void DlgSettingsColorFilter::loadForCurveName()
     createThread ();
     updateHistogram();
     updatePreview(); // Needs thread initialized
+  }
+}
+
+void DlgSettingsColorFilter::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
   }
 }
 

@@ -25,6 +25,7 @@
 #include "ViewPreview.h"
 
 const int AXIS_WIDTH = 4;
+const int MINIMUM_HEIGHT = 500;
 const int RECT_WIDTH = 640;
 const int RECT_HEIGHT = 480;
 const int X_LEFT = RECT_WIDTH / 8;
@@ -237,6 +238,13 @@ void DlgSettingsAxesChecker::load (CmdMediator &cmdMediator)
   updateControls ();
   enableOk (false); // Disable Ok button since there not yet any changes
   updatePreview();
+}
+
+void DlgSettingsAxesChecker::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
 }
 
 void DlgSettingsAxesChecker::slotGroupMode (QAbstractButton*)
