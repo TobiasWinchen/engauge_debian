@@ -519,7 +519,7 @@ void MainWindow::createActionsFile ()
 
   m_actionClose = new QAction(tr ("&Close"), this);
   m_actionClose->setShortcut (QKeySequence::Close);
-  m_actionClose->setStatusTip (tr ("Closes the open document document."));
+  m_actionClose->setStatusTip (tr ("Closes the open document."));
   m_actionClose->setWhatsThis (tr ("Close Document\n\n"
                                    "Closes the open document."));
   connect (m_actionClose, SIGNAL (triggered ()), this, SLOT (slotFileClose ()));
@@ -866,7 +866,7 @@ void MainWindow::createActionsView ()
   m_actionZoom1To1 = new QAction (tr ("1:1 (100%)"), this);
   m_actionZoom1To1->setCheckable (true);
   m_actionZoom1To1->setChecked (true);
-  m_actionZoom1To1->setStatusTip (tr ("Zoom 6:1"));
+  m_actionZoom1To1->setStatusTip (tr ("Zoom 1:1"));
   connect (m_actionZoom1To1, SIGNAL (triggered ()), this, SLOT (slotViewZoom1To1 ()));
 
   m_actionZoom1To2 = new QAction (tr ("1:2 (50%)"), this);
@@ -2488,8 +2488,11 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                                                          QVariant (DEFAULT_MAXIMUM_GRID_LINES)).toInt ());
   m_modelMainWindow.setHighlightOpacity (settings.value (SETTINGS_HIGHLIGHT_OPACITY,
                                                          QVariant (DEFAULT_HIGHLIGHT_OPACITY)).toDouble ());
+  m_modelMainWindow.setSmallDialogs (settings.value (SETTINGS_SMALL_DIALOGS,
+                                                     QVariant (DEFAULT_SMALL_DIALOGS)).toBool ());
 
   updateSettingsMainWindow();
+  updateSmallDialogs();
 
   settings.endGroup();
 }
@@ -2538,6 +2541,7 @@ void MainWindow::settingsWrite ()
   settings.setValue (SETTINGS_LOCALE_COUNTRY, m_modelMainWindow.locale().country());
   settings.setValue (SETTINGS_MAIN_TITLE_BAR_FORMAT, m_modelMainWindow.mainTitleBarFormat());
   settings.setValue (SETTINGS_MAXIMUM_GRID_LINES, m_modelMainWindow.maximumGridLines());
+  settings.setValue (SETTINGS_SMALL_DIALOGS, m_modelMainWindow.smallDialogs());
   settings.setValue (SETTINGS_VIEW_BACKGROUND_TOOLBAR, m_actionViewBackground->isChecked());
   settings.setValue (SETTINGS_VIEW_DIGITIZE_TOOLBAR, m_actionViewDigitize->isChecked ());
   settings.setValue (SETTINGS_VIEW_STATUS_BAR, m_statusBar->statusBarMode ());
@@ -4278,6 +4282,7 @@ void MainWindow::updateGridLines ()
   GridLineFactory factory (*m_scene,
                            m_cmdMediator->document().modelCoords());
   factory.createGridLinesForEvenlySpacedGrid (m_cmdMediator->document().modelGridDisplay(),
+                                              m_cmdMediator->document(),
                                               m_modelMainWindow,
                                               m_transformation,
                                               m_gridLines);
@@ -4467,6 +4472,23 @@ void MainWindow::updateSettingsSegments(const DocumentModelSegments &modelSegmen
 
   m_cmdMediator->document().setModelSegments(modelSegments);
   m_digitizeStateContext->updateModelSegments(modelSegments);
+}
+
+void MainWindow::updateSmallDialogs ()
+{
+  m_dlgSettingsAxesChecker->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsColorFilter->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsCoords->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsCurveAddRemove->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsCurveProperties->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsDigitizeCurve->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsExportFormat->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsGeneral->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsGridDisplay->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsGridRemoval->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsMainWindow->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsPointMatch->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsSegments->setSmallDialogs (m_modelMainWindow.smallDialogs ());
 }
 
 void MainWindow::updateTransformationAndItsDependencies()

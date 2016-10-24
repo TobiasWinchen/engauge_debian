@@ -30,7 +30,7 @@
 
 const int IMAGE_WIDTH = 100;
 const int IMAGE_HEIGHT = 100;
-
+const int MINIMUM_HEIGHT = 450;
 const int INNER_RADIUS_MAX = 64;
 const int INNER_RADIUS_MIN = 0;
 const int LINE_LENGTH_MIN = 2; // Min length of one line in the cursor, in pixels
@@ -213,6 +213,13 @@ void DlgSettingsDigitizeCurve::load (CmdMediator &cmdMediator)
   updateControls();
   enableOk (false); // Disable Ok button since there not yet any changes
   updatePreview();
+}
+
+void DlgSettingsDigitizeCurve::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
 }
 
 void DlgSettingsDigitizeCurve::slotCursorCustom (bool)

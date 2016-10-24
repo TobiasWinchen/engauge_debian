@@ -26,6 +26,7 @@
 const int COUNT_MIN = 1;
 const int COUNT_MAX = 100;
 const int COUNT_DECIMALS = 0;
+const int MINIMUM_HEIGHT = 480;
 
 DlgSettingsGridDisplay::DlgSettingsGridDisplay(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Grid Display"),
@@ -345,6 +346,13 @@ void DlgSettingsGridDisplay::load (CmdMediator &cmdMediator)
   updatePreview();
 }
 
+void DlgSettingsGridDisplay::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
+}
+
 void DlgSettingsGridDisplay::slotColor (QString const &)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsGridDisplay::slotColor";
@@ -598,6 +606,7 @@ void DlgSettingsGridDisplay::updatePreview ()
                              cmdMediator ().document ().modelCoords());
 
     factory.createGridLinesForEvenlySpacedGrid (*m_modelGridDisplayAfter,
+                                                cmdMediator ().document (),
                                                 mainWindow ().modelMainWindow(),
                                                 mainWindow ().transformation(),
                                                 m_gridLines);

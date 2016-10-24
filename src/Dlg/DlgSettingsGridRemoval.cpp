@@ -27,6 +27,7 @@ const int CLOSE_DECIMALS = 1;
 const int COUNT_MIN = 1;
 const int COUNT_MAX = 100;
 const int COUNT_DECIMALS = 0;
+const int MINIMUM_HEIGHT = 480;
 
 DlgSettingsGridRemoval::DlgSettingsGridRemoval(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Grid Removal"),
@@ -342,6 +343,13 @@ void DlgSettingsGridRemoval::load (CmdMediator &cmdMediator)
   updateControls ();
   enableOk (false); // Disable Ok button since there not yet any changes
   updatePreview();
+}
+
+void DlgSettingsGridRemoval::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
 }
 
 void DlgSettingsGridRemoval::slotCloseDistance(const QString &)

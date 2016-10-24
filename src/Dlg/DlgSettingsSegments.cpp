@@ -23,13 +23,14 @@
 #include "SegmentFactory.h"
 #include "ViewPreview.h"
 
+const int MINIMUM_HEIGHT = 540;
 const int MIN_LENGTH_MIN = 1;
 const int MIN_LENGTH_MAX = 10000;
 const int POINT_SEPARATION_MIN = 5;
 const int POINT_SEPARATION_MAX = 10000;
 
 const int IMAGE_WIDTH = 400;
-const int IMAGE_HEIGHT = 300;
+const int IMAGE_HEIGHT = 350;
 
 const double TWOPI = 2.0 * 3.1415926535;
 
@@ -289,6 +290,13 @@ void DlgSettingsSegments::load (CmdMediator &cmdMediator)
   updateControls();
   enableOk (false); // Disable Ok button since there not yet any changes
   updatePreview();
+}
+
+void DlgSettingsSegments::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
 }
 
 void DlgSettingsSegments::slotFillCorners (int state)

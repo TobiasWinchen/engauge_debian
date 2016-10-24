@@ -50,7 +50,8 @@ protected:
 
   /// Add Ok and Cancel buttons to subpanel to get the whole dialog.
   void finishPanel (QWidget *subPanel,
-                    int minimumWidth = MINIMUM_DIALOG_WIDTH);
+                    int minimumWidth = MINIMUM_DIALOG_WIDTH,
+                    int minimumHeightOrZero = 0);
 
   /// Process slotOk.
   virtual void handleOk () = 0;
@@ -82,6 +83,9 @@ protected:
   /// Override the default Ok button behavior applied in showEvent
   void setDisableOkAtStartup(bool disableOkAtStartup);
   
+  /// If false then dialogs have a minimum size so all controls are visible
+  virtual void setSmallDialogs (bool smallDialogs) = 0;
+
 private slots:
 
   /// Hide dialog.

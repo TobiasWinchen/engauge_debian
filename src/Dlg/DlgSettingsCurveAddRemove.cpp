@@ -26,6 +26,7 @@
 #include "SettingsForGraph.h"
 
 const int FIRST_COLUMN = 0;
+const int MINIMUM_HEIGHT = 500;
 
 DlgSettingsCurveAddRemove::DlgSettingsCurveAddRemove(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Curve Add/Remove"),
@@ -44,8 +45,8 @@ DlgSettingsCurveAddRemove::~DlgSettingsCurveAddRemove()
 }
 
 void DlgSettingsCurveAddRemove::appendCurveName (const QString &curveNameNew,
-                                             const QString &curveNameOriginal,
-                                             int numPoints)
+                                                 const QString &curveNameOriginal,
+                                                 int numPoints)
 {
   ENGAUGE_CHECK_PTR (m_curveNameList);
 
@@ -426,6 +427,13 @@ void DlgSettingsCurveAddRemove::selectCurveName (const QString &curveWanted)
       break;
 
     }
+  }
+}
+
+void DlgSettingsCurveAddRemove::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
   }
 }
 

@@ -33,6 +33,7 @@
 #include "Transformation.h"
 #include "ViewPreview.h"
 
+const int c = 500; // Big enough so ok/cancel buttons are visible
 const QString OVERRIDDEN_VALUE(""); // Values are overridden in updateControls
 
 const int COLUMN_0 = 0;
@@ -69,6 +70,7 @@ const int FONT_SIZE = 6;
 const double POWER_FOR_LOG = 10.0; // Need a larger power (certainly more than e) to make log gradient obvious
 
 const int MINIMUM_DIALOG_WIDTH_COORDS = 800;
+const int MINIMUM_HEIGHT = 540;
 
 DlgSettingsCoords::DlgSettingsCoords(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Coordinates"),
@@ -369,6 +371,7 @@ QWidget *DlgSettingsCoords::createSubPanel ()
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCoords::createSubPanel";
 
   QWidget *subPanel = new QWidget ();
+
   QGridLayout *layout = new QGridLayout (subPanel);
   subPanel->setLayout (layout);
 
@@ -721,6 +724,13 @@ void DlgSettingsCoords::resetSceneRectangle ()
   itemPerimeter->setVisible(false);
   m_scenePreview->addItem (itemPerimeter);
   m_viewPreview->centerOn (QPointF (0.0, 0.0));
+}
+
+void DlgSettingsCoords::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
 }
 
 void DlgSettingsCoords::slotCartesianPolar (bool)

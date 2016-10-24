@@ -48,6 +48,7 @@ const QString CONNECT_AS_RELATION_STRAIGHT_STR ("Relation - Straight");
 
 const double PREVIEW_WIDTH = 100.0;
 const double PREVIEW_HEIGHT = 100.0;
+const int MINIMUM_HEIGHT = 500;
 
 const QPointF POS_LEFT (PREVIEW_WIDTH / 3.0,
                         PREVIEW_HEIGHT * 2.0 / 3.0);
@@ -464,6 +465,13 @@ void DlgSettingsCurveProperties::setCurveName (const QString &curveName)
 {
   m_cmbCurveName->setCurrentText (curveName);
   loadForCurveName (curveName);
+}
+
+void DlgSettingsCurveProperties::setSmallDialogs(bool smallDialogs)
+{
+  if (!smallDialogs) {
+    setMinimumHeight (MINIMUM_HEIGHT);
+  }
 }
 
 void DlgSettingsCurveProperties::slotCurveName(const QString &curveName)
