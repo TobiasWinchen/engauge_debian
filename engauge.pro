@@ -145,7 +145,6 @@ HEADERS  += \
     src/Curve/Curve.h \
     src/Curve/CurveConnectAs.h \
     src/Curve/CurveNameList.h \
-    src/Curve/CurveNameListEntry.h \
     src/Curve/CurveSettingsInt.h \
     src/Curve/CurvesGraphs.h \
     src/Curve/CurveStyle.h \
@@ -237,6 +236,12 @@ HEADERS  += \
     src/FileCmd/FileCmdScript.h \
     src/FileCmd/FileCmdSerialize.h \
     src/Filter/FilterImage.h \
+    src/Fitting/FittingCurve.h \
+    src/Fitting/FittingCurveCoefficients.h \
+    src/Fitting/FittingModel.h \
+    src/Fitting/FittingPointsConvenient.h \
+    src/Fitting/FittingStatistics.h \
+    src/Fitting/FittingWindow.h \
     src/Format/FormatCoordsUnits.h \
     src/Format/FormatCoordsUnitsStrategyAbstractBase.h \
     src/Format/FormatCoordsUnitsStrategyNonPolarTheta.h \
@@ -285,11 +290,13 @@ HEADERS  += \
     src/Import/ImportCropping.h \
     src/Import/ImportCroppingUtilBase.h \
     src/Import/ImportCroppingUtilNonPdf.h \
+    src/util/LinearToLog.h \
     src/Line/LineStyle.h \
     src/Load/LoadFileInfo.h \
     src/Load/LoadImageFromUrl.h \
     src/Logger/Logger.h \
     src/Logger/LoggerUpload.h \
+    src/Matrix/Matrix.h \
     src/main/MainTitleBarFormat.h \
     src/main/MainWindow.h \
     src/main/MainWindowModel.h \
@@ -354,6 +361,9 @@ HEADERS  += \
     src/View/ViewProfileParameters.h \
     src/View/ViewProfileScale.h \
     src/View/ViewSegmentFilter.h \
+    src/Window/WindowAbstractBase.h \        
+    src/Window/WindowModelBase.h \    
+    src/Window/WindowTable.h \
     src/util/Xml.h \
     src/Zoom/ZoomControl.h \
     src/Zoom/ZoomFactor.h \
@@ -456,7 +466,6 @@ SOURCES += \
     src/Curve/Curve.cpp \
     src/Curve/CurveConnectAs.cpp \
     src/Curve/CurveNameList.cpp \
-    src/Curve/CurveNameListEntry.cpp \
     src/Curve/CurveSettingsInt.cpp \
     src/Curve/CurvesGraphs.cpp \
     src/Curve/CurveStyle.cpp \
@@ -542,6 +551,10 @@ SOURCES += \
     src/FileCmd/FileCmdScript.cpp \
     src/FileCmd/FileCmdSerialize.cpp \
     src/Filter/FilterImage.cpp \
+    src/Fitting/FittingCurve.cpp \    
+    src/Fitting/FittingModel.cpp \
+    src/Fitting/FittingStatistics.cpp \
+    src/Fitting/FittingWindow.cpp \    
     src/Format/FormatCoordsUnits.cpp \
     src/Format/FormatCoordsUnitsStrategyAbstractBase.cpp \
     src/Format/FormatCoordsUnitsStrategyNonPolarTheta.cpp \
@@ -586,11 +599,13 @@ SOURCES += \
     src/Help/HelpWindow.cpp \
     src/Import/ImportCroppingUtilBase.cpp \
     src/Import/ImportCroppingUtilNonPdf.cpp \
+    src/util/LinearToLog.cpp \    
     src/Line/LineStyle.cpp \
     src/Load/LoadFileInfo.cpp \
     src/Load/LoadImageFromUrl.cpp \
     src/Logger/Logger.cpp \
     src/Logger/LoggerUpload.cpp \
+    src/Matrix/Matrix.cpp \
     src/main/main.cpp \
     src/main/MainWindow.cpp \
     src/main/MainWindowModel.cpp \
@@ -650,6 +665,9 @@ SOURCES += \
     src/View/ViewProfileParameters.cpp \
     src/View/ViewProfileScale.cpp \
     src/View/ViewSegmentFilter.cpp \
+    src/Window/WindowAbstractBase.cpp \
+    src/Window/WindowModelBase.cpp \
+    src/Window/WindowTable.cpp \    
     src/util/Xml.cpp \
     src/Zoom/ZoomLabels.cpp \
     src/util/ZValues.cpp
@@ -722,6 +740,7 @@ INCLUDEPATH += src \
                src/Export \
                src/FileCmd \
                src/Filter \
+               src/Fitting \
                src/Format \
                src/Geometry \
                src/Ghosts \
@@ -735,6 +754,7 @@ INCLUDEPATH += src \
                src/Load \
                src/Logger \
                src/main \
+               src/Matrix \
                src/Mime \
                src/Network \
                src/NonPdf \
@@ -751,6 +771,7 @@ INCLUDEPATH += src \
                src/Tutorial \
                src/util \
                src/View \
+               src/Window \
                src/Zoom
 
 win32-* {

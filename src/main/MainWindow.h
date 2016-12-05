@@ -11,6 +11,7 @@
 #include "CoordSystemIndex.h"
 #include "DigitizeStateAbstractBase.h"
 #include "DocumentAxesPointsRequired.h"
+#include "FittingCurveCoefficients.h"
 #include "GridLines.h"
 #include "MainWindowModel.h"
 #include <QCursor>
@@ -53,6 +54,8 @@ class DocumentModelPointMatch;
 class DocumentModelSegments;
 class ExportToFile;
 class FileCmdScript;
+class FittingCurve;
+class FittingWindow;
 class GeometryWindow;
 class Ghosts;
 class GraphicsScene;
@@ -263,6 +266,8 @@ private slots:
   void slotFilePrint();
   bool slotFileSave(); /// Slot method that is sometimes called directly with return value expected
   bool slotFileSaveAs(); /// Slot method that is sometimes called directly with return value expected
+  void slotFittingWindowClosed();
+  void slotFittingWindowCurveFit(FittingCurveCoefficients, double, double, bool, bool);
   void slotGeometryWindowClosed();
   void slotHelpAbout();
   void slotHelpTutorial();
@@ -287,6 +292,7 @@ private slots:
   void slotSettingsMainWindow ();
   void slotSettingsPointMatch ();
   void slotSettingsSegments ();
+  void slotTableStatusChange ();
   void slotTimeoutRegressionErrorReport ();
   void slotTimeoutRegressionFileCmdScript ();
   void slotUndoTextChanged (const QString &);
@@ -298,6 +304,7 @@ private slots:
   void slotViewToolBarChecklistGuide ();
   void slotViewToolBarCoordSystem ();
   void slotViewToolBarDigitize ();
+  void slotViewToolBarFittingWindow ();
   void slotViewToolBarGeometryWindow ();
   void slotViewToolBarSettingsViews ();
   void slotViewToolTips ();
@@ -419,6 +426,7 @@ private:
   void updateAfterCommandStatusBarCoords ();
   void updateChecklistGuide ();
   void updateControls (); // Update the widgets (typically in terms of show/hide state) depending on the application state.
+  void updateFittingWindow ();
   void updateGeometryWindow ();
   void updateGridLines();
   void updateHighlightOpacity();
@@ -477,6 +485,7 @@ private:
   QAction *m_actionViewChecklistGuide;
   QAction *m_actionViewCoordSystem;
   QAction *m_actionViewDigitize;
+  QAction *m_actionViewFittingWindow;
   QAction *m_actionViewGeometryWindow;
   QAction *m_actionViewSettingsViews;
   QAction *m_actionViewToolTips;
@@ -551,6 +560,7 @@ private:
   ViewSegmentFilter *m_viewSegmentFilter;
   QToolBar *m_toolSettingsViews;
   ChecklistGuide *m_dockChecklistGuide;
+  FittingWindow *m_dockFittingWindow;
   GeometryWindow *m_dockGeometryWindow;
 
   QComboBox *m_cmbCoordSystem;
@@ -619,6 +629,9 @@ private:
 
   // Map between zoom enumerations. This eliminates the need for a switch statement
   QMap<ZoomFactorInitial, ZoomFactor> m_zoomMap;
+
+  // Fitted curve. Null if not currently applicable/defined
+  FittingCurve *m_fittingCurve;
 };
 
 #endif // MAIN_WINDOW_H

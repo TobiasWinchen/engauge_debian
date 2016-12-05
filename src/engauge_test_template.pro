@@ -126,7 +126,6 @@ HEADERS  += \
     Curve/Curve.h \
     Curve/CurveConnectAs.h \
     Curve/CurveNameList.h \
-    Curve/CurveNameListEntry.h \
     Curve/CurveSettingsInt.h \
     Curve/CurvesGraphs.h \
     Curve/CurveStyle.h \
@@ -218,6 +217,12 @@ HEADERS  += \
     FileCmd/FileCmdSerialize.h \
     FileCmd/FileCmdScript.h \
     Filter/FilterImage.h \
+    Fitting/FittingCurve.h \
+    Fitting/FittingCurveCoefficients.h \            
+    Fitting/FittingModel.h \
+    Fitting/FittingPointsConvenient.h \        
+    Fitting/FittingStatistics.h \
+    Fitting/FittingWindow.h \
     Format/FormatCoordsUnits.h \
     Format/FormatCoordsUnitsStrategyAbstractBase.h \
     Format/FormatCoordsUnitsStrategyNonPolarTheta.h \
@@ -266,6 +271,7 @@ HEADERS  += \
     Import/ImportCropping.h \
     Import/ImportCroppingUtilBase.h \
     Import/ImportCroppingUtilNonPdf.h \
+    util/LinearToLog.h \
     Line/LineStyle.h \
     Load/LoadFileInfo.h \
     Load/LoadImageFromUrl.h \
@@ -274,6 +280,7 @@ HEADERS  += \
     main/MainTitleBarFormat.h \
     main/MainWindow.h \
     main/MainWindowModel.h \
+    Matrix/Matrix.h \
     util/MigrateToVersion6.h \
     Mime/MimePoints.h \
     util/mmsubs.h \
@@ -336,6 +343,9 @@ HEADERS  += \
     View/ViewProfileParameters.h \
     View/ViewProfileScale.h \
     View/ViewSegmentFilter.h \
+    Window/WindowAbstractBase.h \
+    Window/WindowModelBase.h \
+    Window/WindowTable.h \    
     util/Xml.h \
     Zoom/ZoomControl.h \
     Zoom/ZoomFactor.h \
@@ -438,7 +448,6 @@ SOURCES += \
     Curve/Curve.cpp \
     Curve/CurveConnectAs.cpp \
     Curve/CurveNameList.cpp \
-    Curve/CurveNameListEntry.cpp \
     Curve/CurveSettingsInt.cpp \
     Curve/CurvesGraphs.cpp \
     Curve/CurveStyle.cpp \
@@ -524,6 +533,10 @@ SOURCES += \
     FileCmd/FileCmdSerialize.cpp \
     FileCmd/FileCmdScript.cpp \
     Filter/FilterImage.cpp \
+    Fitting/FittingCurve.cpp \    
+    Fitting/FittingModel.cpp \
+    Fitting/FittingStatistics.cpp \
+    Fitting/FittingWindow.cpp \    
     Format/FormatCoordsUnits.cpp \
     Format/FormatCoordsUnitsStrategyAbstractBase.cpp \
     Format/FormatCoordsUnitsStrategyNonPolarTheta.cpp \
@@ -568,11 +581,13 @@ SOURCES += \
     Help/HelpWindow.cpp \
     Import/ImportCroppingUtilBase.cpp \
     Import/ImportCroppingUtilNonPdf.cpp \
+    util/LinearToLog.cpp \    
     Line/LineStyle.cpp \
     Load/LoadFileInfo.cpp \
     Load/LoadImageFromUrl.cpp \
     Logger/Logger.cpp \
     Logger/LoggerUpload.cpp \
+    Matrix/Matrix.cpp \
     main/MainWindow.cpp \
     main/MainWindowModel.cpp \
     util/MigrateToVersion6.cpp \
@@ -632,6 +647,9 @@ SOURCES += \
     View/ViewProfileParameters.cpp \
     View/ViewProfileScale.cpp \
     View/ViewSegmentFilter.cpp \
+    Window/WindowAbstractBase.cpp \    
+    Window/WindowModelBase.cpp \
+    Window/WindowTable.cpp \    
     util/Xml.cpp \
     Zoom/ZoomLabels.cpp \
     util/ZValues.cpp
@@ -640,13 +658,10 @@ TARGET = ../bin/TEST
 
 QT += core gui network printsupport testlib widgets xml help
 
-macx-* {
 LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
-}
 
 win32-g++* {
 CONFIG += windows
-LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
 }
 
 LIBS += -llog4cpp -lfftw3
@@ -667,6 +682,7 @@ INCLUDEPATH += Background \
                Export \
                FileCmd \
                Filter \
+               Fitting \
                Format \
                Geometry \
                Ghosts \
@@ -680,6 +696,7 @@ INCLUDEPATH += Background \
                Load \
                Logger \
                main \
+               Matrix \
                Mime \
                Network \
                NonPdf \
@@ -697,17 +714,11 @@ INCLUDEPATH += Background \
                Tutorial \
                util \
                View \
+               Window \
                Zoom
 
-macx-* {
 INCLUDEPATH += $$(FFTW_HOME)/include \
                $$(LOG4CPP_HOME)/include
-}
-
-win32-g++* {
-INCLUDEPATH += $$(FFTW_HOME)/include \
-               $$(LOG4CPP_HOME)/include
-}
 
 RESOURCES += \
     engauge.qrc

@@ -9,11 +9,12 @@
 
 #include "DocumentModelExportFormat.h"
 #include "GeometryStrategyContext.h"
-#include <QDockWidget>
+#include "WindowAbstractBase.h"
 
 class CmdMediator;
 class Curve;
 class GeometryModel;
+class MainWindow;
 class MainWindowModel;
 class QItemSelection;
 class QString;
@@ -24,29 +25,27 @@ class Transformation;
 ///
 /// Column COLUMN_BODY_POINT_IDENTIFIERS is hidden. It contains the point identifiers so we can find
 /// the line associated with a point, and then highlight that line
-class GeometryWindow : public QDockWidget
+class GeometryWindow : public WindowAbstractBase
 {
   Q_OBJECT;
 
 public:
   /// Single constructor. Parent is needed or else this widget cannot be redocked after being undocked
-  GeometryWindow (QWidget *parent);
+  GeometryWindow (MainWindow *mainWindow);
   virtual ~GeometryWindow ();
 
-  /// Clear stale information
-  void clear ();
-
-  /// Catch close event so corresponding menu item in MainWindow can be updated accordingly
+  virtual void clear ();
   virtual void closeEvent(QCloseEvent *event);
 
   /// Hidden column that has the point identifiers
   static int columnBodyPointIdentifiers ();
 
-  /// Populate the table with the specified Curve
-  void update (const CmdMediator &cmdMediator,
-               const MainWindowModel &modelMainWindow,
-               const QString &curveSelected,
-               const Transformation &transformation);
+  virtual void doCopy ();
+  virtual void update (const CmdMediator &cmdMediator,
+                       const MainWindowModel &modelMainWindow,
+                       const QString &curveSelected,
+                       const Transformation &transformation);
+  virtual QTableView *view () const;
 
 public slots:
 
@@ -56,21 +55,15 @@ public slots:
   /// Unhighlight the row for the specified point
   void slotPointHoverLeave (QString);
 
-  /// Prepare for copy after selection has changed
-  void slotSelectionChanged (const QItemSelection &, const QItemSelection &);
-
 signals:
+
   /// Signal that this QDockWidget was just closed
   void signalGeometryWindowClosed();
 
 private:
   GeometryWindow();
 
-  int fold2dIndexes (int row,
-                     int col,
-                     int rowLow,
-                     int colLow,
-                     int colHigh) const;
+  void createWidgets (MainWindow *mainWindow);
   void initializeHeader();
   void loadStrategies ();
   void resizeTable (int rowCount);

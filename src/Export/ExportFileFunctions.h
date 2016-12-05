@@ -23,6 +23,9 @@ class Transformation;
 /// Strategy class for exporting to a file. This strategy is external to the Document class so that class is simpler.
 class ExportFileFunctions : public ExportFileAbstractBase
 {
+  // For unit testing
+  friend class TestExport;
+
 public:
   /// Single constructor.
   ExportFileFunctions();
@@ -44,6 +47,8 @@ private:
                                            const ExportValuesXOrY &xThetaValues,
                                            const QString &delimiter,
                                            const Transformation &transformation,
+                                           bool isLogXTheta,
+                                           bool isLogYRadius,
                                            QTextStream &str) const;
   void exportOnePerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
                                            const Document &document,
@@ -52,6 +57,8 @@ private:
                                            const ExportValuesXOrY &xThetaValues,
                                            const QString &delimiter,
                                            const Transformation &transformation,
+                                           bool isLogXTheta,
+                                           bool isLogYRadius,
                                            QTextStream &str) const;
 
   /// Allocate a 2D y/radius array indexed by (included) curve and x/theta.
@@ -69,6 +76,8 @@ private:
                           const MainWindowModel &modelMainWindow,
                           const QStringList &curvesIncluded,
                           const Transformation &transformation,
+                          bool isLogXTheta,
+                          bool isLogYRadius,
                           const ExportValuesXOrY &xThetaValues,
                           QVector<QVector<QString*> > &yRadiusValues) const;
   void loadYRadiusValuesForCurveInterpolatedSmooth (const DocumentModelCoords &modelCoords,
@@ -77,6 +86,8 @@ private:
                                                     const Points &points,
                                                     const ExportValuesXOrY &xThetaValues,
                                                     const Transformation &transformation,
+                                                    bool isLogXTheta,
+                                                    bool isLogYRadius,
                                                     QVector<QString*> &yRadiusValues) const;
   void loadYRadiusValuesForCurveInterpolatedStraight (const DocumentModelCoords &modelCoords,
                                                       const DocumentModelGeneral &modelGeneral,

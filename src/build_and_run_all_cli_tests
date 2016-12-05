@@ -10,9 +10,11 @@
 # Test names. Specify a single test to run just that test
 tests=( \
     TestCorrelation  \
+    TestExport \
     TestFormats \
     TestGraphCoords \
     TestGridLineLimiter \
+    TestMatrix \
     TestProjectedPoint \
     TestSegmentFill \
     TestSpline \
