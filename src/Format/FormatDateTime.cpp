@@ -7,6 +7,11 @@
 #include "EngaugeAssert.h"
 #include "FormatDateTime.h"
 #include "Logger.h"
+#include <QDateTime>
+#include <QTimeZone>
+
+// Need a reference time zone so exported outputs do not exhibit unpredictable local/UTC hours differences
+const Qt::TimeSpec REFERENCE_TIME_ZONE (Qt::UTC);
 
 FormatDateTime::FormatDateTime()
 {
@@ -89,7 +94,7 @@ void FormatDateTime::dateTimeLookup (const FormatsDate &formatsDateAll,
                                                             string)) {
 
             success = true;
-            value = dt.toTime_t();
+            value = dt.toTimeSpec (REFERENCE_TIME_ZONE).toTime_t ();
             iterating = false; // Stop iterating
 
             LOG4CPP_INFO_S ((*mainCat)) << "FormatDateTime::dateTimeLookup"
@@ -133,7 +138,7 @@ QString FormatDateTime::formatOutput (CoordUnitsDate coordUnitsDate,
 
   QDateTime dt = QDateTime::fromTime_t (value);
 
-  return dt.toString (format);
+  return dt.toTimeSpec(REFERENCE_TIME_ZONE).toString (format);
 }
 
 void FormatDateTime::loadFormatsFormat()

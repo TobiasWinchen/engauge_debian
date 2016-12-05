@@ -7,11 +7,11 @@
 #ifndef GEOMETRY_MODEL_H
 #define GEOMETRY_MODEL_H
 
-#include <QStandardItemModel>
 #include <QString>
+#include "WindowModelBase.h"
 
 /// Model that adds row highlighting according to the currently select point identifier
-class GeometryModel : public QStandardItemModel
+class GeometryModel : public WindowModelBase
 {
 public:
   /// Single constructor

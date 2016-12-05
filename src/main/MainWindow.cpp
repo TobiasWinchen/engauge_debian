@@ -52,6 +52,8 @@
 #include "ExportImageForRegression.h"
 #include "ExportToFile.h"
 #include "FileCmdScript.h"
+#include "FittingCurve.h"
+#include "FittingWindow.h"
 #include "GeometryWindow.h"
 #include "Ghosts.h"
 #include "GraphicsItemsExtractor.h"
@@ -147,7 +149,8 @@ MainWindow::MainWindow(const QString &errorReportFile,
   m_timerRegressionErrorReport(0),
   m_fileCmdScript (0),
   m_isErrorReportRegressionTest (isRegressionTest),
-  m_timerRegressionFileCmdScript(0)
+  m_timerRegressionFileCmdScript(0),
+  m_fittingCurve (0)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::MainWindow"
                               << " curDir=" << QDir::currentPath().toLatin1().data();
@@ -704,6 +707,14 @@ void MainWindow::createActionsView ()
                                                 "Show or hide the checklist guide"));
   connect (m_actionViewChecklistGuide, SIGNAL (changed ()), this, SLOT (slotViewToolBarChecklistGuide()));
 
+  m_actionViewFittingWindow = new QAction (tr ("Curve Fitting Window"), this);
+  m_actionViewFittingWindow->setCheckable (true);
+  m_actionViewFittingWindow->setChecked (false);
+  m_actionViewFittingWindow->setStatusTip (tr ("Show or hide the curve fitting window."));
+  m_actionViewFittingWindow->setWhatsThis (tr ("View Curve Fitting Window\n\n"
+                                               "Show or hide the curve fitting window"));
+  connect (m_actionViewFittingWindow, SIGNAL (changed ()), this, SLOT (slotViewToolBarFittingWindow()));
+
   m_actionViewGeometryWindow = new QAction (tr ("Geometry Window"), this);
   m_actionViewGeometryWindow->setCheckable (true);
   m_actionViewGeometryWindow->setChecked (false);
@@ -932,9 +943,18 @@ void MainWindow::createDockableWidgets ()
   m_dockChecklistGuide = new ChecklistGuide (this);
   connect (m_dockChecklistGuide, SIGNAL (signalChecklistClosed()), this, SLOT (slotChecklistClosed()));
 
+  // Fitting window starts out hidden since there is nothing to show initially. It will be positioned in settingsRead
+  m_dockFittingWindow = new FittingWindow (this);
+  connect (m_dockFittingWindow, SIGNAL (signalFittingWindowClosed()),
+           this, SLOT (slotFittingWindowClosed()));
+  connect (m_dockFittingWindow, SIGNAL (signalCurveFit(FittingCurveCoefficients, double, double, bool, bool)),
+           this, SLOT (slotFittingWindowCurveFit(FittingCurveCoefficients, double, double, bool, bool)));
+
   // Geometry window starts out hidden since there is nothing to show initially. It will be positioned in settingsRead
   m_dockGeometryWindow = new GeometryWindow (this);
-  connect (m_dockGeometryWindow, SIGNAL (signalGeometryWindowClosed()), this, SLOT (slotGeometryWindowClosed()));
+  connect (m_dockGeometryWindow, SIGNAL (signalGeometryWindowClosed()),
+           this, SLOT (slotGeometryWindowClosed()));
+
 }
 
 void MainWindow::createHelpWindow ()
@@ -1028,6 +1048,7 @@ void MainWindow::createMenus()
   m_menuView->addAction (m_actionViewBackground);
   m_menuView->addAction (m_actionViewDigitize);
   m_menuView->addAction (m_actionViewChecklistGuide);
+  m_menuView->addAction (m_actionViewFittingWindow);
   m_menuView->addAction (m_actionViewGeometryWindow);
   m_menuView->addAction (m_actionViewSettingsViews);
   m_menuView->addAction (m_actionViewCoordSystem);
@@ -1211,7 +1232,8 @@ void MainWindow::createToolBars ()
   m_cmbCurve->setMinimumWidth (180);
   m_cmbCurve->setStatusTip (tr ("Select curve for new points."));
   m_cmbCurve->setWhatsThis (tr ("Selected Curve Name\n\n"
-                                "Select curve for any new points. Every point belongs to one curve."));
+                                "Select curve for any new points. Every point belongs to one curve.\n\n"
+                                "This can be changed while in Curve Point, Point Match, Color Picker or Segment Fill mode."));
   connect (m_cmbCurve, SIGNAL (activated (int)), this, SLOT (slotCmbCurve (int))); // activated() ignores code changes
 
   // Digitize toolbar
@@ -2455,6 +2477,11 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                  SETTINGS_CHECKLIST_GUIDE_DOCK_AREA,
                  SETTINGS_CHECKLIST_GUIDE_DOCK_GEOMETRY,
                  Qt::RightDockWidgetArea);
+  addDockWindow (m_dockFittingWindow,
+                 settings,
+                 SETTINGS_FITTING_WINDOW_DOCK_AREA,
+                 SETTINGS_FITTING_WINDOW_DOCK_GEOMETRY,
+                 Qt::RightDockWidgetArea);
   addDockWindow (m_dockGeometryWindow,
                  settings,
                  SETTINGS_GEOMETRY_WINDOW_DOCK_AREA,
@@ -2490,6 +2517,8 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                                                          QVariant (DEFAULT_HIGHLIGHT_OPACITY)).toDouble ());
   m_modelMainWindow.setSmallDialogs (settings.value (SETTINGS_SMALL_DIALOGS,
                                                      QVariant (DEFAULT_SMALL_DIALOGS)).toBool ());
+  m_modelMainWindow.setDragDropExport (settings.value (SETTINGS_DRAG_DROP_EXPORT,
+                                                       QVariant (DEFAULT_DRAG_DROP_EXPORT)).toBool ());
 
   updateSettingsMainWindow();
   updateSmallDialogs();
@@ -2522,6 +2551,14 @@ void MainWindow::settingsWrite ()
     settings.setValue (SETTINGS_CHECKLIST_GUIDE_DOCK_AREA, dockWidgetArea (m_dockChecklistGuide));
 
   }
+  if (m_dockFittingWindow->isFloating()) {
+
+    settings.setValue (SETTINGS_FITTING_WINDOW_DOCK_AREA, Qt::NoDockWidgetArea);
+    settings.setValue (SETTINGS_FITTING_WINDOW_DOCK_GEOMETRY, m_dockFittingWindow->saveGeometry());
+  } else {
+
+    settings.setValue (SETTINGS_FITTING_WINDOW_DOCK_AREA, dockWidgetArea (m_dockFittingWindow));
+  }
   if (m_dockGeometryWindow->isFloating()) {
 
     settings.setValue (SETTINGS_GEOMETRY_WINDOW_DOCK_AREA, Qt::NoDockWidgetArea);
@@ -2534,6 +2571,7 @@ void MainWindow::settingsWrite ()
   }
   settings.setValue (SETTINGS_BACKGROUND_IMAGE, m_cmbBackground->currentData().toInt());
   settings.setValue (SETTINGS_CHECKLIST_GUIDE_WIZARD, m_actionHelpChecklistGuideWizard->isChecked ());
+  settings.setValue (SETTINGS_DRAG_DROP_EXPORT, m_modelMainWindow.dragDropExport ());
   settings.setValue (SETTINGS_HIGHLIGHT_OPACITY, m_modelMainWindow.highlightOpacity());
   settings.setValue (SETTINGS_IMPORT_CROPPING, m_modelMainWindow.importCropping());
   settings.setValue (SETTINGS_IMPORT_PDF_RESOLUTION, m_modelMainWindow.pdfResolution ());
@@ -2805,6 +2843,7 @@ void MainWindow::slotCmbCurve(int /* index */)
 
   updateViewedCurves();
   updateViewsOfSettings();
+  updateFittingWindow();
   updateGeometryWindow();
 }
 
@@ -2894,45 +2933,93 @@ void MainWindow::slotEditCopy ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditCopy";
 
-  GraphicsItemsExtractor graphicsItemsExtractor;
-  const QList<QGraphicsItem*> &items = m_scene->selectedItems();
-  QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+  // Copy command is sent to FittingWindow or GeometryWindow, or processed locally
+  bool tableFittingIsActive, tableFittingIsCopyable;
+  bool tableGeometryIsActive, tableGeometryIsCopyable;
+  m_dockFittingWindow->getTableStatus (tableFittingIsActive, tableFittingIsCopyable); // Fitting window status
+  m_dockGeometryWindow->getTableStatus (tableGeometryIsActive, tableGeometryIsCopyable); // Geometry window status
 
-  CmdCopy *cmd = new CmdCopy (*this,
-                              m_cmdMediator->document(),
-                              pointIdentifiers);
-  m_digitizeStateContext->appendNewCmd (m_cmdMediator,
-                                        cmd);
+  if (tableFittingIsActive) {
+
+    // Send to FittingWindow
+    m_dockFittingWindow->doCopy ();
+
+  } else if (tableGeometryIsActive) {
+
+    // Send to GeometryWindow
+    m_dockGeometryWindow->doCopy ();
+
+  } else {
+
+    // Process curve points in main window
+    GraphicsItemsExtractor graphicsItemsExtractor;
+    const QList<QGraphicsItem*> &items = m_scene->selectedItems();
+    QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+
+    CmdCopy *cmd = new CmdCopy (*this,
+                                m_cmdMediator->document(),
+                                pointIdentifiers);
+    m_digitizeStateContext->appendNewCmd (m_cmdMediator,
+                                          cmd);
+  }
 }
 
 void MainWindow::slotEditCut ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditCut";
 
-  GraphicsItemsExtractor graphicsItemsExtractor;
-  const QList<QGraphicsItem*> &items = m_scene->selectedItems();
-  QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+  // Copy command is sent to FittingWindow or GeometryWindow, or processed locally
+  bool tableFittingIsActive, tableFittingIsCopyable;
+  bool tableGeometryIsActive, tableGeometryIsCopyable;
+  m_dockFittingWindow->getTableStatus (tableFittingIsActive, tableFittingIsCopyable); // Fitting window status
+  m_dockGeometryWindow->getTableStatus (tableGeometryIsActive, tableGeometryIsCopyable); // Geometry window status
 
-  CmdCut *cmd = new CmdCut (*this,
-                            m_cmdMediator->document(),
-                            pointIdentifiers);
-  m_digitizeStateContext->appendNewCmd (m_cmdMediator,
-                                        cmd);
+  if (tableFittingIsActive || tableGeometryIsActive) {
+
+    // Cannot delete from fitting or geometry windows
+
+  } else {
+
+    // Process curve points in main window
+    GraphicsItemsExtractor graphicsItemsExtractor;
+    const QList<QGraphicsItem*> &items = m_scene->selectedItems();
+    QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+
+    CmdCut *cmd = new CmdCut (*this,
+                              m_cmdMediator->document(),
+                              pointIdentifiers);
+    m_digitizeStateContext->appendNewCmd (m_cmdMediator,
+                                          cmd);
+  }
 }
 
 void MainWindow::slotEditDelete ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditDelete";
 
-  GraphicsItemsExtractor graphicsItemsExtractor;
-  const QList<QGraphicsItem*> &items = m_scene->selectedItems();
-  QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+  // Copy command is sent to FittingWindow or GeometryWindow, or processed locally
+  bool tableFittingIsActive, tableFittingIsCopyable;
+  bool tableGeometryIsActive, tableGeometryIsCopyable;
+  m_dockFittingWindow->getTableStatus (tableFittingIsActive, tableFittingIsCopyable); // Fitting window status
+  m_dockGeometryWindow->getTableStatus (tableGeometryIsActive, tableGeometryIsCopyable); // Geometry window status
 
-  CmdDelete *cmd = new CmdDelete (*this,
-                                  m_cmdMediator->document(),
-                                  pointIdentifiers);
-  m_digitizeStateContext->appendNewCmd (m_cmdMediator,
-                                        cmd);
+  if (tableFittingIsActive || tableGeometryIsActive) {
+
+    // Cannot delete from fitting or geometry windows
+
+  } else {
+
+    // Process curve points in main window
+    GraphicsItemsExtractor graphicsItemsExtractor;
+    const QList<QGraphicsItem*> &items = m_scene->selectedItems();
+    QStringList pointIdentifiers = graphicsItemsExtractor.selectedPointIdentifiers (items);
+
+    CmdDelete *cmd = new CmdDelete (*this,
+                                    m_cmdMediator->document(),
+                                    pointIdentifiers);
+    m_digitizeStateContext->appendNewCmd (m_cmdMediator,
+                                          cmd);
+  }
 }
 
 void MainWindow::slotEditMenu ()
@@ -2980,6 +3067,12 @@ void MainWindow::slotFileClose()
     m_digitizeStateContext->requestImmediateStateTransition (m_cmdMediator,
                                                              DIGITIZE_STATE_EMPTY);
 
+    // Deallocate fitted curve
+    if (m_fittingCurve != 0) {
+      m_scene->removeItem (m_fittingCurve);
+      m_fittingCurve = 0;
+    }
+
     // Remove screen objects
     m_scene->resetOnLoad ();
 
@@ -2988,6 +3081,9 @@ void MainWindow::slotFileClose()
 
     // Remove scroll bars if they exist
     m_scene->setSceneRect (QRectF (0, 0, 1, 1));
+
+    // Remove stale data from fitting window
+    m_dockFittingWindow->clear ();
 
     // Remove stale data from geometry window
     m_dockGeometryWindow->clear ();
@@ -3186,6 +3282,39 @@ bool MainWindow::slotFileSaveAs()
   }
 
   return false;
+}
+
+void MainWindow::slotFittingWindowClosed()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFittingWindowClosed";
+
+  m_actionViewFittingWindow->setChecked (false);
+}
+
+void MainWindow::slotFittingWindowCurveFit(FittingCurveCoefficients fittingCurveCoef,
+                                           double xMin,
+                                           double xMax,
+                                           bool isLogXTheta,
+                                           bool isLogYRadius)
+{
+  // Do not output elements in fittingCurveCoef here since that list may be empty
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFittingWindowCurveFit"
+                              << " order=" << fittingCurveCoef.size() - 1;
+
+  if (m_fittingCurve != 0) {
+    m_scene->removeItem (m_fittingCurve);
+    delete m_fittingCurve;
+    m_fittingCurve = 0;
+  }
+
+  m_fittingCurve = new FittingCurve (fittingCurveCoef,
+                                     xMin,
+                                     xMax,
+                                     isLogXTheta,
+                                     isLogYRadius,
+                                     m_transformation);
+  m_fittingCurve->setVisible (m_actionViewFittingWindow->isChecked ());
+  m_scene->addItem (m_fittingCurve);
 }
 
 void MainWindow::slotGeometryWindowClosed()
@@ -3447,6 +3576,15 @@ void MainWindow::slotSettingsSegments ()
   m_dlgSettingsSegments->show ();
 }
 
+void MainWindow::slotTableStatusChange ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotTableStatusChange";
+
+  // This slot is called when either window in FittingWindow or GeometryWindow loses/gains focus. This is
+  // so the Copy menu item can be updated
+  updateControls ();
+}
+
 void MainWindow::slotSettingsMainWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSettingsMainWindow";
@@ -3628,6 +3766,23 @@ void MainWindow::slotViewToolBarDigitize ()
     m_toolDigitize->show();
   } else {
     m_toolDigitize->hide();
+  }
+}
+
+void MainWindow::slotViewToolBarFittingWindow()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewToolBarFittingWindow";
+
+  if (m_actionViewFittingWindow->isChecked()) {
+    m_dockFittingWindow->show ();
+    if (m_fittingCurve != 0) {
+      m_fittingCurve->setVisible (true);
+    }
+  } else {
+    m_dockFittingWindow->hide ();
+    if (m_fittingCurve != 0) {
+      m_fittingCurve->setVisible (false);
+    }
   }
 }
 
@@ -4048,6 +4203,7 @@ void MainWindow::updateAfterCommand ()
 
   updateControls ();
   updateChecklistGuide ();
+  updateFittingWindow ();
   updateGeometryWindow();
 
   // Final action at the end of a redo/undo is to checkpoint the Document and GraphicsScene to log files
@@ -4145,10 +4301,20 @@ void MainWindow::updateControls ()
     m_actionEditUndo->setEnabled (m_cmdMediator->canUndo ());
     m_actionEditRedo->setEnabled (m_cmdMediator->canRedo () || m_cmdStackShadow->canRedo ());
   }
-  m_actionEditCut->setEnabled (m_scene->selectedItems().count () > 0);
-  m_actionEditCopy->setEnabled (m_scene->selectedItems().count () > 0);
+  bool tableFittingIsActive, tableFittingIsCopyable;
+  bool tableGeometryIsActive, tableGeometryIsCopyable;
+  m_dockFittingWindow->getTableStatus (tableFittingIsActive, tableFittingIsCopyable); // Fitting window status
+  m_dockGeometryWindow->getTableStatus (tableGeometryIsActive, tableGeometryIsCopyable); // Geometry window status
+  m_actionEditCut->setEnabled (!tableFittingIsActive &&
+                               !tableGeometryIsActive &&
+                               m_scene->selectedItems().count () > 0);
+  m_actionEditCopy->setEnabled ((!tableFittingIsActive && !tableGeometryIsActive && m_scene->selectedItems().count () > 0) ||
+                                (tableFittingIsActive && tableFittingIsCopyable) ||
+                                (tableGeometryIsActive && tableGeometryIsCopyable));
   m_actionEditPaste->setEnabled (false);
-  m_actionEditDelete->setEnabled (m_scene->selectedItems().count () > 0);
+  m_actionEditDelete->setEnabled (!tableFittingIsActive &&
+                                  !tableGeometryIsActive &&
+                                  m_scene->selectedItems().count () > 0);
   // m_actionEditPasteAsNew and m_actionEditPasteAsNewAdvanced are updated when m_menuEdit is about to be shown
 
   m_actionDigitizeAxis->setEnabled (!m_currentFile.isEmpty ());
@@ -4252,15 +4418,34 @@ void MainWindow::updateDigitizeStateIfSoftwareTriggered (DigitizeState digitizeS
   }
 }
 
+void MainWindow::updateFittingWindow ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateFittingWindow";
+
+  if (m_cmdMediator != 0 &&
+      m_cmbCurve != 0) {
+
+    // Update fitting window
+    m_dockFittingWindow->update (*m_cmdMediator,
+                                 m_modelMainWindow,
+                                 m_cmbCurve->currentText (),
+                                 m_transformation);
+  }
+}
+
 void MainWindow::updateGeometryWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateGeometryWindow";
 
-  // Update geometry window
-  m_dockGeometryWindow->update (*m_cmdMediator,
-                                m_modelMainWindow,
-                                m_cmbCurve->currentText (),
-                                m_transformation);
+  if (m_cmdMediator != 0 &&
+      m_cmbCurve != 0) {
+
+    // Update geometry window
+    m_dockGeometryWindow->update (*m_cmdMediator,
+                                  m_modelMainWindow,
+                                  m_cmbCurve->currentText (),
+                                  m_transformation);
+  }
 }
 
 void MainWindow::updateGraphicsLinesToMatchGraphicsPoints()
@@ -4449,6 +4634,8 @@ void MainWindow::updateSettingsMainWindow()
 
   updateHighlightOpacity();
   updateWindowTitle();
+  updateFittingWindow(); // Forward the drag and drop choice
+  updateGeometryWindow(); // Forward the drag and drop choice
 }
 
 void MainWindow::updateSettingsMainWindow(const MainWindowModel &modelMainWindow)

@@ -13,12 +13,12 @@
 #include "GeometryModel.h"
 #include "GeometryWindow.h"
 #include "Logger.h"
+#include "MainWindow.h"
 #include <QApplication>
 #include <QClipboard>
-#include <QHeaderView>
 #include <QItemSelectionModel>
-#include <QTableView>
 #include <QTextStream>
+#include "WindowTable.h"
 
 // Token constraints:
 // (1) should fit nicely into narrow columns. This eliminates details like Forward and Backward in the distance parameter tokens
@@ -32,8 +32,8 @@ const QString TokenIndex (QObject::tr ("Index"));
 const QString TokenDistanceGraph (QObject::tr ("Distance"));
 const QString TokenDistancePercent (QObject::tr ("Percent"));
 
-GeometryWindow::GeometryWindow (QWidget *parent) :
-  QDockWidget (parent)
+GeometryWindow::GeometryWindow (MainWindow *mainWindow) :
+  WindowAbstractBase (mainWindow)
 {
   setVisible (false);
   setAllowedAreas (Qt::AllDockWidgetAreas);
@@ -48,22 +48,13 @@ GeometryWindow::GeometryWindow (QWidget *parent) :
                     "Y = Y coordinate of each point\n\n"
                     "Index = Point number\n\n"
                     "Distance = Distance along the curve in forward or backward direction, in either graph units "
-                    "or as a percentage"));
+                    "or as a percentage\n\n"
+                    "If drag-and-drop is disabled, a rectangular set of cells may be selected by clicking and dragging. Otherwise, if "
+                    "drag-and-drop is enabled, a rectangular set of cells may be selected using Click then Shift+Click, since click and drag "
+                    "starts the dragging operation. Drag-and-drop mode is set in the Main Window settings"));
 
-  m_model = new GeometryModel;
-
-  m_view = new QTableView;
-  m_view->setModel (m_model); // Call before setSelectionModel since this also overrides the selection model
-  m_view->horizontalHeader()->hide();
-  m_view->verticalHeader()->hide();
-  m_view->setEditTriggers(QAbstractItemView::NoEditTriggers); // Control is read only
-  connect (m_view->selectionModel(), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)),
-           this, SLOT (slotSelectionChanged (const QItemSelection &, const QItemSelection &)));
-
-  setWidget (m_view);
-
+  createWidgets (mainWindow);
   loadStrategies();
-
   initializeHeader ();
 }
 
@@ -89,18 +80,34 @@ void GeometryWindow::closeEvent(QCloseEvent * /* event */)
   emit signalGeometryWindowClosed();
 }
 
-int GeometryWindow::fold2dIndexes (int row,
-                                   int col,
-                                   int rowLow,
-                                   int colLow,
-                                   int colHigh) const
-{
-  return (row - rowLow) * (colHigh - colLow + 1) + (col - colLow);
-}
-
 int GeometryWindow::columnBodyPointIdentifiers ()
 {
   return COLUMN_BODY_POINT_IDENTIFIERS;
+}
+
+void GeometryWindow::createWidgets (MainWindow *mainWindow)
+{
+  m_model = new GeometryModel;
+
+  m_view = new WindowTable (*m_model);
+  connect (m_view, SIGNAL (signalTableStatusChange ()),
+           mainWindow, SLOT (slotTableStatusChange ()));
+
+  setWidget (m_view);
+}
+
+void GeometryWindow::doCopy ()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "GeometryWindow::doCopy";
+
+  QString text = m_model->selectionAsText (m_modelExport.delimiter());
+
+  if (!text.isEmpty ()) {
+
+    // Save to clipboard
+    QApplication::clipboard ()->setText (text);
+
+  }
 }
 
 void GeometryWindow::initializeHeader ()
@@ -147,58 +154,11 @@ void GeometryWindow::slotPointHoverLeave (QString /* pointIdentifier */)
   m_model->setCurrentPointIdentifier ("");
 }
 
-void GeometryWindow::slotSelectionChanged (const QItemSelection & /* selected */,
-                                           const QItemSelection & /* deselected */)
+void GeometryWindow::unselectAll ()
 {
-  const bool NOT_GNUPLOT = false;
-
   QItemSelectionModel *selectionModel = m_view->selectionModel ();
-  QModelIndexList selection = selectionModel->selectedIndexes ();
 
-  if (selection.size () > 0) {
-
-    // Gather input. A rectangular grid that encompasses all selected indexes will be copied
-    int rowLow = 0, rowHigh = 0, colLow = 0, colHigh = 0;
-    bool isFirst = true;
-    for (QModelIndexList::const_iterator itr = selection.begin(); itr != selection.end(); itr++) {
-      QModelIndex index = *itr;
-      if (isFirst || index.row ()    < rowLow ) rowLow  = index.row ();
-      if (isFirst || index.row ()    > rowHigh) rowHigh = index.row ();
-      if (isFirst || index.column () < colLow ) colLow  = index.column ();
-      if (isFirst || index.column () > colHigh) colHigh = index.column ();
-      isFirst = false;
-    }
-
-    int numRows = rowHigh - rowLow + 1;
-    int numCols = colHigh - colLow + 1;
-
-    // Put data into two dimensional rowXcolumn table is handled as a flattened vector. Table is initialized
-    // with empty strings
-    QVector<QString> table (numRows * numCols);
-
-    for (int i = 0; i < selection.size (); i++) {
-      QModelIndex index = selection [i];
-      QVariant data = m_model->data (index);
-      QString text = data.toString ();
-      table [fold2dIndexes (index.row(), index.column(), rowLow, colLow, colHigh)] = text;
-    }
-
-    // Concatenate table into output string
-    QString output;
-    QTextStream str (&output);
-    for (int row = rowLow; row <= rowHigh; row++) {
-      QString delimiter;
-      for (int col = colLow; col <= colHigh; col++) {
-        str << delimiter << table [fold2dIndexes (row, col, rowLow, colLow, colHigh)];
-        delimiter = exportDelimiterToText (m_modelExport.delimiter(),
-                                           NOT_GNUPLOT);
-      }
-      str << "\n";
-    }
-
-    // Save to clipboard
-    QApplication::clipboard ()->setText (output);
-  }
+  selectionModel->clearSelection ();
 }
 
 void GeometryWindow::update (const CmdMediator &cmdMediator,
@@ -208,8 +168,10 @@ void GeometryWindow::update (const CmdMediator &cmdMediator,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "GeometryWindow::update";
 
-  // Save export format
+  // Save inputs
   m_modelExport = cmdMediator.document().modelExport();
+  m_model->setDelimiter (m_modelExport.delimiter());
+  m_view->setDragEnabled (modelMainWindow.dragDropExport());
 
   // Gather and calculate geometry data
   const Curve *curve = cmdMediator.document().curveForCurveName (curveSelected);
@@ -274,9 +236,7 @@ void GeometryWindow::update (const CmdMediator &cmdMediator,
   m_view->setColumnHidden (COLUMN_BODY_POINT_IDENTIFIERS, true);
 }
 
-void GeometryWindow::unselectAll ()
+QTableView *GeometryWindow::view () const
 {
-  QItemSelectionModel *selectionModel = m_view->selectionModel ();
-
-  selectionModel->clearSelection ();
+  return dynamic_cast<QTableView*> (m_view);
 }
