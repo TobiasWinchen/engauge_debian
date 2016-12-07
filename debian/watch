@@ -1,5 +1,5 @@
 version=3
-opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/engauge-$1\.tar\.gz/ \
+opts="dversionmangle=s/\+ds\.\d+$//,filenamemangle=s/\S+\/v?(\S+)\.tar\.gz/engauge-$1\.tar\.gz/" \
 https://github.com/markummitchell/engauge-digitizer/tags .*/v?(\d\S*)\.tar\.gz
 
 
