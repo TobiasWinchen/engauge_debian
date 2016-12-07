@@ -2,6 +2,7 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: engauge-digitizer
 Upstream-Contact: Mark Mitchell <markummitchell@gmail.com>
 Source: http://markummitchell.github.io/engauge-digitizer/ 
+Files-Excluded: dev/windows/* dev/osx/* samples/*
 
 Files: *
 Copyright: 2002-2016, Mark Mitchell <markummitchell@gmail.com> 
