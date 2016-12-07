@@ -1,16 +1,16 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: engauge-digitizer
-Upstream-Contact: Mark Mitchell <mmdigitizer@earthlink.net>
-Source: http://sf.net/digitizer/
+Upstream-Contact: Mark Mitchell <markummitchell@gmail.com>
+Source: http://markummitchell.github.io/engauge-digitizer/ 
 
 Files: *
-Copyright: 2002-2015, Mark Mitchell <mmdigitizer@earthlink.net>
+Copyright: 2002-2016, Mark Mitchell <markummitchell@gmail.com> 
            2011-2012, Tobias Richter <tsr-debian@achos.com>
 License: GPL-2+
 
 Files: debian/*
 Copyright: 2006-2011 Tobias Stefan Richter <tsr-debian@achos.com>
-           2011-2015, Tobias Winchen <tobias.winchen@physik.rwth-aachen.de>
+           2011-2015, Tobias Winchen <tobias@winchen.de>
 License: GPL-2+
 
 Files: src/Callback/functor.h
