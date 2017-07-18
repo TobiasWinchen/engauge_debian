@@ -43,6 +43,7 @@ Description: interactively extracts numbers from bitmap graphs or maps
 Package: engauge-digitizer-doc
 Section: doc
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends}
 Recommends: engauge-digitizer
 Description: engauge-digitizer user manual and tutorial
