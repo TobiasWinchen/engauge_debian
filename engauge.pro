@@ -24,10 +24,20 @@
 #    qmake "DEFINES+=HELPDIR=<directory>". The <directory> is absolute or relative to the application executable directory
 # 6) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
 #    include/library files in an automated and platform-independent manner, so it will not be removed
+# 7) 'network' module of Qt is not included for Windows version since installation file gets blocked by Avast antivirus.
+#    The network module can download files, which is what malware does to install bad things
 #
 # More comments are in the INSTALL file, and below
 
-QT += core gui help network printsupport widgets xml
+QT += core gui help printsupport widgets xml
+!win32 {
+  QT += network
+  DEFINES += "NETWORKING"
+  HEADERS += src/Load/LoadImageFromUrl.h \
+             src/Network/NetworkClient.h
+  SOURCES += src/Load/LoadImageFromUrl.cpp \
+             src/Network/NetworkClient.cpp
+}
 
 CONFIG(debug,debug|release){
   # Debug version:
@@ -65,6 +75,7 @@ HEADERS  += \
     src/Callback/CallbackNextOrdinal.h \
     src/Callback/CallbackPointOrdinal.h \
     src/Callback/CallbackRemovePointsInCurvesGraphs.h \
+    src/Callback/CallbackScaleBar.h \
     src/Callback/CallbackSceneUpdateAfterCommand.h \
     src/Callback/CallbackSearchReturn.h \
     src/Callback/CallbackUpdateTransform.h \
@@ -83,6 +94,7 @@ HEADERS  += \
     src/Cmd/CmdAddPointAxis.h \
     src/Cmd/CmdAddPointGraph.h \
     src/Cmd/CmdAddPointsGraph.h \
+    src/Cmd/CmdAddScale.h \    
     src/Cmd/CmdCopy.h \
     src/Cmd/CmdCut.h \
     src/Cmd/CmdDelete.h \
@@ -157,13 +169,17 @@ HEADERS  += \
     src/DigitizeState/DigitizeStateCurve.h \
     src/DigitizeState/DigitizeStateEmpty.h \
     src/DigitizeState/DigitizeStatePointMatch.h \
+    src/DigitizeState/DigitizeStateScale.h \    
     src/DigitizeState/DigitizeStateSegment.h \
     src/DigitizeState/DigitizeStateSelect.h \
     src/Dlg/DlgAbout.h \
     src/Dlg/DlgEditPointAxis.h \
     src/Dlg/DlgEditPointGraph.h \
     src/Dlg/DlgEditPointGraphLineEdit.h \
-    src/Dlg/DlgErrorReport.h \
+    src/Dlg/DlgEditScale.h \    
+    src/Dlg/DlgErrorReportAbstractBase.h \    
+    src/Dlg/DlgErrorReportLocal.h \
+    src/Dlg/DlgErrorReportNetworking.h \    
     src/Dlg/DlgFilterCommand.h \
     src/Dlg/DlgFilterThread.h \
     src/Dlg/DlgFilterWorker.h \
@@ -184,6 +200,7 @@ HEADERS  += \
     src/Dlg/DlgSettingsMainWindow.h \
     src/Dlg/DlgSettingsPointMatch.h \
     src/Dlg/DlgSettingsSegments.h \
+    src/Dlg/DlgValidatorAboveZero.h \
     src/Dlg/DlgValidatorAbstract.h \
     src/Dlg/DlgValidatorDateTime.h \
     src/Dlg/DlgValidatorDegreesMinutesSeconds.h \
@@ -293,7 +310,6 @@ HEADERS  += \
     src/util/LinearToLog.h \
     src/Line/LineStyle.h \
     src/Load/LoadFileInfo.h \
-    src/Load/LoadImageFromUrl.h \
     src/Logger/Logger.h \
     src/Logger/LoggerUpload.h \
     src/Matrix/Matrix.h \
@@ -303,7 +319,6 @@ HEADERS  += \
     src/util/MigrateToVersion6.h \
     src/Mime/MimePoints.h \
     src/util/mmsubs.h \
-    src/Network/NetworkClient.h \
     src/NonPdf/NonPdf.h \
     src/NonPdf/NonPdfCropping.h \
     src/NonPdf/NonPdfFrameHandle.h \
@@ -320,6 +335,7 @@ HEADERS  += \
     src/Point/PointShape.h \
     src/Point/PointStyle.h \
     src/util/QtToString.h \
+    src/ScaleBar/ScaleBarAxisPointsUnite.h \
     src/Segment/Segment.h \
     src/Segment/SegmentFactory.h \
     src/Segment/SegmentLine.h \
@@ -390,6 +406,7 @@ SOURCES += \
     src/Callback/CallbackNextOrdinal.cpp \
     src/Callback/CallbackPointOrdinal.cpp \
     src/Callback/CallbackRemovePointsInCurvesGraphs.cpp \
+    src/Callback/CallbackScaleBar.cpp \
     src/Callback/CallbackSceneUpdateAfterCommand.cpp \
     src/Callback/CallbackUpdateTransform.cpp \
     src/Checker/Checker.cpp \
@@ -407,6 +424,7 @@ SOURCES += \
     src/Cmd/CmdAddPointAxis.cpp \
     src/Cmd/CmdAddPointGraph.cpp \
     src/Cmd/CmdAddPointsGraph.cpp \
+    src/Cmd/CmdAddScale.cpp \
     src/Cmd/CmdCopy.cpp \
     src/Cmd/CmdCut.cpp \
     src/Cmd/CmdDelete.cpp \
@@ -478,13 +496,17 @@ SOURCES += \
     src/DigitizeState/DigitizeStateCurve.cpp \
     src/DigitizeState/DigitizeStateEmpty.cpp \
     src/DigitizeState/DigitizeStatePointMatch.cpp \
+    src/DigitizeState/DigitizeStateScale.cpp \        
     src/DigitizeState/DigitizeStateSegment.cpp \
     src/DigitizeState/DigitizeStateSelect.cpp \
     src/Dlg/DlgAbout.cpp \
     src/Dlg/DlgEditPointAxis.cpp \
     src/Dlg/DlgEditPointGraph.cpp \
     src/Dlg/DlgEditPointGraphLineEdit.cpp \
-    src/Dlg/DlgErrorReport.cpp \
+    src/Dlg/DlgEditScale.cpp \        
+    src/Dlg/DlgErrorReportAbstractBase.cpp \
+    src/Dlg/DlgErrorReportLocal.cpp \
+    src/Dlg/DlgErrorReportNetworking.cpp \
     src/Dlg/DlgFilterCommand.cpp \
     src/Dlg/DlgFilterThread.cpp \
     src/Dlg/DlgFilterWorker.cpp \
@@ -505,6 +527,7 @@ SOURCES += \
     src/Dlg/DlgSettingsMainWindow.cpp \
     src/Dlg/DlgSettingsPointMatch.cpp \
     src/Dlg/DlgSettingsSegments.cpp \
+    src/Dlg/DlgValidatorAboveZero.cpp \
     src/Dlg/DlgValidatorAbstract.cpp \
     src/Dlg/DlgValidatorDateTime.cpp \
     src/Dlg/DlgValidatorDegreesMinutesSeconds.cpp \
@@ -602,7 +625,6 @@ SOURCES += \
     src/util/LinearToLog.cpp \    
     src/Line/LineStyle.cpp \
     src/Load/LoadFileInfo.cpp \
-    src/Load/LoadImageFromUrl.cpp \
     src/Logger/Logger.cpp \
     src/Logger/LoggerUpload.cpp \
     src/Matrix/Matrix.cpp \
@@ -612,7 +634,6 @@ SOURCES += \
     src/util/MigrateToVersion6.cpp \
     src/Mime/MimePoints.cpp \
     src/util/mmsubs.cpp \
-    src/Network/NetworkClient.cpp \
     src/NonPdf/NonPdf.cpp \
     src/NonPdf/NonPdfCropping.cpp \
     src/NonPdf/NonPdfFrameHandle.cpp \
@@ -626,6 +647,7 @@ SOURCES += \
     src/Point/PointShape.cpp \
     src/Point/PointStyle.cpp \
     src/util/QtToString.cpp \
+    src/ScaleBar/ScaleBarAxisPointsUnite.cpp \
     src/Segment/Segment.cpp \
     src/Segment/SegmentFactory.cpp \
     src/Segment/SegmentLine.cpp \
@@ -762,6 +784,7 @@ INCLUDEPATH += src \
                src/Pdf \
                src/Plot \
                src/Point \
+               src/ScaleBar \
                src/Segment \
                src/Settings \
                src/Spline \
