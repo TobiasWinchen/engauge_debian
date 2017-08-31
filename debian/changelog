@@ -1,15 +1,15 @@
-engauge-digitizer (10.0+ds.1-1) UNRELEASED; urgency=medium
+engauge-digitizer (10.3+ds.1-1) unstable; urgency=medium
 
   * New upstream release
   * Updated to standards version 4.0.0
   * engauge-digitizer-doc as Multi-Arch: foreign
 
- -- Tobias Winchen <tobias@winchen.de>  Tue, 18 Jul 2017 13:59:11 +0200
+ -- Tobias Winchen <tobias@winchen.de>  Thu, 31 Aug 2017 20:35:40 +0200
 
 engauge-digitizer (9.7+ds.1-1) unstable; urgency=medium
 
   * New upstream release
-  * Repacked upstream archive to remove unneeded binary files 
+  * Repacked upstream archive to remove unneeded binary files
 
  -- Tobias Winchen <tobias@winchen.de>  Wed, 07 Dec 2016 21:18:35 +0100
 
@@ -22,7 +22,7 @@ engauge-digitizer (9.3-1) unstable; urgency=medium
 engauge-digitizer (9.1-1) unstable; urgency=medium
 
   * New upstream release
-  * Added hardening=+all 
+  * Added hardening=+all
   * Use secure uri for vcs-field
 
  -- Tobias Winchen <tobias@winchen.de>  Thu, 21 Jul 2016 10:21:27 +0200
@@ -30,13 +30,13 @@ engauge-digitizer (9.1-1) unstable; urgency=medium
 engauge-digitizer (8.3-1) unstable; urgency=medium
 
   * New upstream release
-    - New grid line removal dialog (Closes: #426421) 
+    - New grid line removal dialog (Closes: #426421)
     - Raw data export format for multiple curves available (Closes: #426579)
-    - Crosshair customizable (Closes: #426340) 
+    - Crosshair customizable (Closes: #426340)
   * Updated description in control to be consistent with appdata
-  * Removed obsolete dependency on libpng  
-  * Enabled support for jpeg2000 and pdf formats 
-  * Patch add_search_path_for_help included upstream 
+  * Removed obsolete dependency on libpng
+  * Enabled support for jpeg2000 and pdf formats
+  * Patch add_search_path_for_help included upstream
   * Added appdata information
   * Use provided .desktop file
 
@@ -52,14 +52,14 @@ engauge-digitizer (7.2-2) unstable; urgency=medium
 
 engauge-digitizer (7.2-1) unstable; urgency=medium
 
-  * New upstream release 
+  * New upstream release
     - New tutorial (Closes: #426036)
   * Fixed watch file
   * Fixed typos in control, copyright and .desktop
   * Update to standards version 3.9.6
-  * Removed menu file 
-  * Updated licenses 
-  * Added hardening flags 
+  * Removed menu file
+  * Updated licenses
+  * Added hardening flags
 
  -- Tobias Winchen <tobias@winchen.de>  Sun, 10 Apr 2016 14:42:11 +0200
 
@@ -73,7 +73,7 @@ engauge-digitizer (5.2-1) unstable; urgency=low
   * Minimum debian/rules files now using dh
   * Updated to standards version 3.9.5
   * Updated to debhelper 9
-  * Added patch from upstream allowing strict aliasing 
+  * Added patch from upstream allowing strict aliasing
   * Fixed lintian warnings in dep-5 copyright formatting
   * Added keywords to desktop file
   * Added Vcs-git and Vcs-Browser fields to debian/control
@@ -83,7 +83,7 @@ engauge-digitizer (5.2-1) unstable; urgency=low
 
 engauge-digitizer (5.0-3) unstable; urgency=low
 
-  * Added patch including mising header. Closes: #672068 (FTBFS with gcc-4.7) 
+  * Added patch including mising header. Closes: #672068 (FTBFS with gcc-4.7)
 
  -- Tobias Winchen <winchen@physik.rwth-aachen.de>  Thu, 17 May 2012 11:46:21 +0200
 
@@ -116,7 +116,7 @@ engauge-digitizer (4.1-2) unstable; urgency=low
   * remove dependency on libqt3-compat-headers by kind patch from Barry
     deFreese (Closes: #464391)
   * drop dpatch build dependency - currently not used
-  * minor changes to bump standards version to 3.7.3 
+  * minor changes to bump standards version to 3.7.3
 
  -- Tobias Stefan Richter <tsr-debian@achos.com>  Thu,  1 May 2008 00:02:04 +0100
 
