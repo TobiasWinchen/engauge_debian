@@ -60,7 +60,9 @@ class GeometryWindow;
 class Ghosts;
 class GraphicsScene;
 class GraphicsView;
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
 class HelpWindow;
+#endif
 class LoadImageFromUrl;
 class NetworkClient;
 class QAction;
@@ -72,6 +74,7 @@ class QGraphicsLineItem;
 class QMenu;
 class QPushButton;
 class QSettings;
+class QSignalMapper;
 class QTextStream;
 class QTimer;
 class QToolBar;
@@ -309,17 +312,9 @@ private slots:
   void slotViewToolBarGeometryWindow ();
   void slotViewToolBarSettingsViews ();
   void slotViewToolTips ();
-  void slotViewZoom16To1 ();
-  void slotViewZoom8To1 ();
-  void slotViewZoom4To1 ();
-  void slotViewZoom2To1 ();
-  void slotViewZoom1To1 ();
-  void slotViewZoom1To2 ();
-  void slotViewZoom1To4 ();
-  void slotViewZoom1To8 ();
-  void slotViewZoom1To16 ();
+  void slotViewZoomFactor (ZoomFactor);
+  void slotViewZoomFactorInt (int);
   void slotViewZoom (int);
-  void slotViewZoomFill ();
   void slotViewZoomIn ();
   void slotViewZoomInFromWheelEvent ();
   void slotViewZoomOut ();
@@ -368,9 +363,9 @@ private:
   void createStatusBar();
   void createToolBars();
   void createTutorial();
-  void createZoomMap ();
+  void createZoomMaps ();
   ZoomFactor currentZoomFactor () const;
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   void exportAllCoordinateSystemsAfterRegressionTests();
 #endif
   QString exportFilenameFromInputFilename (const QString &fileName) const;
@@ -412,6 +407,7 @@ private:
   void saveStartingDocumentSnapshot();
   void setCurrentFile(const QString &fileName);
   void setCurrentPathFromFile (const QString &fileName);
+  void setNonFillZoomFactor (ZoomFactor newZoomFactor);
   void setPixmap (const QString &curveSelected,
                   const QPixmap &pixmap);
   void settingsRead (bool isReset);
@@ -513,15 +509,32 @@ private:
   QAction *m_actionZoomOut;
   QAction *m_actionZoomIn;
   QActionGroup *m_groupZoom;
+  QSignalMapper *m_mapperZoomFactor;
   QAction *m_actionZoomFill;
   QAction *m_actionZoom16To1;
+  QAction *m_actionZoom16To1Farther;
+  QAction *m_actionZoom8To1Closer;
   QAction *m_actionZoom8To1;
+  QAction *m_actionZoom8To1Farther;
+  QAction *m_actionZoom4To1Closer;
   QAction *m_actionZoom4To1;
+  QAction *m_actionZoom4To1Farther;
+  QAction *m_actionZoom2To1Closer;
   QAction *m_actionZoom2To1;
+  QAction *m_actionZoom2To1Farther;
+  QAction *m_actionZoom1To1Closer;
   QAction *m_actionZoom1To1;
+  QAction *m_actionZoom1To1Farther;
+  QAction *m_actionZoom1To2Closer;
   QAction *m_actionZoom1To2;
+  QAction *m_actionZoom1To2Farther;
+  QAction *m_actionZoom1To4Closer;
   QAction *m_actionZoom1To4;
+  QAction *m_actionZoom1To4Farther;
+  QAction *m_actionZoom1To8Closer;
   QAction *m_actionZoom1To8;
+  QAction *m_actionZoom1To8Farther;
+  QAction *m_actionZoom1To16Closer;
   QAction *m_actionZoom1To16;
 
   QMenu *m_menuSettings;
@@ -572,7 +585,9 @@ private:
   QPushButton *m_btnShowAll;
   QToolBar *m_toolCoordSystem;
 
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)  
   HelpWindow *m_helpWindow;
+#endif
   TutorialDlg *m_tutorialDlg;
 
   CmdMediator *m_cmdMediator; /// Contains the Document as a private member
@@ -631,8 +646,9 @@ private:
   // Grid lines
   GridLines m_gridLines;
 
-  // Map between zoom enumerations. This eliminates the need for a switch statement
-  QMap<ZoomFactorInitial, ZoomFactor> m_zoomMap;
+  // Map to/from/between zoom enumerations. These eliminate the need for switch statements
+  QMap<ZoomFactorInitial, ZoomFactor> m_zoomMapFromInitial;
+  QMap<ZoomFactor, QAction*> m_zoomMapToAction;
 
   // Fitted curve. Null if not currently applicable/defined
   FittingCurve *m_fittingCurve;

@@ -25,18 +25,20 @@
 # 6) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
 #    include/library files in an automated and platform-independent manner, so it will not be removed
 # 7) 'network' module of Qt is not included for Windows version since installation file gets blocked by Avast antivirus.
+#    Likewise, it is not included for OSX since it is interpretted as a threat. 
 #    The network module can download files, which is what malware does to install bad things
+# 8) In OSX, QtHelp requires QtNetwork which is rejected by the operating system, so QtHelp is disabled
 #
 # More comments are in the INSTALL file, and below
 
-QT += core gui help printsupport widgets xml
-!win32 {
-  QT += network
-  DEFINES += "NETWORKING"
-  HEADERS += src/Load/LoadImageFromUrl.h \
-             src/Network/NetworkClient.h
-  SOURCES += src/Load/LoadImageFromUrl.cpp \
-             src/Network/NetworkClient.cpp
+QT += core gui printsupport widgets xml
+
+win32-*|linux-*|unix-* {
+QT += help
+HEADERS += src/Help/HelpBrowser.h \
+           src/Help/HelpWindow.h
+SOURCES += src/Help/HelpBrowser.cpp \
+           src/Help/HelpWindow.cpp
 }
 
 CONFIG(debug,debug|release){
@@ -103,7 +105,6 @@ HEADERS  += \
     src/Cmd/CmdFactory.h \
     src/Cmd/CmdMediator.h \
     src/Cmd/CmdMoveBy.h \
-    src/Cmd/CmdPaste.h \
     src/Cmd/CmdPointChangeBase.h \
     src/Cmd/CmdRedoForTest.h \
     src/Cmd/CmdSelectCoordSystem.h \
@@ -302,8 +303,6 @@ HEADERS  += \
     src/Grid/GridLines.h \
     src/Grid/GridLineStyle.h \
     src/Grid/GridRemoval.h \
-    src/Help/HelpBrowser.h \
-    src/Help/HelpWindow.h \
     src/Import/ImportCropping.h \
     src/Import/ImportCroppingUtilBase.h \
     src/Import/ImportCroppingUtilNonPdf.h \
@@ -317,7 +316,9 @@ HEADERS  += \
     src/main/MainWindow.h \
     src/main/MainWindowModel.h \
     src/util/MigrateToVersion6.h \
-    src/Mime/MimePoints.h \
+    src/Mime/MimePointsDetector.h \
+    src/Mime/MimePointsExport.h \
+    src/Mime/MimePointsImport.h \    
     src/util/mmsubs.h \
     src/NonPdf/NonPdf.h \
     src/NonPdf/NonPdfCropping.h \
@@ -385,6 +386,7 @@ HEADERS  += \
     src/Zoom/ZoomFactor.h \
     src/Zoom/ZoomFactorInitial.h \
     src/Zoom/ZoomLabels.h \
+    src/Zoom/ZoomTransition.h \
     src/util/ZValues.h
 
 SOURCES += \
@@ -433,7 +435,6 @@ SOURCES += \
     src/Cmd/CmdFactory.cpp \
     src/Cmd/CmdMediator.cpp \
     src/Cmd/CmdMoveBy.cpp \
-    src/Cmd/CmdPaste.cpp \
     src/Cmd/CmdRedoForTest.cpp \
     src/Cmd/CmdPointChangeBase.cpp \
     src/Cmd/CmdSelectCoordSystem.cpp \
@@ -618,8 +619,6 @@ SOURCES += \
     src/Grid/GridLineLimiter.cpp \
     src/Grid/GridLines.cpp \
     src/Grid/GridRemoval.cpp \
-    src/Help/HelpBrowser.cpp \
-    src/Help/HelpWindow.cpp \
     src/Import/ImportCroppingUtilBase.cpp \
     src/Import/ImportCroppingUtilNonPdf.cpp \
     src/util/LinearToLog.cpp \    
@@ -632,7 +631,9 @@ SOURCES += \
     src/main/MainWindow.cpp \
     src/main/MainWindowModel.cpp \
     src/util/MigrateToVersion6.cpp \
-    src/Mime/MimePoints.cpp \
+    src/Mime/MimePointsDetector.cpp \
+    src/Mime/MimePointsExport.cpp \
+    src/Mime/MimePointsImport.cpp \    
     src/util/mmsubs.cpp \
     src/NonPdf/NonPdf.cpp \
     src/NonPdf/NonPdfCropping.cpp \
@@ -692,6 +693,7 @@ SOURCES += \
     src/Window/WindowTable.cpp \    
     src/util/Xml.cpp \
     src/Zoom/ZoomLabels.cpp \
+    src/Zoom/ZoomTransition.cpp \
     src/util/ZValues.cpp
 
 macx-* {
@@ -707,11 +709,10 @@ macx-* {
   }
 
   QMAKE_LFLAGS += "-stdlib=libc++ -gdwarf-2"
+  # /usr/local/Cellar path below is for Travis builds
   INCLUDEPATH += $$(FFTW_HOME)/include \
                  $$(LOG4CPP_HOME)/include \
                  /usr/local/Cellar/qt5/5.5.1_2/lib/QtCore.framework/Versions/5/Headers \
-                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtHelp.framework/Versions/5/Headers \
-                 /usr/local/Cellar/qt5/5.5.1_2/lib/QtNetwork.framework/Versions/5/Headers \
                  /usr/local/Cellar/qt5/5.5.1_2/lib/QtPrintSupport.framework/Versions/5/Headers \
                  /usr/local/Cellar/qt5/5.5.1_2/lib/QtWidgets.framework/Versions/5/Headers \
                  /usr/local/Cellar/qt5/5.5.1_2/lib/QtXml.framework/Versions/5/Headers
@@ -739,6 +740,12 @@ win32-msvc* {
 }
 
 linux-* {
+  QT += network
+  DEFINES += "NETWORKING"
+  HEADERS += src/Load/LoadImageFromUrl.h \
+             src/Network/NetworkClient.h
+  SOURCES += src/Load/LoadImageFromUrl.cpp \
+             src/Network/NetworkClient.cpp
   INCLUDEPATH += $$(FFTW_HOME)/include \
                  $$(LOG4CPP_HOME)/include
   LIBS += -L/$$(FFTW_HOME)/lib -L$$(LOG4CPP_HOME)/lib

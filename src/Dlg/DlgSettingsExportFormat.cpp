@@ -34,13 +34,17 @@
 #include "Settings.h"
 #include "Transformation.h"
 
+// Colors that should match the help text for m_editPreview
+const QString COLOR_FUNCTIONS = ("#DDDDFF");
+const QString COLOR_RELATIONS = ("#DDFFDD");
+
 const int MIN_INDENT_COLUMN_WIDTH = 20;
 const int MIN_HEADER_EMPTY_COLUMN_WIDTH = 10;
 const int MIN_EDIT_WIDTH = 110;
 const int MAX_EDIT_WIDTH = 180;
 
 const int TAB_WIDGET_INDEX_FUNCTIONS = 0;
-//const int TAB_WIDGET_INDEX_RELATIONS = 1;
+const int TAB_WIDGET_INDEX_RELATIONS = 1;
 
 const QString EMPTY_PREVIEW;
 
@@ -52,7 +56,9 @@ DlgSettingsExportFormat::DlgSettingsExportFormat(MainWindow &mainWindow) :
                            "DlgSettingsExportFormat",
                            mainWindow),
   m_modelExportBefore (0),
-  m_modelExportAfter (0)
+  m_modelExportAfter (0),
+  m_haveFunction (false),
+  m_haveRelation (false)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::DlgSettingsExportFormat";
 
@@ -156,24 +162,24 @@ void DlgSettingsExportFormat::createFileLayout (QHBoxLayout *layoutMisc)
   QVBoxLayout *layoutLayout = new QVBoxLayout;
   groupLayout->setLayout (layoutLayout);
 
-  m_btnFunctionsLayoutAllCurves = new QRadioButton (tr ("All curves on each line"));
-  m_btnFunctionsLayoutAllCurves->setWhatsThis (tr ("Exported file will have, on each line, "
+  m_btnCurvesLayoutAllCurves = new QRadioButton (tr ("All curves on each line"));
+  m_btnCurvesLayoutAllCurves->setWhatsThis (tr ("Exported file will have, on each line, "
                                                    "an X value, the Y value for the first curve, the Y value for the second curve,..."));
-  layoutLayout->addWidget (m_btnFunctionsLayoutAllCurves);
-  connect (m_btnFunctionsLayoutAllCurves, SIGNAL (released()), this, SLOT (slotFunctionsLayoutAllCurves ()));
+  layoutLayout->addWidget (m_btnCurvesLayoutAllCurves);
+  connect (m_btnCurvesLayoutAllCurves, SIGNAL (released()), this, SLOT (slotFunctionsLayoutAllCurves ()));
 
-  m_btnFunctionsLayoutOneCurve = new QRadioButton (tr ("One curve on each line"));
-  m_btnFunctionsLayoutOneCurve->setWhatsThis (tr ("Exported file will have all the points for "
+  m_btnCurvesLayoutOneCurve = new QRadioButton (tr ("One curve on each line"));
+  m_btnCurvesLayoutOneCurve->setWhatsThis (tr ("Exported file will have all the points for "
                                                   "the first curve, with one X-Y pair on each line, then the points for the second curve,..."));
-  layoutLayout->addWidget (m_btnFunctionsLayoutOneCurve);
-  connect (m_btnFunctionsLayoutOneCurve, SIGNAL (released()), this, SLOT (slotFunctionsLayoutOneCurve ()));
+  layoutLayout->addWidget (m_btnCurvesLayoutOneCurve);
+  connect (m_btnCurvesLayoutOneCurve, SIGNAL (released()), this, SLOT (slotFunctionsLayoutOneCurve ()));
 }
 
 void DlgSettingsExportFormat::createFunctionsPointsSelection (QHBoxLayout *layoutFunctions)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createFunctionsPointsSelection";
 
-  QGroupBox *groupPointsSelection = new QGroupBox (tr ("Points Selection"));
+  QGroupBox *groupPointsSelection = new QGroupBox (tr ("Function Points Selection"));
   layoutFunctions->addWidget (groupPointsSelection, 1);
 
   QGridLayout *layoutPointsSelections = new QGridLayout;
@@ -186,6 +192,7 @@ void DlgSettingsExportFormat::createFunctionsPointsSelection (QHBoxLayout *layou
   layoutPointsSelections->setColumnStretch (3, 1);
 
   int row = 0;
+
   m_btnFunctionsPointsAllCurves = new QRadioButton (tr ("Interpolate Ys at Xs from all curves"));
   m_btnFunctionsPointsAllCurves->setWhatsThis (tr ("Exported file will have values at every unique X "
                                                    "value from every curve. Y values will be linearly interpolated if necessary"));
@@ -288,12 +295,29 @@ void DlgSettingsExportFormat::createPreview(QGridLayout *layout, int &row)
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createPreview";
 
   QLabel *label = new QLabel (tr ("Preview"));
-  layout->addWidget (label, row++, 0, 1, 3);
+  layout->addWidget (label, row, 0, 1, 3);
+
+  // Legend. Padding and margin in rich text do not work so &nbsp; is used for spacing
+  QLabel *labelLegend = new QLabel;
+  labelLegend->setTextFormat (Qt::RichText);
+  QString legendHtml = QString ("<span style=\"background-color: %1\">&nbsp;Functions&nbsp;</span>"
+                                "&nbsp;&nbsp;&nbsp;"
+                                "<span style=\"background-color: %2\">&nbsp;Relations&nbsp;</span>")
+      .arg (COLOR_FUNCTIONS)
+      .arg (COLOR_RELATIONS);
+  labelLegend->setText (legendHtml);
+  layout->addWidget (labelLegend, row++, 1, 1, 2, Qt::AlignRight);
 
   m_editPreview = new QTextEdit;
   m_editPreview->setReadOnly (true);
-  m_editPreview->setWhatsThis (tr ("Preview window shows how current settings affect the exported file"));
+  m_editPreview->setWhatsThis (tr ("Preview window shows how current settings affect the exported file.\n\n"
+                                   "Functions (shown here in blue) are output first, followed by relations "
+                                   "(shown here in green) if any exist."));
   m_editPreview->setMinimumHeight (MINIMUM_PREVIEW_HEIGHT);
+  m_editPreview->document()->setDefaultStyleSheet("div { padding-left: 20px; }");
+  QPalette p = m_editPreview->palette();
+  p.setColor (QPalette::Base, QColor (240, 240, 240)); // Replace attention-getting white border by gray
+  m_editPreview->setPalette (p);
 
   layout->addWidget (m_editPreview, row++, 0, 1, 3);
 }
@@ -302,7 +326,7 @@ void DlgSettingsExportFormat::createRelationsPointsSelection (QHBoxLayout *layou
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createRelationsPointsSelection";
 
-  QGroupBox *groupPointsSelection = new QGroupBox (tr ("Points Selection"));
+  QGroupBox *groupPointsSelection = new QGroupBox (tr ("Relation Points Selection"));
   layoutRelations->addWidget (groupPointsSelection);
 
   QGridLayout *layoutPointsSelections = new QGridLayout;
@@ -315,6 +339,7 @@ void DlgSettingsExportFormat::createRelationsPointsSelection (QHBoxLayout *layou
   layoutPointsSelections->setColumnStretch (3, 1);
 
   int row = 0;
+
   m_btnRelationsPointsEvenlySpaced = new QRadioButton (tr ("Interpolate Xs and Ys at evenly spaced intervals."));
   m_btnRelationsPointsEvenlySpaced->setWhatsThis (tr ("Exported file will have points evenly spaced along each relation, separated by the interval "
                                                       "selected below. If the last interval does not end at the last point, then a shorter last interval "
@@ -439,6 +464,25 @@ void DlgSettingsExportFormat::createXLabel (QGridLayout *layoutHeader,
   connect (m_editXLabel, SIGNAL (textChanged (const QString &)), this, SLOT (slotXLabel(const QString &)));
 }
 
+QString DlgSettingsExportFormat::exportedTextToExportedHtml (const QString &text,
+                                                             const QString &color) const
+{
+  QRegExp re ("<br>$");
+
+  QString textCopy (text);
+  QString replaced = textCopy
+      .replace ("\n", "<br>")
+      .replace (" ", "&nbsp;")
+      .replace (re, "")
+      .replace ("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
+  QString html = QString ("<div style=\"display: inline; background-color: %1\">%2</div>")
+    .arg (color)
+    .arg (replaced);
+
+  return html;
+}
+
 bool DlgSettingsExportFormat::goodIntervalFunctions() const
 {
   // LOG4CPP_INFO_S is below
@@ -555,8 +599,8 @@ void DlgSettingsExportFormat::load (CmdMediator &cmdMediator)
   m_btnFunctionsPointsRaw->setChecked (pointsSelectionFunctions == EXPORT_POINTS_SELECTION_FUNCTIONS_RAW);
 
   ExportLayoutFunctions layoutFunctions = m_modelExportAfter->layoutFunctions ();
-  m_btnFunctionsLayoutAllCurves->setChecked (layoutFunctions == EXPORT_LAYOUT_ALL_PER_LINE);
-  m_btnFunctionsLayoutOneCurve->setChecked (layoutFunctions == EXPORT_LAYOUT_ONE_PER_LINE);
+  m_btnCurvesLayoutAllCurves->setChecked (layoutFunctions == EXPORT_LAYOUT_ALL_PER_LINE);
+  m_btnCurvesLayoutOneCurve->setChecked (layoutFunctions == EXPORT_LAYOUT_ONE_PER_LINE);
 
   ExportPointsSelectionRelations pointsSelectionRelations = m_modelExportAfter->pointsSelectionRelations();
   m_btnRelationsPointsEvenlySpaced->setChecked (pointsSelectionRelations == EXPORT_POINTS_SELECTION_RELATIONS_INTERPOLATE);
@@ -589,6 +633,7 @@ void DlgSettingsExportFormat::load (CmdMediator &cmdMediator)
 
   initializeIntervalConstraints ();
 
+  updateControlsUponLoad (); // Before updateControls so m_haveFunction and m_haveRelation are set
   updateControls();
   updateIntervalConstraints();
   enableOk (false); // Disable Ok button since there not yet any changes
@@ -942,10 +987,53 @@ void DlgSettingsExportFormat::updateControls ()
   m_btnInclude->setEnabled (selectedForInclude > 0); // Need at least one selection
   m_btnExclude->setEnabled ((selectedForExclude > 0) && (inInclude - selectedForExclude > 0)); // Need at least one selection, and one left after the move
 
-  m_editFunctionsPointsEvenlySpacing->setEnabled (m_btnFunctionsPointsEvenlySpaced->isChecked ());
-  m_editRelationsPointsEvenlySpacing->setEnabled (m_btnRelationsPointsEvenlySpaced->isChecked ());
+  m_editFunctionsPointsEvenlySpacing->setEnabled (m_haveFunction && m_btnFunctionsPointsEvenlySpaced->isChecked ());
+  m_editRelationsPointsEvenlySpacing->setEnabled (m_haveRelation && m_btnRelationsPointsEvenlySpaced->isChecked ());
 
   m_editXLabel->setEnabled (!m_btnHeaderNone->isChecked());
+}
+
+void DlgSettingsExportFormat::updateControlsUponLoad ()
+{
+  CurveStyles curveStyles = cmdMediator().document().modelCurveStyles();
+
+  m_haveFunction = false;
+  m_haveRelation = false;
+
+  QStringList curveNames = curveStyles.curveNames();
+
+  QStringList::const_iterator itr;
+  for (itr = curveNames.begin(); itr != curveNames.end (); itr++) {
+    QString curveName = *itr;
+    CurveStyle curveStyle = curveStyles.curveStyle (curveName);
+    CurveConnectAs curveConnectAs = curveStyle.lineStyle().curveConnectAs();
+    if (curveConnectAs == CONNECT_AS_FUNCTION_SMOOTH || curveConnectAs == CONNECT_AS_FUNCTION_STRAIGHT) {
+      m_haveFunction = true;
+    } else if (curveConnectAs == CONNECT_AS_RELATION_SMOOTH || curveConnectAs == CONNECT_AS_RELATION_STRAIGHT) {
+      m_haveRelation = true;
+    }
+  }
+
+  // Enable function-specific widgets if appropriate
+  m_btnFunctionsPointsAllCurves->setEnabled (m_haveFunction);
+  m_btnFunctionsPointsFirstCurve->setEnabled (m_haveFunction);
+  m_btnFunctionsPointsEvenlySpaced->setEnabled (m_haveFunction);
+  m_editFunctionsPointsEvenlySpacing->setEnabled (m_haveFunction);
+  m_cmbFunctionsPointsEvenlySpacingUnits->setEnabled (m_haveFunction);
+  m_btnFunctionsPointsRaw->setEnabled (m_haveFunction);
+
+  // Enable relation-specific widgets if appropriate
+  m_btnRelationsPointsEvenlySpaced->setEnabled (m_haveRelation);
+  m_editRelationsPointsEvenlySpacing->setEnabled (m_haveRelation);
+  m_cmbRelationsPointsEvenlySpacingUnits->setEnabled (m_haveRelation);
+  m_btnRelationsPointsRaw->setEnabled (m_haveRelation);
+
+  // Do not start with a tab that does not apply to the current set of functions/relations
+  if (!m_haveRelation) {
+    m_tabWidget->setCurrentIndex (TAB_WIDGET_INDEX_FUNCTIONS);
+  } else if (!m_haveFunction) {
+    m_tabWidget->setCurrentIndex (TAB_WIDGET_INDEX_RELATIONS);
+  }
 }
 
 void DlgSettingsExportFormat::updateIntervalConstraints ()
@@ -984,37 +1072,52 @@ void DlgSettingsExportFormat::updatePreview()
   // Save the scroll position for continuity before and after the preview update
   int scrollPosition = m_editPreview->verticalScrollBar()->value();
 
-  QString exportedText;
-  QTextStream str (&exportedText);
+  QString exportedTextFunctions, exportedTextRelations, exportedHtml;
+  QTextStream strFunctions (&exportedTextFunctions);
+  QTextStream strRelations (&exportedTextRelations);
 
   if (mainWindow().transformation().transformIsDefined()) {
 
-    // Transformation is defined so we can create a preview
-    if (m_tabWidget->currentIndex() == TAB_WIDGET_INDEX_FUNCTIONS) {
+    unsigned int numWritesSoFar = 0;
 
-      ExportFileFunctions exportStrategy;
-      exportStrategy.exportToFile (*m_modelExportAfter,
-                                   cmdMediator().document(),
-                                   mainWindow().modelMainWindow(),
-                                   mainWindow().transformation(),
-                                   str);
+    ExportFileFunctions exportStrategyFunctions;
+    exportStrategyFunctions.exportToFile (*m_modelExportAfter,
+                                          cmdMediator().document(),
+                                          mainWindow().modelMainWindow(),
+                                          mainWindow().transformation(),
+                                          strFunctions,
+                                          numWritesSoFar);
 
-    } else {
+    ExportFileRelations exportStrategyRelations;
+    exportStrategyRelations.exportToFile (*m_modelExportAfter,
+                                          cmdMediator().document(),
+                                          mainWindow().modelMainWindow(),
+                                          mainWindow().transformation(),
+                                          strRelations,
+                                          numWritesSoFar);
 
-      ExportFileRelations exportStrategy;
-      exportStrategy.exportToFile (*m_modelExportAfter,
-                                   cmdMediator().document(),
-                                   mainWindow().modelMainWindow(),
-                                   mainWindow().transformation(),
-                                   str);
+    // Use html to set background color. A <div> fills the whole background, unlike a <span>.
+    // Final carriage return is removed to prevent unwanted blank line. A requirement is that
+    // if there are no functions then no empty <div> appears (too confusing), and likewise if
+    // there are no relations
+    QString exportedHtmlFunctions, exportedHtmlRelations;
+    if (! exportedTextFunctions.isEmpty ()) {
 
+      exportedHtmlFunctions = exportedTextToExportedHtml (exportedTextFunctions, COLOR_FUNCTIONS);
     }
+    if (! exportedTextRelations.isEmpty ()) {
+
+      exportedHtmlRelations = exportedTextToExportedHtml (exportedTextRelations, COLOR_RELATIONS);
+    }
+
+    exportedHtml = exportedHtmlFunctions + exportedHtmlRelations;
+
   } else {
 
-    str << "Preview is unavailable until axis points are defined.";
+    exportedHtml = tr ("Preview is unavailable until axis points are defined.");
   }
 
-  m_editPreview->setText (exportedText);
+  m_editPreview->setHtml (exportedHtml);
 
   // Restore scroll position
   m_editPreview->verticalScrollBar()->setValue (scrollPosition);
