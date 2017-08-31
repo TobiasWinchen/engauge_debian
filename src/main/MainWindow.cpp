@@ -1,3 +1,4 @@
+
 /******************************************************************************************************
  * (C) 2014 markummitchell@github.com. This file is part of Engauge Digitizer, which is released      *
  * under GNU General Public License version 2 (GPLv2) or (at your option) any later version. See file *
@@ -13,6 +14,7 @@
 #include "img/bannerapp_256.xpm"
 #include "ChecklistGuide.h"
 #include "ChecklistGuideWizard.h"
+#include "CmdAddPointsGraph.h"
 #include "CmdCopy.h"
 #include "CmdCut.h"
 #include "CmdDelete.h"
@@ -64,7 +66,9 @@
 #include "GraphicsView.h"
 #include "GridLineFactory.h"
 #include "GridLineLimiter.h"
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
 #include "HelpWindow.h"
+#endif
 #ifdef ENGAUGE_JPEG2000
 #include "Jpeg2000.h"
 #endif // ENGAUGE_JPEG2000
@@ -75,6 +79,7 @@
 #include "Logger.h"
 #include "MainTitleBarFormat.h"
 #include "MainWindow.h"
+#include "MimePointsImport.h"
 #ifdef NETWORKING
 #include "NetworkClient.h"
 #endif
@@ -85,6 +90,7 @@
 #include "PdfResolution.h"
 #include <QAction>
 #include <QApplication>
+#include <QClipboard>
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QDebug>
@@ -99,15 +105,21 @@
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QLabel>
+#include <qmath.h>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QProcess>
+#include <QPushButton>
 #include <QSettings>
+#include <QSignalMapper>
 #include <QTextStream>
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
 #include <QtHelp>
+#endif
 #include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
@@ -126,6 +138,7 @@
 #include "ViewSegmentFilter.h"
 #include "ZoomFactor.h"
 #include "ZoomFactorInitial.h"
+#include "ZoomTransition.h"
 
 const QString EMPTY_FILENAME ("");
 const char *ENGAUGE_FILENAME_DESCRIPTION = "Engauge Document";
@@ -175,7 +188,9 @@ MainWindow::MainWindow(const QString &errorReportFile,
 
   setCurrentFile ("");
   createIcons();
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   setWindowFlags (Qt::WindowContextHelpButtonHint | windowFlags ()); // Add help to default buttons
+#endif
   setWindowTitle (engaugeWindowTitle ());
 
   createCentralWidget();
@@ -194,7 +209,7 @@ MainWindow::MainWindow(const QString &errorReportFile,
   createStateContextTransformation ();
   createSettingsDialogs ();
   createCommandStackShadow ();
-  createZoomMap ();
+  createZoomMaps ();
   updateControls ();
 
   settingsRead (isReset); // This changes the current directory when not regression testing
@@ -263,8 +278,8 @@ void MainWindow::applyZoomFactorAfterLoad()
   ZoomFactor zoomFactor;
   ZoomFactorInitial zoomFactorInitial = m_modelMainWindow.zoomFactorInitial();
 
-  if (m_zoomMap.contains (zoomFactorInitial)) {
-    zoomFactor = m_zoomMap [zoomFactorInitial];
+  if (m_zoomMapFromInitial.contains (zoomFactorInitial)) {
+    zoomFactor = m_zoomMapFromInitial [zoomFactorInitial];
   } else if (zoomFactorInitial == ZOOM_INITIAL_PREVIOUS) {
     zoomFactor = currentZoomFactor ();
   } else {
@@ -534,7 +549,7 @@ void MainWindow::createActionsFile ()
                                   "Opens an existing document."));
   connect (m_actionOpen, SIGNAL (triggered ()), this, SLOT (slotFileOpen ()));
 
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     QAction *recentFileAction = new QAction (this);
     recentFileAction->setVisible (true);
@@ -607,7 +622,7 @@ void MainWindow::createActionsHelp ()
                                           "and/or point"));
   connect (m_actionHelpTutorial, SIGNAL (triggered ()), this, SLOT (slotHelpTutorial()));
 
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   m_actionHelpHelp = new QAction (tr ("Help"), this);
   m_actionHelpHelp->setShortcut (QKeySequence::HelpContents);
   m_actionHelpHelp->setStatusTip (tr ("Help documentation"));
@@ -877,66 +892,193 @@ void MainWindow::createActionsView ()
   // setShortCut is called by updateSettingsMainWindow
   connect (m_actionZoomIn, SIGNAL (triggered ()), this, SLOT (slotViewZoomIn ()));
 
+  m_mapperZoomFactor = new QSignalMapper (this);
+  connect (m_mapperZoomFactor, SIGNAL (mapped (int)), this, SLOT (slotViewZoomFactorInt (int)));
+
   m_actionZoom16To1 = new QAction (tr ("16:1 (1600%)"), this);
   m_actionZoom16To1->setCheckable (true);
   m_actionZoom16To1->setStatusTip (tr ("Zoom 16:1"));
-  connect (m_actionZoom16To1, SIGNAL (triggered ()), this, SLOT (slotViewZoom16To1 ()));
+  connect (m_actionZoom16To1, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom16To1, ZOOM_16_TO_1);
+
+  m_actionZoom16To1Farther = new QAction (tr ("16:1 farther (1270%)"), this);
+  m_actionZoom16To1Farther->setCheckable (true);
+  m_actionZoom16To1Farther->setStatusTip (tr ("Zoom 12.7:1"));
+  connect (m_actionZoom16To1Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom16To1Farther, ZOOM_16_TO_1_FARTHER);
+
+  m_actionZoom8To1Closer = new QAction (tr ("8:1 closer (1008%)"), this);
+  m_actionZoom8To1Closer->setCheckable (true);
+  m_actionZoom8To1Closer->setStatusTip (tr ("Zoom 10.08:1"));
+  connect (m_actionZoom8To1Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom8To1Closer, ZOOM_8_TO_1_CLOSER);
 
   m_actionZoom8To1 = new QAction (tr ("8:1 (800%)"), this);
   m_actionZoom8To1->setCheckable (true);
   m_actionZoom8To1->setStatusTip (tr ("Zoom 8:1"));
-  connect (m_actionZoom8To1, SIGNAL (triggered ()), this, SLOT (slotViewZoom8To1 ()));
+  connect (m_actionZoom8To1, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom8To1, ZOOM_8_TO_1);
+
+  m_actionZoom8To1Farther = new QAction (tr ("8:1 farther (635%)"), this);
+  m_actionZoom8To1Farther->setCheckable (true);
+  m_actionZoom8To1Farther->setStatusTip (tr ("Zoom 6.35:1"));
+  connect (m_actionZoom8To1Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom8To1Farther, ZOOM_8_TO_1_FARTHER);
+
+  m_actionZoom4To1Closer = new QAction (tr ("4:1 closer (504%)"), this);
+  m_actionZoom4To1Closer->setCheckable (true);
+  m_actionZoom4To1Closer->setStatusTip (tr ("Zoom 5.04:1"));
+  connect (m_actionZoom4To1Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom4To1Closer, ZOOM_4_TO_1_CLOSER);
 
   m_actionZoom4To1 = new QAction (tr ("4:1 (400%)"), this);
   m_actionZoom4To1->setCheckable (true);
   m_actionZoom4To1->setStatusTip (tr ("Zoom 4:1"));
-  connect (m_actionZoom4To1, SIGNAL (triggered ()), this, SLOT (slotViewZoom4To1 ()));
+  connect (m_actionZoom4To1, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom4To1, ZOOM_4_TO_1);
+
+  m_actionZoom4To1Farther = new QAction (tr ("4:1 farther (317%)"), this);
+  m_actionZoom4To1Farther->setCheckable (true);
+  m_actionZoom4To1Farther->setStatusTip (tr ("Zoom 3.17:1"));
+  connect (m_actionZoom4To1Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom4To1Farther, ZOOM_4_TO_1_FARTHER);
+
+  m_actionZoom2To1Closer = new QAction (tr ("2:1 closer (252%)"), this);
+  m_actionZoom2To1Closer->setCheckable (true);
+  m_actionZoom2To1Closer->setStatusTip (tr ("Zoom 2.52:1"));
+  connect (m_actionZoom2To1Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom2To1Closer, ZOOM_2_TO_1_CLOSER);
 
   m_actionZoom2To1 = new QAction (tr ("2:1 (200%)"), this);
   m_actionZoom2To1->setCheckable (true);
   m_actionZoom2To1->setStatusTip (tr ("Zoom 2:1"));
-  connect (m_actionZoom2To1, SIGNAL (triggered ()), this, SLOT (slotViewZoom2To1 ()));
+  connect (m_actionZoom2To1, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom2To1, ZOOM_2_TO_1);
+
+  m_actionZoom2To1Farther = new QAction (tr ("2:1 farther (159%)"), this);
+  m_actionZoom2To1Farther->setCheckable (true);
+  m_actionZoom2To1Farther->setStatusTip (tr ("Zoom 1.59:1"));
+  connect (m_actionZoom2To1Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom2To1Farther, ZOOM_2_TO_1_FARTHER);
+
+  m_actionZoom1To1Closer = new QAction (tr ("1:1 closer (126%)"), this);
+  m_actionZoom1To1Closer->setCheckable (true);
+  m_actionZoom1To1Closer->setChecked (true);
+  m_actionZoom1To1Closer->setStatusTip (tr ("Zoom 1.3:1"));
+  connect (m_actionZoom1To1Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To1Closer, ZOOM_1_TO_1_CLOSER);
 
   m_actionZoom1To1 = new QAction (tr ("1:1 (100%)"), this);
   m_actionZoom1To1->setCheckable (true);
   m_actionZoom1To1->setChecked (true);
   m_actionZoom1To1->setStatusTip (tr ("Zoom 1:1"));
-  connect (m_actionZoom1To1, SIGNAL (triggered ()), this, SLOT (slotViewZoom1To1 ()));
+  connect (m_actionZoom1To1, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To1, ZOOM_1_TO_1);
+
+  m_actionZoom1To1Farther = new QAction (tr ("1:1 farther (79%)"), this);
+  m_actionZoom1To1Farther->setCheckable (true);
+  m_actionZoom1To1Farther->setChecked (true);
+  m_actionZoom1To1Farther->setStatusTip (tr ("Zoom 0.8:1"));
+  connect (m_actionZoom1To1Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To1Farther, ZOOM_1_TO_1_FARTHER);
+
+  m_actionZoom1To2Closer = new QAction (tr ("1:2 closer (63%)"), this);
+  m_actionZoom1To2Closer->setCheckable (true);
+  m_actionZoom1To2Closer->setStatusTip (tr ("Zoom 1.3:2"));
+  connect (m_actionZoom1To2Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To2Closer, ZOOM_1_TO_2_CLOSER);
 
   m_actionZoom1To2 = new QAction (tr ("1:2 (50%)"), this);
   m_actionZoom1To2->setCheckable (true);
   m_actionZoom1To2->setStatusTip (tr ("Zoom 1:2"));
-  connect (m_actionZoom1To2, SIGNAL (triggered ()), this, SLOT (slotViewZoom1To2 ()));
+  connect (m_actionZoom1To2, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To2, ZOOM_1_TO_2);
+
+  m_actionZoom1To2Farther = new QAction (tr ("1:2 farther (40%)"), this);
+  m_actionZoom1To2Farther->setCheckable (true);
+  m_actionZoom1To2Farther->setStatusTip (tr ("Zoom 0.8:2"));
+  connect (m_actionZoom1To2Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To2Farther, ZOOM_1_TO_2_FARTHER);
+
+  m_actionZoom1To4Closer = new QAction (tr ("1:4 closer (31%)"), this);
+  m_actionZoom1To4Closer->setCheckable (true);
+  m_actionZoom1To4Closer->setStatusTip (tr ("Zoom 1.3:4"));
+  connect (m_actionZoom1To4Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To4Closer, ZOOM_1_TO_4_CLOSER);
 
   m_actionZoom1To4 = new QAction (tr ("1:4 (25%)"), this);
   m_actionZoom1To4->setCheckable (true);
   m_actionZoom1To4->setStatusTip (tr ("Zoom 1:4"));
-  connect (m_actionZoom1To4, SIGNAL (triggered ()), this, SLOT (slotViewZoom1To4 ()));
+  connect (m_actionZoom1To4, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To4, ZOOM_1_TO_4);
+
+  m_actionZoom1To4Farther = new QAction (tr ("1:4 farther (20%)"), this);
+  m_actionZoom1To4Farther->setCheckable (true);
+  m_actionZoom1To4Farther->setStatusTip (tr ("Zoom 0.8:4"));
+  connect (m_actionZoom1To4Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To4Farther, ZOOM_1_TO_4_FARTHER);
+
+  m_actionZoom1To8Closer = new QAction (tr ("1:8 closer (12.5%)"), this);
+  m_actionZoom1To8Closer->setCheckable (true);
+  m_actionZoom1To8Closer->setStatusTip (tr ("Zoom 1:8"));
+  connect (m_actionZoom1To8Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To8Closer, ZOOM_1_TO_8_CLOSER);
 
   m_actionZoom1To8 = new QAction (tr ("1:8 (12.5%)"), this);
   m_actionZoom1To8->setCheckable (true);
   m_actionZoom1To8->setStatusTip (tr ("Zoom 1:8"));
-  connect (m_actionZoom1To8, SIGNAL (triggered ()), this, SLOT (slotViewZoom1To8 ()));
+  connect (m_actionZoom1To8, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To8, ZOOM_1_TO_8);
+
+  m_actionZoom1To8Farther = new QAction (tr ("1:8 farther (10%)"), this);
+  m_actionZoom1To8Farther->setCheckable (true);
+  m_actionZoom1To8Farther->setStatusTip (tr ("Zoom 0.8:8"));
+  connect (m_actionZoom1To8Farther, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To8Farther, ZOOM_1_TO_8_FARTHER);
+
+  m_actionZoom1To16Closer = new QAction (tr ("1:16 closer (8%)"), this);
+  m_actionZoom1To16Closer->setCheckable (true);
+  m_actionZoom1To16Closer->setStatusTip (tr ("Zoom 1.3:16"));
+  connect (m_actionZoom1To16Closer, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To16Closer, ZOOM_1_TO_16_CLOSER);
 
   m_actionZoom1To16 = new QAction (tr ("1:16 (6.25%)"), this);
   m_actionZoom1To16->setCheckable (true);
   m_actionZoom1To16->setStatusTip (tr ("Zoom 1:16"));
-  connect (m_actionZoom1To16, SIGNAL (triggered ()), this, SLOT (slotViewZoom1To16 ()));
+  connect (m_actionZoom1To16, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoom1To16, ZOOM_1_TO_16);
 
   m_actionZoomFill = new QAction (tr ("Fill"), this);
   m_actionZoomFill->setCheckable (true);
   m_actionZoomFill->setStatusTip (tr ("Zoom with stretching to fill window"));
-  connect (m_actionZoomFill, SIGNAL (triggered ()), this, SLOT (slotViewZoomFill ()));
+  connect (m_actionZoomFill, SIGNAL (triggered ()), m_mapperZoomFactor, SLOT (map ()));
+  m_mapperZoomFactor->setMapping (m_actionZoomFill, ZOOM_FILL);
 
   m_groupZoom = new QActionGroup (this);
   m_groupZoom->addAction (m_actionZoom16To1);
+  m_groupZoom->addAction (m_actionZoom16To1Farther);
+  m_groupZoom->addAction (m_actionZoom8To1Closer);
   m_groupZoom->addAction (m_actionZoom8To1);
+  m_groupZoom->addAction (m_actionZoom8To1Farther);
+  m_groupZoom->addAction (m_actionZoom4To1Closer);
   m_groupZoom->addAction (m_actionZoom4To1);
+  m_groupZoom->addAction (m_actionZoom4To1Farther);
+  m_groupZoom->addAction (m_actionZoom2To1Closer);
   m_groupZoom->addAction (m_actionZoom2To1);
+  m_groupZoom->addAction (m_actionZoom2To1Farther);
+  m_groupZoom->addAction (m_actionZoom1To1Closer);
   m_groupZoom->addAction (m_actionZoom1To1);
+  m_groupZoom->addAction (m_actionZoom1To1Farther);
+  m_groupZoom->addAction (m_actionZoom1To2Closer);
   m_groupZoom->addAction (m_actionZoom1To2);
+  m_groupZoom->addAction (m_actionZoom1To2Farther);
+  m_groupZoom->addAction (m_actionZoom1To4Closer);
   m_groupZoom->addAction (m_actionZoom1To4);
+  m_groupZoom->addAction (m_actionZoom1To4Farther);
+  m_groupZoom->addAction (m_actionZoom1To8Closer);
   m_groupZoom->addAction (m_actionZoom1To8);
+  m_groupZoom->addAction (m_actionZoom1To8Farther);
+  m_groupZoom->addAction (m_actionZoom1To16Closer);
   m_groupZoom->addAction (m_actionZoom1To16);
   m_groupZoom->addAction (m_actionZoomFill);
 }
@@ -984,7 +1126,7 @@ void MainWindow::createHelpWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createHelpWindow";
 
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   m_helpWindow = new HelpWindow (this);
   m_helpWindow->hide ();
   addDockWidget (Qt::RightDockWidgetArea,
@@ -1031,7 +1173,7 @@ void MainWindow::createMenus()
   m_menuFile->addAction (m_actionImportAdvanced);
   m_menuFile->addAction (m_actionImportImageReplace);
   m_menuFile->addAction (m_actionOpen);
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   m_menuFileOpenRecent = new QMenu (tr ("Open &Recent"));
   for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
     m_menuFileOpenRecent->addAction (m_actionRecentFiles.at (i));
@@ -1102,13 +1244,29 @@ void MainWindow::createMenus()
   m_menuViewZoom->addAction (m_actionZoomIn);
   m_menuViewZoom->insertSeparator (m_actionZoom16To1);
   m_menuViewZoom->addAction (m_actionZoom16To1);
+  m_menuViewZoom->addAction (m_actionZoom16To1Farther);
+  m_menuViewZoom->addAction (m_actionZoom8To1Closer);
   m_menuViewZoom->addAction (m_actionZoom8To1);
+  m_menuViewZoom->addAction (m_actionZoom8To1Farther);
+  m_menuViewZoom->addAction (m_actionZoom4To1Closer);
   m_menuViewZoom->addAction (m_actionZoom4To1);
+  m_menuViewZoom->addAction (m_actionZoom4To1Farther);
+  m_menuViewZoom->addAction (m_actionZoom2To1Closer);
   m_menuViewZoom->addAction (m_actionZoom2To1);
+  m_menuViewZoom->addAction (m_actionZoom2To1Farther);
+  m_menuViewZoom->addAction (m_actionZoom1To1Closer);
   m_menuViewZoom->addAction (m_actionZoom1To1);
+  m_menuViewZoom->addAction (m_actionZoom1To1Farther);
+  m_menuViewZoom->addAction (m_actionZoom1To2Closer);
   m_menuViewZoom->addAction (m_actionZoom1To2);
+  m_menuViewZoom->addAction (m_actionZoom1To2Farther);
+  m_menuViewZoom->addAction (m_actionZoom1To4Closer);
   m_menuViewZoom->addAction (m_actionZoom1To4);
+  m_menuViewZoom->addAction (m_actionZoom1To4Farther);
+  m_menuViewZoom->addAction (m_actionZoom1To8Closer);
   m_menuViewZoom->addAction (m_actionZoom1To8);
+  m_menuViewZoom->addAction (m_actionZoom1To8Farther);
+  m_menuViewZoom->addAction (m_actionZoom1To16Closer);
   m_menuViewZoom->addAction (m_actionZoom1To16);
   m_menuViewZoom->addAction (m_actionZoomFill);
   m_menuView->addMenu (m_menuViewZoom);
@@ -1134,7 +1292,7 @@ void MainWindow::createMenus()
   m_menuHelp->insertSeparator(m_actionHelpWhatsThis);
   m_menuHelp->addAction (m_actionHelpWhatsThis);
   m_menuHelp->addAction (m_actionHelpTutorial);
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   m_menuHelp->addAction (m_actionHelpHelp);
 #endif
   m_menuHelp->addAction (m_actionHelpAbout);
@@ -1347,49 +1505,64 @@ void MainWindow::createTutorial ()
   m_tutorialDlg->hide();
 }
 
-void MainWindow::createZoomMap ()
+void MainWindow::createZoomMaps ()
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createZoomMap";
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::createZoomMaps";
 
-  m_zoomMap [ZOOM_INITIAL_16_TO_1] = ZOOM_16_TO_1;
-  m_zoomMap [ZOOM_INITIAL_8_TO_1] = ZOOM_8_TO_1;
-  m_zoomMap [ZOOM_INITIAL_4_TO_1] = ZOOM_4_TO_1;
-  m_zoomMap [ZOOM_INITIAL_2_TO_1] = ZOOM_2_TO_1;
-  m_zoomMap [ZOOM_INITIAL_1_TO_1] = ZOOM_1_TO_1;
-  m_zoomMap [ZOOM_INITIAL_1_TO_2] = ZOOM_1_TO_2;
-  m_zoomMap [ZOOM_INITIAL_1_TO_4] = ZOOM_1_TO_4;
-  m_zoomMap [ZOOM_INITIAL_1_TO_8] = ZOOM_1_TO_8;
-  m_zoomMap [ZOOM_INITIAL_1_TO_16] = ZOOM_1_TO_16;
-  m_zoomMap [ZOOM_INITIAL_FILL] = ZOOM_FILL;
+  m_zoomMapFromInitial [ZOOM_INITIAL_16_TO_1] = ZOOM_16_TO_1;
+  m_zoomMapFromInitial [ZOOM_INITIAL_8_TO_1] = ZOOM_8_TO_1;
+  m_zoomMapFromInitial [ZOOM_INITIAL_4_TO_1] = ZOOM_4_TO_1;
+  m_zoomMapFromInitial [ZOOM_INITIAL_2_TO_1] = ZOOM_2_TO_1;
+  m_zoomMapFromInitial [ZOOM_INITIAL_1_TO_1] = ZOOM_1_TO_1;
+  m_zoomMapFromInitial [ZOOM_INITIAL_1_TO_2] = ZOOM_1_TO_2;
+  m_zoomMapFromInitial [ZOOM_INITIAL_1_TO_4] = ZOOM_1_TO_4;
+  m_zoomMapFromInitial [ZOOM_INITIAL_1_TO_8] = ZOOM_1_TO_8;
+  m_zoomMapFromInitial [ZOOM_INITIAL_1_TO_16] = ZOOM_1_TO_16;
+  m_zoomMapFromInitial [ZOOM_INITIAL_FILL] = ZOOM_FILL;
+
+  m_zoomMapToAction [ZOOM_16_TO_1] = m_actionZoom16To1;
+  m_zoomMapToAction [ZOOM_16_TO_1_FARTHER] = m_actionZoom16To1Farther;
+  m_zoomMapToAction [ZOOM_8_TO_1_CLOSER] = m_actionZoom8To1Closer;
+  m_zoomMapToAction [ZOOM_8_TO_1] = m_actionZoom8To1;
+  m_zoomMapToAction [ZOOM_8_TO_1_FARTHER] = m_actionZoom8To1Farther;
+  m_zoomMapToAction [ZOOM_4_TO_1_CLOSER] = m_actionZoom4To1Closer;
+  m_zoomMapToAction [ZOOM_4_TO_1] = m_actionZoom4To1;
+  m_zoomMapToAction [ZOOM_4_TO_1_FARTHER] = m_actionZoom4To1Farther;
+  m_zoomMapToAction [ZOOM_2_TO_1_CLOSER] = m_actionZoom2To1Closer;
+  m_zoomMapToAction [ZOOM_2_TO_1] = m_actionZoom2To1;
+  m_zoomMapToAction [ZOOM_2_TO_1_FARTHER] = m_actionZoom2To1Farther;
+  m_zoomMapToAction [ZOOM_1_TO_1_CLOSER] = m_actionZoom1To1Closer;
+  m_zoomMapToAction [ZOOM_1_TO_1] = m_actionZoom1To1;
+  m_zoomMapToAction [ZOOM_1_TO_1_FARTHER] = m_actionZoom1To1Farther;
+  m_zoomMapToAction [ZOOM_1_TO_2_CLOSER] = m_actionZoom1To2Closer;
+  m_zoomMapToAction [ZOOM_1_TO_2] = m_actionZoom1To2;
+  m_zoomMapToAction [ZOOM_1_TO_2_FARTHER] = m_actionZoom1To2Farther;
+  m_zoomMapToAction [ZOOM_1_TO_4_CLOSER] = m_actionZoom1To4Closer;
+  m_zoomMapToAction [ZOOM_1_TO_4] = m_actionZoom1To4;
+  m_zoomMapToAction [ZOOM_1_TO_4_FARTHER] = m_actionZoom1To4Farther;
+  m_zoomMapToAction [ZOOM_1_TO_8_CLOSER] = m_actionZoom1To8Closer;
+  m_zoomMapToAction [ZOOM_1_TO_8] = m_actionZoom1To8;
+  m_zoomMapToAction [ZOOM_1_TO_8_FARTHER] = m_actionZoom1To8Farther;
+  m_zoomMapToAction [ZOOM_1_TO_16_CLOSER] = m_actionZoom1To16Closer;
+  m_zoomMapToAction [ZOOM_1_TO_16] = m_actionZoom1To16;
+  m_zoomMapToAction [ZOOM_FILL] = m_actionZoomFill;
 }
 
 ZoomFactor MainWindow::currentZoomFactor () const
 {
-  if (m_actionZoom1To1->isChecked()) {
-    return ZOOM_1_TO_1;
-  } else if (m_actionZoom1To2->isChecked()) {
-    return ZOOM_1_TO_2;
-  } else if (m_actionZoom1To4->isChecked()) {
-    return ZOOM_1_TO_4;
-  } else if (m_actionZoom1To8->isChecked()) {
-    return ZOOM_1_TO_8;
-  } else if (m_actionZoom1To16->isChecked()) {
-    return ZOOM_1_TO_16;
-  } else if (m_actionZoom2To1->isChecked()) {
-    return ZOOM_2_TO_1;
-  } else if (m_actionZoom4To1->isChecked()) {
-    return ZOOM_4_TO_1;
-  } else if (m_actionZoom8To1->isChecked()) {
-    return ZOOM_8_TO_1;
-  } else if (m_actionZoom16To1->isChecked()) {
-    return ZOOM_16_TO_1;
-  } else if (m_actionZoomFill->isChecked()) {
-    return ZOOM_FILL;
-  } else {
-    ENGAUGE_ASSERT (false);
-    return ZOOM_1_TO_1;
+  // Find the zoom control that is checked
+  for (int z = 0; z < NUMBER_ZOOM_FACTORS; z++) {
+    ZoomFactor zoomFactor = (ZoomFactor) z;
+    if (m_zoomMapToAction [zoomFactor]->isChecked ()) {
+      // This zoom control is checked
+      return zoomFactor;
+    }
   }
+
+  ENGAUGE_ASSERT (false);
+  return ZOOM_1_TO_1;
 }
+
 bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
   if (event->type () == QEvent::KeyPress) {
@@ -1412,7 +1585,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
   return QObject::eventFilter (target, event);
 }
 
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
 void MainWindow::exportAllCoordinateSystemsAfterRegressionTests()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::exportAllCoordinateSystemsAfterRegressionTests curDir=" << QDir::currentPath().toLatin1().data();
@@ -2184,7 +2357,7 @@ void MainWindow::resizeEvent(QResizeEvent * /* event */)
   LOG4CPP_DEBUG_S ((*mainCat)) << "MainWindow::resizeEvent";
 
   if (m_actionZoomFill->isChecked ()) {
-    slotViewZoomFill();
+    slotViewZoomFactor (ZOOM_FILL);
   }
 }
 
@@ -2433,6 +2606,15 @@ void MainWindow::setCurrentPathFromFile (const QString &fileName)
   }
 }
 
+void MainWindow::setNonFillZoomFactor (ZoomFactor newZoomFactor)
+{
+  ENGAUGE_ASSERT (newZoomFactor != ZOOM_FILL);
+
+  // Update controls and apply zoom factor
+  m_zoomMapToAction [newZoomFactor]->setChecked (true);
+  slotViewZoomFactor (newZoomFactor);
+}
+
 void MainWindow::setPixmap (const QString &curveSelected,
                             const QPixmap &pixmap)
 {
@@ -2482,7 +2664,7 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                         QPoint (200, 200)).toPoint ());
 
   // Help window geometry
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   QSize helpSize = settings.value (SETTINGS_HELP_SIZE,
                                    QSize (900, 600)).toSize();
   m_helpWindow->resize (helpSize);
@@ -2603,7 +2785,7 @@ void MainWindow::settingsWrite ()
   settings.beginGroup (SETTINGS_GROUP_MAIN_WINDOW);
   settings.setValue (SETTINGS_SIZE, size ());
   settings.setValue (SETTINGS_POS, pos ());
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   settings.setValue (SETTINGS_HELP_SIZE, m_helpWindow->size());
   settings.setValue (SETTINGS_HELP_POS, m_helpWindow->pos ());
 #endif
@@ -2718,7 +2900,7 @@ bool MainWindow::setupAfterLoadNewDocument (const QString &fileName,
 
   m_isDocumentExported = false;
 
-  // Background must be set (by setPixmap) before slotViewZoomFill which relies on the background. At this point
+  // Background must be set (by setPixmap) before slotViewZoomFactor which relies on the background. At this point
   // the transformation is undefined (unless the code is changed) so grid removal will not work
   // but updateTransformationAndItsDependencies will call this again to fix that issue. Note that the selected
   // curve name was set (by setCurveSelected) earlier before the call to setPixmap
@@ -2938,6 +3120,7 @@ void MainWindow::slotDigitizeAxis ()
   m_cmbCurve->setEnabled (false); // Graph curve is irrelevant in this mode
   m_viewPointStyle->setEnabled (true); // Point style is important in this mode
   m_viewSegmentFilter->setEnabled (true); // Filtering is important in this mode
+  updateControls (); // For Paste which is state dependent
 }
 
 void MainWindow::slotDigitizeColorPicker ()
@@ -2949,6 +3132,7 @@ void MainWindow::slotDigitizeColorPicker ()
   m_cmbCurve->setEnabled (true);
   m_viewPointStyle->setEnabled (true);
   m_viewSegmentFilter->setEnabled (true);
+  updateControls (); // For Paste which is state dependent
 }
 
 void MainWindow::slotDigitizeCurve ()
@@ -2960,6 +3144,7 @@ void MainWindow::slotDigitizeCurve ()
   m_cmbCurve->setEnabled (true);
   m_viewPointStyle->setEnabled (true);
   m_viewSegmentFilter->setEnabled (true);
+  updateControls (); // For Paste which is state dependent
 }
 
 void MainWindow::slotDigitizePointMatch ()
@@ -2971,6 +3156,7 @@ void MainWindow::slotDigitizePointMatch ()
   m_cmbCurve->setEnabled (true);
   m_viewPointStyle->setEnabled (true);
   m_viewSegmentFilter->setEnabled (true);
+  updateControls (); // For Paste which is state dependent
 }
 
 void MainWindow::slotDigitizeScale ()
@@ -2982,6 +3168,7 @@ void MainWindow::slotDigitizeScale ()
   m_cmbCurve->setEnabled (false);
   m_viewPointStyle->setEnabled (false);
   m_viewSegmentFilter->setEnabled (false);
+  updateControls (); // For Paste which is state dependent
 }
 
 void MainWindow::slotDigitizeSegment ()
@@ -2993,6 +3180,7 @@ void MainWindow::slotDigitizeSegment ()
   m_cmbCurve->setEnabled (true);
   m_viewPointStyle->setEnabled (true);
   m_viewSegmentFilter->setEnabled (true);
+  updateControls (); // For Paste which is state dependent
 }
 
 void MainWindow::slotDigitizeSelect ()
@@ -3004,6 +3192,7 @@ void MainWindow::slotDigitizeSelect ()
   m_cmbCurve->setEnabled (false);
   m_viewPointStyle->setEnabled (false);
   m_viewSegmentFilter->setEnabled (false);
+  updateControls (); // For Paste which is state dependent
 }
 
 void MainWindow::slotEditCopy ()
@@ -3116,6 +3305,22 @@ void MainWindow::slotEditMenu ()
 void MainWindow::slotEditPaste ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotEditPaste";
+
+  QList<QPoint> points;
+  QList<double> ordinals;
+
+  MimePointsImport mimePointsImport;
+  mimePointsImport.retrievePoints (m_transformation,
+                                   points,
+                                   ordinals);
+
+  CmdAddPointsGraph *cmd = new CmdAddPointsGraph (*this,
+                                                  m_cmdMediator->document(),
+                                                  m_cmbCurve->currentText (),
+                                                  points,
+                                                  ordinals);
+  m_digitizeStateContext->appendNewCmd (m_cmdMediator,
+                                        cmd);
 }
 
 void MainWindow::slotEditPasteAsNew ()
@@ -3353,8 +3558,7 @@ bool MainWindow::slotFileSaveAs()
   dlg.setFileMode (QFileDialog::AnyFile);
   dlg.selectNameFilter (filterDigitizer);
   dlg.setNameFilters (filters);
-#if defined(OSX_DEBUG) || defined(OSX_RELEASE)
-#else
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   // Prevent hang in OSX
   dlg.setWindowModality(Qt::WindowModal);
 #endif
@@ -3702,7 +3906,7 @@ void MainWindow::slotTimeoutRegressionErrorReport ()
 
   } else {
 
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
     exportAllCoordinateSystemsAfterRegressionTests ();
 #endif
 
@@ -3732,7 +3936,7 @@ void MainWindow::slotTimeoutRegressionFileCmdScript ()
     // Script file might already have closed the Document so export only if last was not closed
     if (m_cmdMediator != 0) {
 
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
       exportAllCoordinateSystemsAfterRegressionTests ();
 #endif
 
@@ -3905,227 +4109,54 @@ void MainWindow::slotViewToolTips ()
   loadToolTips();
 }
 
-void MainWindow::slotViewZoom(int zoom)
+void MainWindow::slotViewZoom (int zoom)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoom";
 
   // Update zoom controls and apply the zoom factor
-  switch ((ZoomFactor) zoom) {
-    case ZOOM_16_TO_1:
-      m_actionZoom16To1->setChecked(true);
-      slotViewZoom16To1 ();
-      break;
-    case ZOOM_8_TO_1:
-      m_actionZoom8To1->setChecked(true);
-      slotViewZoom8To1 ();
-      break;
-    case ZOOM_4_TO_1:
-      m_actionZoom4To1->setChecked(true);
-      slotViewZoom4To1 ();
-      break;
-    case ZOOM_2_TO_1:
-      m_actionZoom2To1->setChecked(true);
-      slotViewZoom2To1 ();
-      break;
-    case ZOOM_1_TO_1:
-      m_actionZoom1To1->setChecked(true);
-      slotViewZoom1To1 ();
-      break;
-    case ZOOM_1_TO_2:
-      m_actionZoom1To2->setChecked(true);
-      slotViewZoom1To2 ();
-      break;
-    case ZOOM_1_TO_4:
-      m_actionZoom1To4->setChecked(true);
-      slotViewZoom1To4 ();
-      break;
-    case ZOOM_1_TO_8:
-      m_actionZoom1To8->setChecked(true);
-      slotViewZoom1To8 ();
-      break;
-    case ZOOM_1_TO_16:
-      m_actionZoom1To16->setChecked(true);
-      slotViewZoom1To16 ();
-      break;
-    case ZOOM_FILL:
-      m_actionZoomFill->setChecked(true);
-      slotViewZoomFill ();
-      break;
+  ZoomFactor zoomFactor = (ZoomFactor) zoom;
+  m_zoomMapToAction [zoomFactor]->setChecked (true);
+  slotViewZoomFactor ((ZoomFactor) zoom);
+}
+
+void MainWindow::slotViewZoomFactor (ZoomFactor zoomFactor)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoomFactor";
+
+  if (zoomFactor == ZOOM_FILL) {
+      m_backgroundStateContext->fitInView (*m_view);
+  } else {
+
+    ZoomTransition zoomTransition;    
+    double factor = zoomTransition.mapToFactor (zoomFactor);
+
+    QTransform transform;
+    transform.scale (factor, factor);
+    m_view->setTransform (transform);
   }
+
+  emit signalZoom(zoomFactor);
 }
 
-void MainWindow::slotViewZoom16To1 ()
+void MainWindow::slotViewZoomFactorInt (int zoom)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoom16To1";
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoomFactorInt";
 
-  QTransform transform;
-  transform.scale (16.0, 16.0);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_16_TO_1);
-}
-
-void MainWindow::slotViewZoom8To1 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoom8To1";
-
-  QTransform transform;
-  transform.scale (8.0, 8.0);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_8_TO_1);
-}
-
-void MainWindow::slotViewZoom4To1 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoom4To1";
-
-  QTransform transform;
-  transform.scale (4.0, 4.0);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_4_TO_1);
-}
-
-void MainWindow::slotViewZoom2To1 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotZoom2To1";
-
-  QTransform transform;
-  transform.scale (2.0, 2.0);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_2_TO_1);
-}
-
-void MainWindow::slotViewZoom1To1 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoom1To1";
-
-  QTransform transform;
-  transform.scale (1.0, 1.0);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_1_TO_1);
-}
-
-void MainWindow::slotViewZoom1To2 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotZoom1To2";
-
-  QTransform transform;
-  transform.scale (0.5, 0.5);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_1_TO_2);
-}
-
-void MainWindow::slotViewZoom1To4 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotZoom1To4";
-
-  QTransform transform;
-  transform.scale (0.25, 0.25);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_1_TO_4);
-}
-
-void MainWindow::slotViewZoom1To8 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotZoom1To8";
-
-  QTransform transform;
-  transform.scale (0.125, 0.125);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_1_TO_8);
-}
-
-void MainWindow::slotViewZoom1To16 ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotZoom1To16";
-
-  QTransform transform;
-  transform.scale (0.0625, 0.0625);
-  m_view->setTransform (transform);
-  emit signalZoom(ZOOM_1_TO_16);
-}
-
-void MainWindow::slotViewZoomFill ()
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoomFill";
-
-  m_backgroundStateContext->fitInView (*m_view);
-
-  emit signalZoom(ZOOM_FILL);
+  slotViewZoomFactor ((ZoomFactor) zoom);
 }
 
 void MainWindow::slotViewZoomIn ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoomIn";
 
-  // Try to zoom in. First determine what the next zoom factor should be
-
-  bool goto16To1 = false, goto8To1 = false, goto4To1 = false, goto2To1 = false;
-  bool goto1To1 = false;
-  bool goto1To2 = false, goto1To4 = false, goto1To8 = false, goto1To16 = false;
-  if (m_actionZoomFill->isChecked ()) {
-
-    // Zooming in means user probably wants the more squished direction to be zoomed in by one step
-    double xScale = m_view->transform().m11();
-    double yScale = m_view->transform().m22();
-    double scale = qMin(xScale, yScale);
-    if (scale < 0.125) {
-      goto1To8 = true;
-    } else if (scale < 0.25) {
-      goto1To4 = true;
-    } else if (scale < 0.5) {
-      goto1To2 = true;
-    } else if (scale < 1) {
-      goto1To1 = true;
-    } else if (scale < 2) {
-      goto2To1 = true;
-    } else if (scale < 4) {
-      goto4To1 = true;
-    } else if (scale < 8) {
-      goto8To1 = true;
-    } else {
-      goto1To16 = true;
-    }
-  } else {
-    goto16To1 = m_actionZoom8To1->isChecked ();
-    goto8To1 = m_actionZoom4To1->isChecked ();
-    goto4To1 = m_actionZoom2To1->isChecked ();
-    goto2To1 = m_actionZoom1To1->isChecked ();
-    goto1To1 = m_actionZoom1To2->isChecked ();
-    goto1To2 = m_actionZoom1To4->isChecked ();
-    goto1To4 = m_actionZoom1To8->isChecked ();
-    goto1To8 = m_actionZoom1To16->isChecked ();
-  }
-
-  // Update controls and apply zoom factor
-  if (goto16To1) {
-    m_actionZoom16To1->setChecked (true);
-    slotViewZoom16To1 ();
-  } else if (goto8To1) {
-    m_actionZoom8To1->setChecked (true);
-    slotViewZoom8To1 ();
-  } else if (goto4To1) {
-    m_actionZoom4To1->setChecked (true);
-    slotViewZoom4To1 ();
-  } else if (goto2To1) {
-    m_actionZoom2To1->setChecked (true);
-    slotViewZoom2To1 ();
-  } else if (goto1To1) {
-    m_actionZoom1To1->setChecked (true);
-    slotViewZoom1To1 ();
-  } else if (goto1To2) {
-    m_actionZoom1To2->setChecked (true);
-    slotViewZoom1To2 ();
-  } else if (goto1To4) {
-    m_actionZoom1To4->setChecked (true);
-    slotViewZoom1To4 ();
-  } else if (goto1To8) {
-    m_actionZoom1To8->setChecked (true);
-    slotViewZoom1To8 ();
-  } else if (goto1To16) {
-    m_actionZoom1To16->setChecked (true);
-    slotViewZoom1To16 ();
-  }
+  ZoomTransition zoomTransition;
+  ZoomFactor zoomFactorNew = zoomTransition.zoomIn (currentZoomFactor (),
+                                                    m_view->transform ().m11 (),
+                                                    m_view->transform ().m22 (),
+                                                    m_actionZoomFill->isChecked ());
+  setNonFillZoomFactor (zoomFactorNew);
 }
+
 
 void MainWindow::slotViewZoomInFromWheelEvent ()
 {
@@ -4148,74 +4179,13 @@ void MainWindow::slotViewZoomOut ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoomOut";
 
-  // Try to zoom out. First determine what the next zoom factor should be
-
-  bool goto16To1 = false, goto8To1 = false, goto4To1 = false, goto2To1 = false;
-  bool goto1To1 = false;
-  bool goto1To2 = false, goto1To4 = false, goto1To8 = false, goto1To16 = false;
-  if (m_actionZoomFill->isChecked ()) {
-
-    // Zooming out means user probably wants the less squished direction to be zoomed out by one step
-    double xScale = m_view->transform().m11();
-    double yScale = m_view->transform().m22();
-    double scale = qMax(xScale, yScale);
-    if (scale > 8) {
-      goto8To1 = true;
-    } else if (scale > 4) {
-      goto4To1 = true;
-    } else if (scale > 2) {
-      goto2To1 = true;
-    } else if (scale > 1) {
-      goto1To1 = true;
-    } else if (scale > 0.5) {
-      goto1To2 = true;
-    } else if (scale > 0.25) {
-      goto1To4 = true;
-    } else if (scale > 0.125) {
-      goto1To8 = true;
-    } else {
-      goto1To16 = true;
-    }
-  } else {
-    goto8To1 = m_actionZoom16To1->isChecked ();
-    goto4To1 = m_actionZoom8To1->isChecked ();
-    goto2To1 = m_actionZoom4To1->isChecked ();
-    goto1To1 = m_actionZoom2To1->isChecked ();
-    goto1To2 = m_actionZoom1To1->isChecked ();
-    goto1To4 = m_actionZoom1To2->isChecked ();
-    goto1To8 = m_actionZoom1To4->isChecked ();
-    goto1To16 = m_actionZoom1To8->isChecked ();
-  }
-
-  // Update controls and apply zoom factor
-  if (goto1To16) {
-    m_actionZoom1To16->setChecked (true);
-    slotViewZoom1To16 ();
-  } else if (goto1To8) {
-    m_actionZoom1To8->setChecked (true);
-    slotViewZoom1To8 ();
-  } else if (goto1To4) {
-    m_actionZoom1To4->setChecked (true);
-    slotViewZoom1To4 ();
-  } else if (goto1To2) {
-    m_actionZoom1To2->setChecked (true);
-    slotViewZoom1To2 ();
-  } else if (goto1To1) {
-    m_actionZoom1To1->setChecked (true);
-    slotViewZoom1To1 ();
-  } else if (goto2To1) {
-    m_actionZoom2To1->setChecked (true);
-    slotViewZoom2To1 ();
-  } else if (goto4To1) {
-    m_actionZoom4To1->setChecked (true);
-    slotViewZoom4To1 ();
-  } else if (goto8To1) {
-    m_actionZoom8To1->setChecked (true);
-    slotViewZoom8To1 ();
-  } else if (goto16To1) {
-    m_actionZoom16To1->setChecked (true);
-    slotViewZoom16To1 ();
-  }
+  // Try to zoom out
+  ZoomTransition zoomTransition;
+  ZoomFactor zoomFactorNew = zoomTransition.zoomOut (currentZoomFactor (),
+                                                     m_view->transform ().m11 (),
+                                                     m_view->transform ().m22 (),
+                                                     m_actionZoomFill->isChecked ());
+  setNonFillZoomFactor (zoomFactorNew);
 }
 
 void MainWindow::slotViewZoomOutFromWheelEvent ()
@@ -4374,7 +4344,7 @@ void MainWindow::updateControls ()
   m_cmbBackground->setEnabled (!m_currentFile.isEmpty ());
 
   m_actionImportImageReplace->setEnabled (m_cmdMediator != 0);
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   m_menuFileOpenRecent->setEnabled ((m_actionRecentFiles.count () > 0) &&
                                     (m_actionRecentFiles.at(0)->isVisible ())); // Need at least one visible recent file entry
 #endif
@@ -4401,7 +4371,8 @@ void MainWindow::updateControls ()
   m_actionEditCopy->setEnabled ((!tableFittingIsActive && !tableGeometryIsActive && m_scene->selectedItems().count () > 0) ||
                                 (tableFittingIsActive && tableFittingIsCopyable) ||
                                 (tableGeometryIsActive && tableGeometryIsCopyable));
-  m_actionEditPaste->setEnabled (false);
+  m_actionEditPaste->setEnabled (m_digitizeStateContext->canPaste (m_transformation,
+                                                                   m_view->size ()));
   m_actionEditDelete->setEnabled (!tableFittingIsActive &&
                                   !tableGeometryIsActive &&
                                   m_scene->selectedItems().count () > 0);
@@ -4587,7 +4558,7 @@ void MainWindow::updateRecentFileList()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateRecentFileList";
 
-#ifndef OSX_RELEASE
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   QStringList recentFilePaths = settings.value(SETTINGS_RECENT_FILE_LIST).toStringList();
 

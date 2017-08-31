@@ -20,20 +20,6 @@ ExportFileAbstractBase::ExportFileAbstractBase()
 {
 }
 
-QString ExportFileAbstractBase::curveSeparator (const QString *string) const
-{
-  QString separator = "";
-
-  if (string != 0) {
-
-    if (!string->trimmed().isEmpty()) {
-      return "\n";
-    }
-  }
-
-  return separator;
-}
-
 QStringList ExportFileAbstractBase::curvesToInclude (const DocumentModelExportFormat &modelExportOverride,
                                                      const Document &document,
                                                      const QStringList &curvesGraphsNames,
@@ -86,14 +72,12 @@ QString ExportFileAbstractBase::gnuplotComment() const
   return QString ("# ");
 }
 
-void ExportFileAbstractBase::insertLineSeparator (bool &isFirst,
+void ExportFileAbstractBase::insertLineSeparator (bool isFirst,
                                                   ExportHeader exportHeader,
                                                   QTextStream &str) const
 {
   // Insert line(s) between previous curve and this curve
-  if (isFirst) {
-    isFirst = false;
-  } else {
+  if (!isFirst) {
     if (exportHeader == EXPORT_HEADER_GNUPLOT) {
       str << "\n\n"; // Gnuplot requires two blank lines between curves
     } else {
