@@ -1,0 +1,11 @@
+--- a/engauge.pro
++++ b/engauge.pro
+@@ -33,7 +33,7 @@
+ 
+ QT += core gui printsupport widgets xml
+ 
+-win32-*|linux-*|unix-* {
++!mac {
+ QT += help
+ HEADERS += src/Help/HelpBrowser.h \
+            src/Help/HelpWindow.h
