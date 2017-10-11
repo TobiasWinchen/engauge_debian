@@ -1768,28 +1768,28 @@ Este parâmetro é utilizado nas coordenadas na barra de status e durante a expo
 <context>
     <name>DlgSettingsGridDisplay</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="32" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="31" />
         <source>Grid Display</source>
         <translation>Grade de exibição</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="62" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="65" />
         <source>Color:</source>
         <translation>Cor:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="66" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="69" />
         <source>Select a color for the lines</source>
         <translation>Selecione uma cor para as linhas</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="88" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="162" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="91" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="167" />
         <source>Disable:</source>
         <translation>Desativar:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="92" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="95" />
         <source>Disabled value.
 
 The X grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -1798,13 +1798,13 @@ The X grid lines are specified using only three values at a time. For flexibilit
 As linhas de eixo X são especificados usando apenas três valores de cada vez. Para a flexibilidade, quatro valores são oferecidos para que você deve escolher qual o valor é desativado. Uma vez desativada, esse valor é simplesmente atualizado como outros valores mudam</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="107" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="181" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="110" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="186" />
         <source>Count:</source>
         <translation>Contagem:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="111" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="114" />
         <source>Number of X grid lines.
 
 The number of X grid lines must be entered as an integer greater than zero</source>
@@ -1813,13 +1813,13 @@ The number of X grid lines must be entered as an integer greater than zero</sour
 O número de linhas de grade X deve ser inserido como um número inteiro maior que zero</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="118" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="192" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="123" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="199" />
         <source>Start:</source>
         <translation>Começar:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="122" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="127" />
         <source>Value of the first X grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -1828,13 +1828,13 @@ The start value cannot be greater than the stop value</source>
 O valor inicial não pode ser maior do que o valor de paragem</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="129" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="203" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="134" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="210" />
         <source>Step:</source>
         <translation>Incremento:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="133" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="138" />
         <source>Difference in value between two successive X grid lines.
 
 The step value must be greater than zero</source>
@@ -1843,13 +1843,13 @@ The step value must be greater than zero</source>
 O valor do passo deve ser superior a zero</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="140" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="214" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="145" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="221" />
         <source>Stop:</source>
         <translation>Pare:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="144" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="149" />
         <source>Value of the last X grid line.
 
 The stop value cannot be less than the start value</source>
@@ -1858,7 +1858,7 @@ The stop value cannot be less than the start value</source>
 O valor parada não pode ser inferior ao valor inicial</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="166" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="171" />
         <source>Disabled value.
 
 The Y grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -1867,7 +1867,7 @@ The Y grid lines are specified using only three values at a time. For flexibilit
 As linhas de eixo Y são especificados usando apenas três valores de cada vez. Para a flexibilidade, quatro valores são oferecidos para que você deve escolher qual o valor é desativado. Uma vez desativada, esse valor é simplesmente atualizado como outros valores mudam</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="185" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="190" />
         <source>Number of Y grid lines.
 
 The number of Y grid lines must be entered as an integer greater than zero</source>
@@ -1876,7 +1876,7 @@ The number of Y grid lines must be entered as an integer greater than zero</sour
 O número de linhas de grade Y deve ser inserido como um número inteiro maior que zero</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="196" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="203" />
         <source>Value of the first Y grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -1885,7 +1885,7 @@ The start value cannot be greater than the stop value</source>
 O valor inicial não pode ser maior do que o valor de paragem</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="207" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="214" />
         <source>Difference in value between two successive Y grid lines.
 
 The step value must be greater than zero</source>
@@ -1894,7 +1894,7 @@ The step value must be greater than zero</source>
 O valor do passo deve ser superior a zero</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="218" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="225" />
         <source>Value of the last Y grid line.
 
 The stop value cannot be less than the start value</source>
@@ -1903,34 +1903,39 @@ The stop value cannot be less than the start value</source>
 O valor parada não pode ser inferior ao valor inicial</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="234" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="241" />
         <source>Preview</source>
         <translation>Visualização</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="241" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="248" />
         <source>Preview window that shows how current settings affect grid display</source>
         <translation>Janela de visualização que mostra como as configurações atuais afetam exibição da grade</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="305" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="309" />
         <source>X Grid Lines</source>
         <translation>X Linhas de grelha</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="307" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="311" />
         <source>Grid Lines</source>
         <translation>Linhas de grade</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="311" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="315" />
         <source>Y Grid Lines</source>
         <translation>Y Linhas de grelha</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="313" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="317" />
         <source>Radius Grid Lines</source>
         <translation>Linhas de grade radius</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="575" />
+        <source>Grid line count exceeds limit set by Settings / Main Window.</source>
+        <translation>A contagem da linha de grade excede o limite definido pelas Configurações / Janela principal.</translation>
     </message>
 </context>
 <context>
@@ -2126,17 +2131,17 @@ O valor parada não pode ser inferior ao valor inicial</translation>
 <context>
     <name>DlgSettingsMainWindow</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="32" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="34" />
         <source>Main Window</source>
         <translation>Janela principal</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="57" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="59" />
         <source>Initial zoom:</source>
         <translation>zoom inicial:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="72" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="74" />
         <source>Initial Zoom
 
 Select the initial zoom factor when a new document is loaded. Either the previous zoom can be kept, or the specified zoom can be applied.</source>
@@ -2145,32 +2150,32 @@ Select the initial zoom factor when a new document is loaded. Either the previou
 Selecione o fator de zoom inicial quando um novo documento é carregado. Ou o zoom anterior pode ser mantida, ou o zoom especificado pode ser aplicada.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="78" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="80" />
         <source>Zoom control:</source>
         <translation>controle de zoom:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="82" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="84" />
         <source>Menu only</source>
         <translation>menu só</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="83" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="85" />
         <source>Menu and mouse wheel</source>
         <translation>roda de menu e do rato</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="84" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="86" />
         <source>Menu and +/- keys</source>
         <translation>Teclas de menu e +/-</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="85" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="87" />
         <source>Menu, mouse wheel and +/- keys</source>
         <translation>Menu, roda do mouse e teclas +/-</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="86" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="88" />
         <source>Zoom Control
 
 Select which inputs are used to zoom in and out.</source>
@@ -2179,12 +2184,12 @@ Select which inputs are used to zoom in and out.</source>
 Selecione as entradas que são usados para zoom in e out.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="91" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="93" />
         <source>Locale:</source>
         <translation>Localidade:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="96" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="98" />
         <source>Locale
 
 Select the locale that will be used in numbers (immediately), and the language in the user interface (after restart).
@@ -2197,26 +2202,31 @@ Selecione a localidade que será usada em números (imediatamente), eo idioma na
 A localidade determina como os números são formatados. Especificamente, vírgulas ou períodos serão utilizados como delimitadores de grupo em cada número digitado pelo usuário, exibidas na interface do usuário, ou exportado para um arquivo.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="116" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="118" />
         <source>Import cropping:</source>
         <translation>Importação de corte:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="120" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="122" />
         <source>Import Cropping
 
-Enables or disables cropping of the imported image when importing. Cropping the image is useful for removing unimportant information around a graph, but less useful when the graph already fills the entire image.</source>
+Enables or disables cropping of the imported image when importing. Cropping the image is useful for removing unimportant information around a graph, but less useful when the graph already fills the entire image.
+
+This setting only has an effect when Engauge has been built with support for pdf files.</source>
         <translation>Import Recorte
 
-Habilita ou desabilita cultivo da imagem importada ao importar. Cortar a imagem é útil para a remoção de informações sem importância em torno de um gráfico, mas menos útil quando o gráfico já preenche a totalidade da imagem.</translation>
+Habilita ou desabilita cultivo da imagem importada ao importar. Cortar a imagem é útil para a remoção de informações sem importância em torno de um gráfico, mas menos útil quando o gráfico já preenche a totalidade da imagem.
+
+Esta configuração apenas teve efeito quando a Engauge foi criada com suporte para arquivos pdf.
+</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="132" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="135" />
         <source>Import PDF resolution (dots per inch):</source>
         <translation>Importação de resolução de PDF (pontos por polegada):</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="136" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="139" />
         <source>Import PDF Resolution
 
 Imported Portable Document Format (PDF) files will be converted to this pixel resolution in dots per inch (DPI), where each pixel is one dot. A higher value increases the picture resolution and may also improve numeric digitizing accuracy. However, a very high value can make the image so large that Engauge will slow down.</source>
@@ -2225,12 +2235,12 @@ Imported Portable Document Format (PDF) files will be converted to this pixel re
 Importado arquivos Portable Document Format (PDF) será convertido para esse pixels de resolução em pontos por polegada (DPI), onde cada pixel é um ponto. Um valor mais alto aumenta a resolução da imagem e também pode melhorar a precisão de digitalização numérico. No entanto, um valor muito alto pode tornar a imagem tão grande que Engauge vai abrandar.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="151" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="154" />
         <source>Maximum grid lines:</source>
         <translation>Máximo de linhas de grade:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="156" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="159" />
         <source>Maximum Grid Lines
 
 Maximum number of grid lines to be processed. This limit is applied when the step value is too small for the start and stop values, which would result in too many grid lines visually and possibly extremely long processing time (since each grid line would have to be processed)</source>
@@ -2239,12 +2249,12 @@ Maximum number of grid lines to be processed. This limit is applied when the ste
 O número máximo de linhas da grade a ser processado. Este limite é aplicada quando o valor do passo é muito pequeno para o início e parar de valores, o que resultaria em muitas linhas de grade visual e tempo de processamento possivelmente extremamente longa (uma vez que cada linha da grade teria que ser processado)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="163" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="166" />
         <source>Highlight opacity:</source>
         <translation>Realce opacidade:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="169" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="172" />
         <source>Highlight Opacity
 
 Opacity to be applied when the cursor is over a curve or axis point in Select mode. The change in appearance shows when the point can be selected.</source>
@@ -2253,17 +2263,17 @@ Opacity to be applied when the cursor is over a curve or axis point in Select mo
 Opacidade para ser aplicada quando o cursor está sobre um ponto de curva ou de um eixo em Escolher modo. A mudança na aparência mostra quando o ponto pode ser seleccionado.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="175" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="178" />
         <source>Recent file list:</source>
         <translation>Lista de arquivos recentes:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="178" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="181" />
         <source>Clear</source>
         <translation>Claro</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="180" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="183" />
         <source>Recent File List Clear
 
 Clear the recent file list in the File menu.</source>
@@ -2272,12 +2282,12 @@ Clear the recent file list in the File menu.</source>
 Limpar a lista de arquivos recentes no menu Arquivo.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="186" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="189" />
         <source>Include title bar path:</source>
         <translation>Incluir outros títulos do caminho de bar:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="191" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="194" />
         <source>Title Bar Filename
 
 Includes or excludes the path and file extension from the filename in the title bar.</source>
@@ -2286,12 +2296,12 @@ Includes or excludes the path and file extension from the filename in the title 
 Inclui ou exclui o caminho e arquivo de extensão do nome do arquivo na barra de título.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="196" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="199" />
         <source>Allow small dialogs:</source>
         <translation>Permitir que pequenos diálogos:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="201" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="204" />
         <source>Allow Small Dialogs
 
 Allows settings dialogs to be made very small so they fit on small computer screens.</source>
@@ -2300,12 +2310,12 @@ Allows settings dialogs to be made very small so they fit on small computer scre
 Permite que as configurações diálogos a ser feita muito pequena para que eles se encaixam em telas de computadores pequenos.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="206" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="209" />
         <source>Allow drag and drop export:</source>
         <translation>Permitir exportação por arrastar e soltar:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="211" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="214" />
         <source>Allow Drag and Drop Export
 
 Allows drag and drop export from the Curve Fitting Window and Geometry Window tables.
@@ -4352,9 +4362,19 @@ Quando pressionado, este botão Imprime todos os pontos digitalizados e linhas p
         <translation>Importar imagem</translation>
     </message>
     <message>
+        <location filename="../src/main/MainWindow.cpp" line="2010" />
+        <source>File opened</source>
+        <translation>Arquivo aberto</translation>
+    </message>
+    <message>
         <location filename="../src/main/MainWindow.cpp" line="2055" />
         <source>File not found:</source>
         <translation>Arquivo não encontrado:</translation>
+    </message>
+    <message>
+        <location filename="../src/main/MainWindow.cpp" line="2072" />
+        <source>Error report opened</source>
+        <translation>Relatório de erro aberto</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="2130" />
@@ -4405,17 +4425,17 @@ Você deseja salvar as alterações?</translation>
         <translation>Documento aberto</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="4692" />
+        <location filename="../src/main/MainWindow.cpp" line="4693" />
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="4693" />
+        <location filename="../src/main/MainWindow.cpp" line="4694" />
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="4821" />
+        <location filename="../src/main/MainWindow.cpp" line="4822" />
         <source>Engauge Digitizer %1</source>
         <translation>Engauge Digitizer %1</translation>
     </message>
@@ -5070,6 +5090,21 @@ Você deseja salvar as alterações?</translation>
         <translation>Não é possível ler os dados de estilo ponto</translation>
     </message>
     <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="20" />
+        <source>Coordinates (pixels):</source>
+        <translation>Coordenadas de pixel</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="21" />
+        <source>Coordinates (graph):</source>
+        <translation>Coordenadas do gráfico</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="22" />
+        <source>Resolution (graph):</source>
+        <translation>Resolução de gráfico</translation>
+    </message>
+    <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="11" />
         <source>16:1 farther</source>
         <translation>16:1 mais longe</translation>
@@ -5244,12 +5279,12 @@ Especifica um arquivo de script de comando arquivo como entrada. Usado para depu
 <context>
     <name>StatusBar</name>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="64" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="63" />
         <source>Select cursor coordinate values to display.</source>
         <translation>Escolha um cursor valores de coordenadas para mostrar.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="65" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="64" />
         <source>Select Cursor Coordinate Values
 
 Values at cursor coordinates to display. Coordinates are in screen (pixels) or graph units. Resolution (which is the number of graph units per pixel) is in graph units. Graph units are only available after axis points have been defined.</source>
@@ -5258,12 +5293,12 @@ Values at cursor coordinates to display. Coordinates are in screen (pixels) or g
 Os valores a coordenadas do cursor para exibir. As coordenadas são na tela (pixels) ou unidades de gráfico. Resolução (que é o número de unidades de gráficos por pixel) está em unidades de gráfico. unidades Gráfico estão disponíveis apenas após os pontos eixos foram definidos.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="78" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="77" />
         <source>Cursor coordinate values.</source>
         <translation>Cursor valores de coordenadas.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="79" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="78" />
         <source>Cursor Coordinate Values
 
 Values at cursor coordinates. Coordinates are in screen (pixels) or graph units. Resolution (which is the number of graph units per pixel) is in graph units. Graph units are only available after axis points have been defined.</source>
@@ -5272,12 +5307,12 @@ Values at cursor coordinates. Coordinates are in screen (pixels) or graph units.
 Os valores a coordenadas do cursor. As coordenadas são na tela (pixels) ou unidades de gráfico. Resolução (que é o número de unidades de gráficos por pixel) está em unidades de gráfico. unidades Gráfico estão disponíveis apenas após os pontos eixos foram definidos.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="134" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="132" />
         <source>Select zoom.</source>
         <translation>Selecione um zoom.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="135" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="133" />
         <source>Select Zoom
 
 Points can be more accurately placed by zooming in.</source>

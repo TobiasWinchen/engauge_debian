@@ -26,6 +26,8 @@
 #include "ZoomFactorInitial.h"
 #include "ZoomLabels.h"
 
+const int MAX_GRID_LINES_MIN = 2;
+const int MAX_GRID_LINES_MAX = 1000;
 const int MINIMUM_DIALOG_WIDTH_MAIN_WINDOW = 550;
 
 DlgSettingsMainWindow::DlgSettingsMainWindow(MainWindow &mainWindow) :
@@ -120,7 +122,8 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
   m_cmbImportCropping->setWhatsThis (tr ("Import Cropping\n\n"
                                          "Enables or disables cropping of the imported image when importing. Cropping the image is useful "
                                          "for removing unimportant information around a graph, but less useful when the graph already fills "
-                                         "the entire image."));
+                                         "the entire image.\n\n"
+                                         "This setting only has an effect when Engauge has been built with support for pdf files."));
   ImportCroppingUtilBase importCroppingUtil;
   m_cmbImportCropping->addItem (importCroppingUtil.importCroppingToString (IMPORT_CROPPING_NEVER), IMPORT_CROPPING_NEVER);
   m_cmbImportCropping->addItem (importCroppingUtil.importCroppingToString (IMPORT_CROPPING_MULTIPAGE_PDFS), IMPORT_CROPPING_MULTIPAGE_PDFS);
@@ -152,7 +155,7 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
   layout->addWidget (labelMaximumGridLines, row, 1);
 
   m_spinMaximumGridLines = new QSpinBox;
-  m_spinMaximumGridLines->setMinimum (2);
+  m_spinMaximumGridLines->setRange (MAX_GRID_LINES_MIN, MAX_GRID_LINES_MAX);
   m_spinMaximumGridLines->setWhatsThis (tr ("Maximum Grid Lines\n\n"
                                             "Maximum number of grid lines to be processed. This limit is applied when the step value is too "
                                             "small for the start and stop values, which would result in too many grid lines visually and "

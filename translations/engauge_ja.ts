@@ -1766,28 +1766,28 @@ This parameter is used on the coordinates in the Status Bar and during Export</s
 <context>
     <name>DlgSettingsGridDisplay</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="32" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="31" />
         <source>Grid Display</source>
         <translation>グリッドの表示</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="62" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="65" />
         <source>Color:</source>
         <translation>色：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="66" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="69" />
         <source>Select a color for the lines</source>
         <translation>グリッドの罫線を表示する色を選択します。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="88" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="162" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="91" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="167" />
         <source>Disable:</source>
         <translation>除外対象：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="92" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="95" />
         <source>Disabled value.
 
 The X grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -1796,13 +1796,13 @@ The X grid lines are specified using only three values at a time. For flexibilit
 グリッドの X 枠線を設定するために 4 つのパラメーターを調整可能ですが、一度に変更できるのは、そのうち3 つの要素です。 そのため、まず変更しないパラメーターを除外対象として指定してから調整を始めてください。その際、除外されたパラメーターの値は他の 3 つのパラメーターが変更されるのに伴い自動的に更新されます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="107" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="181" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="110" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="186" />
         <source>Count:</source>
         <translation>本数：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="111" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="114" />
         <source>Number of X grid lines.
 
 The number of X grid lines must be entered as an integer greater than zero</source>
@@ -1811,13 +1811,13 @@ The number of X grid lines must be entered as an integer greater than zero</sour
 X 枠線の本数を 1 以上の整数で指定します。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="118" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="192" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="123" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="199" />
         <source>Start:</source>
         <translation>開始位置：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="122" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="127" />
         <source>Value of the first X grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -1826,13 +1826,13 @@ The start value cannot be greater than the stop value</source>
 X 枠線を開始する位置です。この値は終了位置の値よりも大きくならないようにしてください。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="129" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="203" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="134" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="210" />
         <source>Step:</source>
         <translation>ステップ間隔：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="133" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="138" />
         <source>Difference in value between two successive X grid lines.
 
 The step value must be greater than zero</source>
@@ -1841,13 +1841,13 @@ The step value must be greater than zero</source>
 ゼロよりも大きな値を指定します。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="140" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="214" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="145" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="221" />
         <source>Stop:</source>
         <translation>終了位置：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="144" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="149" />
         <source>Value of the last X grid line.
 
 The stop value cannot be less than the start value</source>
@@ -1856,7 +1856,7 @@ The stop value cannot be less than the start value</source>
 X 枠線を終了する位置です。この値は開始位置の値よりも小さくならないようにしてください。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="166" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="171" />
         <source>Disabled value.
 
 The Y grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -1865,7 +1865,7 @@ The Y grid lines are specified using only three values at a time. For flexibilit
 グリッドの Y 枠線を設定するために 4 つのパラメーターを調整可能ですが、一度に変更できるのは、そのうち3 つの要素です。 そのため、まず変更しないパラメーターを除外対象として指定してから調整を始めてください。その際、除外されたパラメーターの値は他の 3 つのパラメーターが変更されるのに伴い自動的に更新されます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="185" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="190" />
         <source>Number of Y grid lines.
 
 The number of Y grid lines must be entered as an integer greater than zero</source>
@@ -1874,7 +1874,7 @@ The number of Y grid lines must be entered as an integer greater than zero</sour
 Y 枠線の本数を 1 以上の整数で指定します。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="196" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="203" />
         <source>Value of the first Y grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -1883,7 +1883,7 @@ The start value cannot be greater than the stop value</source>
 Y 枠線を開始する位置です。この値は終了位置の値よりも大きくならないようにしてください。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="207" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="214" />
         <source>Difference in value between two successive Y grid lines.
 
 The step value must be greater than zero</source>
@@ -1892,7 +1892,7 @@ The step value must be greater than zero</source>
 ゼロよりも大きな値を指定します。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="218" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="225" />
         <source>Value of the last Y grid line.
 
 The stop value cannot be less than the start value</source>
@@ -1901,34 +1901,39 @@ The stop value cannot be less than the start value</source>
 Y 枠線を終了する位置です。この値は開始位置の値よりも小さくならないようにしてください。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="234" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="241" />
         <source>Preview</source>
         <translation>プレビュー表示</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="241" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="248" />
         <source>Preview window that shows how current settings affect grid display</source>
         <translation>プレビュー画面 では、現在の設定がどのように枠線の表示に影響するかを見ることができます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="305" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="309" />
         <source>X Grid Lines</source>
         <translation>X 枠線</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="307" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="311" />
         <source>Grid Lines</source>
         <translation>グリッド 線</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="311" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="315" />
         <source>Y Grid Lines</source>
         <translation>Y 枠線</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="313" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="317" />
         <source>Radius Grid Lines</source>
         <translation>動径枠線</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="575" />
+        <source>Grid line count exceeds limit set by Settings / Main Window.</source>
+        <translation>グリッド数が設定/メインウィンドウで設定した制限を超えています。</translation>
     </message>
 </context>
 <context>
@@ -2124,17 +2129,17 @@ Y 枠線を終了する位置です。この値は開始位置の値よりも小
 <context>
     <name>DlgSettingsMainWindow</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="32" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="34" />
         <source>Main Window</source>
         <translation>メイン画面</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="57" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="59" />
         <source>Initial zoom:</source>
         <translation>初期画面の倍率：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="72" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="74" />
         <source>Initial Zoom
 
 Select the initial zoom factor when a new document is loaded. Either the previous zoom can be kept, or the specified zoom can be applied.</source>
@@ -2143,32 +2148,32 @@ Select the initial zoom factor when a new document is loaded. Either the previou
 新たにドキュメントを開いたときに画面に表示される倍率を設定します。前回閉じたときの倍率を維持することもできますし、また倍率を指定して開くこともできます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="78" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="80" />
         <source>Zoom control:</source>
         <translation>倍率の変更：</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="82" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="84" />
         <source>Menu only</source>
         <translation>メニューのみ</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="83" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="85" />
         <source>Menu and mouse wheel</source>
         <translation>メニューおよびマウス ホィールを使用</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="84" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="86" />
         <source>Menu and +/- keys</source>
         <translation>メニューおよび +/- キーを使用</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="85" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="87" />
         <source>Menu, mouse wheel and +/- keys</source>
         <translation>メニュー、マウス ホィール、あるいは +/- キーを使用</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="86" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="88" />
         <source>Zoom Control
 
 Select which inputs are used to zoom in and out.</source>
@@ -2177,12 +2182,12 @@ Select which inputs are used to zoom in and out.</source>
 倍率の拡大・縮小にどの入力方法を使うかを選べます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="91" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="93" />
         <source>Locale:</source>
         <translation>ロケール</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="96" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="98" />
         <source>Locale
 
 Select the locale that will be used in numbers (immediately), and the language in the user interface (after restart).
@@ -2195,26 +2200,31 @@ The locale determines how numbers are formatted. Specifically, either commas or 
 ロケール は数値の表現形式を決定付けますが、特に コンマ とピリオド はユーザーインターフェースでの表示に加えて出力ファイルでの取り扱いに影響します。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="116" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="118" />
         <source>Import cropping:</source>
         <translation>画像をトリミングしてインポート</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="120" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="122" />
         <source>Import Cropping
 
-Enables or disables cropping of the imported image when importing. Cropping the image is useful for removing unimportant information around a graph, but less useful when the graph already fills the entire image.</source>
+Enables or disables cropping of the imported image when importing. Cropping the image is useful for removing unimportant information around a graph, but less useful when the graph already fills the entire image.
+
+This setting only has an effect when Engauge has been built with support for pdf files.</source>
         <translation>画像をトリミングしてインポート
 
-画像を インポート する際に周囲をトリミングするかどうかを指定します。 画像のトリミングは画像周辺の不要な部分を除去するのに有用ですが、もしグラフが画像いっぱいに描画されているのであればあまり意味はありません。</translation>
+画像を インポート する際に周囲をトリミングするかどうかを指定します。 画像のトリミングは画像周辺の不要な部分を除去するのに有用ですが、もしグラフが画像いっぱいに描画されているのであればあまり意味はありません。
+
+この設定は、Engaugeがpdfファイルをサポートするように構築されている場合にのみ有効です。
+</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="132" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="135" />
         <source>Import PDF resolution (dots per inch):</source>
         <translation>PDF インポート の解像度 (dpi)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="136" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="139" />
         <source>Import PDF Resolution
 
 Imported Portable Document Format (PDF) files will be converted to this pixel resolution in dots per inch (DPI), where each pixel is one dot. A higher value increases the picture resolution and may also improve numeric digitizing accuracy. However, a very high value can make the image so large that Engauge will slow down.</source>
@@ -2223,12 +2233,12 @@ Imported Portable Document Format (PDF) files will be converted to this pixel re
 Portable Document Format (PDF) ファイルをインポートすると、ここで指定した解像度  (dots per inch: DPI)に変換されます。ここでのドットはピクセルに相当します。 値を大きくすると解像度が上がり、デジタイズ精度がよくなる可能性があります。一方で、あまり大きな値を与えて画像ファイルサイズが大きいと Engauge の動きが遅くなります。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="151" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="154" />
         <source>Maximum grid lines:</source>
         <translation>枠線の最大数</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="156" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="159" />
         <source>Maximum Grid Lines
 
 Maximum number of grid lines to be processed. This limit is applied when the step value is too small for the start and stop values, which would result in too many grid lines visually and possibly extremely long processing time (since each grid line would have to be processed)</source>
@@ -2237,12 +2247,12 @@ Maximum number of grid lines to be processed. This limit is applied when the ste
 ここで作成できる枠線の最大本数を指定します。この上限値を設定することで、枠線を生成する際にその範囲に比べてインターバル間隔が小さすぎるなど、枠線が多すぎて見分けがつかなくなったり、処理に時間がかかりすぎたりすることを防ぐことができます。 (各枠線の処理にある程度の時間を要します)。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="163" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="166" />
         <source>Highlight opacity:</source>
         <translation>ハイライト時の透明度</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="169" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="172" />
         <source>Highlight Opacity
 
 Opacity to be applied when the cursor is over a curve or axis point in Select mode. The change in appearance shows when the point can be selected.</source>
@@ -2251,17 +2261,17 @@ Opacity to be applied when the cursor is over a curve or axis point in Select mo
 選択モードで カーブ あるいは座標軸の基準点にマウスを重ねると、透明度の変化でハイライトしています。この見た目の変化でポイントがいつ選択されたかなどを知ることができます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="175" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="178" />
         <source>Recent file list:</source>
         <translation>最近利用したファイルのリスト</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="178" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="181" />
         <source>Clear</source>
         <translation>クリア</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="180" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="183" />
         <source>Recent File List Clear
 
 Clear the recent file list in the File menu.</source>
@@ -2270,12 +2280,12 @@ Clear the recent file list in the File menu.</source>
 ファイル メニューに表示される 最近利用したファイルリストをクリアすることができます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="186" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="189" />
         <source>Include title bar path:</source>
         <translation>タイトルバーにファイルへのパスを含める</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="191" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="194" />
         <source>Title Bar Filename
 
 Includes or excludes the path and file extension from the filename in the title bar.</source>
@@ -2284,12 +2294,12 @@ Includes or excludes the path and file extension from the filename in the title 
 タイトル バーにはファイル名が表示されますが、同時にファイルへのパスや拡張子を表示するか非表示とするかを選択できます。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="196" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="199" />
         <source>Allow small dialogs:</source>
         <translation>設定画面を小さく</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="201" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="204" />
         <source>Allow Small Dialogs
 
 Allows settings dialogs to be made very small so they fit on small computer screens.</source>
@@ -2298,12 +2308,12 @@ Allows settings dialogs to be made very small so they fit on small computer scre
 設定画面を可能な限り小さくして、小型のコンピューターの画面で扱いやすくします。</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="206" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="209" />
         <source>Allow drag and drop export:</source>
         <translation>ドラッグ アンド ドロップ でのエクスポートを許可</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="211" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="214" />
         <source>Allow Drag and Drop Export
 
 Allows drag and drop export from the Curve Fitting Window and Geometry Window tables.
@@ -3892,7 +3902,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="904" />
         <source>16:1 farther (1270%)</source>
-        <translation>16:1 やや遠望 (1270%)</translation>
+        <translation>16:1 よりやや遠望 (1270%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="906" />
@@ -3902,7 +3912,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="910" />
         <source>8:1 closer (1008%)</source>
-        <translation>8:1 やや近望 (1008%)</translation>
+        <translation>8:1 よりやや近接 (1008%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="912" />
@@ -3922,7 +3932,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="922" />
         <source>8:1 farther (635%)</source>
-        <translation>8:1 やや遠望 (635%)</translation>
+        <translation>8:1 よりやや遠望 (635%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="924" />
@@ -3932,7 +3942,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="928" />
         <source>4:1 closer (504%)</source>
-        <translation>4:1 やや近望 (504%)</translation>
+        <translation>4:1 よりやや近接 (504%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="930" />
@@ -3952,7 +3962,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="940" />
         <source>4:1 farther (317%)</source>
-        <translation>4:1 やや遠望 (317%)</translation>
+        <translation>4:1 よりやや遠望 (317%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="942" />
@@ -3962,7 +3972,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="946" />
         <source>2:1 closer (252%)</source>
-        <translation>2:1 やや近望 (252%)</translation>
+        <translation>2:1 よりやや近接 (252%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="948" />
@@ -3982,7 +3992,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="958" />
         <source>2:1 farther (159%)</source>
-        <translation>2:1 やや遠望 (159%)</translation>
+        <translation>2:1 よりやや遠望 (159%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="960" />
@@ -3992,7 +4002,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="964" />
         <source>1:1 closer (126%)</source>
-        <translation>1:1 やや近望 (126%)</translation>
+        <translation>1:1 よりやや近接 (126%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="967" />
@@ -4012,7 +4022,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="978" />
         <source>1:1 farther (79%)</source>
-        <translation>1:1 やや遠望 (79%)</translation>
+        <translation>1:1 よりやや遠望 (79%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="981" />
@@ -4022,7 +4032,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="985" />
         <source>1:2 closer (63%)</source>
-        <translation>1:2 やや近望 (63%)</translation>
+        <translation>1:2 よりやや近接 (63%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="987" />
@@ -4042,7 +4052,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="997" />
         <source>1:2 farther (40%)</source>
-        <translation>1:2 やや遠望 (40%)</translation>
+        <translation>1:2 よりやや遠望 (40%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="999" />
@@ -4052,7 +4062,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1003" />
         <source>1:4 closer (31%)</source>
-        <translation>1:4 やや遠望 (31%)</translation>
+        <translation>1:4 よりやや遠望 (31%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1005" />
@@ -4072,7 +4082,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1015" />
         <source>1:4 farther (20%)</source>
-        <translation>1:4 やや遠望 (20%)</translation>
+        <translation>1:4 よりやや遠望 (20%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1017" />
@@ -4082,7 +4092,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1021" />
         <source>1:8 closer (12.5%)</source>
-        <translation>1:8 やや近望 (12.5%)</translation>
+        <translation>1:8 よりやや近接 (12.5%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1023" />
@@ -4098,7 +4108,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1033" />
         <source>1:8 farther (10%)</source>
-        <translation>1:8 やや遠望 (10%)</translation>
+        <translation>1:8 よりやや遠望 (10%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1035" />
@@ -4108,7 +4118,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1039" />
         <source>1:16 closer (8%)</source>
-        <translation>1:16 やや近望 (8%)</translation>
+        <translation>1:16 よりやや近接 (8%)</translation>
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="1041" />
@@ -4354,9 +4364,19 @@ When pressed, this button Prints all digitized points and lines for all coordina
         <translation>画像を インポート</translation>
     </message>
     <message>
+        <location filename="../src/main/MainWindow.cpp" line="2010" />
+        <source>File opened</source>
+        <translation>ファイルが開かれた</translation>
+    </message>
+    <message>
         <location filename="../src/main/MainWindow.cpp" line="2055" />
         <source>File not found:</source>
         <translation>ファイル が見つかりません。</translation>
+    </message>
+    <message>
+        <location filename="../src/main/MainWindow.cpp" line="2072" />
+        <source>Error report opened</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../src/main/MainWindow.cpp" line="2130" />
@@ -4407,17 +4427,17 @@ Do you want to save your changes?</source>
         <translation>ドキュメントを開く</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="4692" />
+        <location filename="../src/main/MainWindow.cpp" line="4693" />
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="4693" />
+        <location filename="../src/main/MainWindow.cpp" line="4694" />
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="4821" />
+        <location filename="../src/main/MainWindow.cpp" line="4822" />
         <source>Engauge Digitizer %1</source>
         <translation>Engauge Digitizer %1</translation>
     </message>
@@ -5072,84 +5092,99 @@ Do you want to save your changes?</source>
         <translation>ポイント の スタイル 設定を読み込むことができません。</translation>
     </message>
     <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="20" />
+        <source>Coordinates (pixels):</source>
+        <translation>ピクセル単位の座標</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="21" />
+        <source>Coordinates (graph):</source>
+        <translation>グラフ座標の座標</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="22" />
+        <source>Resolution (graph):</source>
+        <translation>グラフ座標における解像度</translation>
+    </message>
+    <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="11" />
         <source>16:1 farther</source>
-        <translation>16:1 やや遠望</translation>
+        <translation>16:1 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="12" />
         <source>8:1 closer</source>
-        <translation>8:1 やや近望</translation>
+        <translation>8:1 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="14" />
         <source>8:1 farther</source>
-        <translation>8:1 やや遠望</translation>
+        <translation>8:1 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="15" />
         <source>4:1 closer</source>
-        <translation>4:1 やや近望</translation>
+        <translation>4:1 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="17" />
         <source>4:1 farther</source>
-        <translation>4:1 やや遠望</translation>
+        <translation>4:1 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="18" />
         <source>2:1 closer</source>
-        <translation>2:1 やや近望</translation>
+        <translation>2:1 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="20" />
         <source>2:1 farther</source>
-        <translation>2:1 やや遠望</translation>
+        <translation>2:1 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="21" />
         <source>1:1 closer</source>
-        <translation>1:1 やや近望</translation>
+        <translation>1:1 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="23" />
         <source>1:1 farther</source>
-        <translation>1:1 やや遠望</translation>
+        <translation>1:1 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="24" />
         <source>1:2 closer</source>
-        <translation>1:2 やや近望</translation>
+        <translation>1:2 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="26" />
         <source>1:2 farther</source>
-        <translation>1:2 やや遠望</translation>
+        <translation>1:2 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="27" />
         <source>1:4 closer</source>
-        <translation>1:4 やや近望</translation>
+        <translation>1:4 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="29" />
         <source>1:4 farther</source>
-        <translation>1:4 やや遠望</translation>
+        <translation>1:4 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="30" />
         <source>1:8 closer</source>
-        <translation>1:8 やや近望</translation>
+        <translation>1:8 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="32" />
         <source>1:8 farther</source>
-        <translation>1:8 やや遠望</translation>
+        <translation>1:8 よりやや遠望</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="33" />
         <source>1:16 closer</source>
-        <translation>1:16 やや遠望</translation>
+        <translation>1:16 よりやや近接</translation>
     </message>
     <message>
         <location filename="../src/Zoom/ZoomLabels.cpp" line="35" />
@@ -5245,12 +5280,12 @@ Do you want to save your changes?</source>
 <context>
     <name>StatusBar</name>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="64" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="63" />
         <source>Select cursor coordinate values to display.</source>
         <translation>表示する カーソル 座標を選択</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="65" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="64" />
         <source>Select Cursor Coordinate Values
 
 Values at cursor coordinates to display. Coordinates are in screen (pixels) or graph units. Resolution (which is the number of graph units per pixel) is in graph units. Graph units are only available after axis points have been defined.</source>
@@ -5259,12 +5294,12 @@ Values at cursor coordinates to display. Coordinates are in screen (pixels) or g
 カーソル 位置 での座標値として表示する値を設定します。座標は コンピューター画面の ピクセル (数) あるいは グラフ 上での単位のいずれでも示すことが可能です。精度 は (つまり 一つのピクセルの サイズ ) は グラフ 単位 で示されます。 グラフ の単位 での表示は 座標軸 の基準となる ポイント の設定が終わっていないと選択できません。</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="78" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="77" />
         <source>Cursor coordinate values.</source>
         <translation>カーソル 位置 の座標値</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="79" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="78" />
         <source>Cursor Coordinate Values
 
 Values at cursor coordinates. Coordinates are in screen (pixels) or graph units. Resolution (which is the number of graph units per pixel) is in graph units. Graph units are only available after axis points have been defined.</source>
@@ -5273,12 +5308,12 @@ Values at cursor coordinates. Coordinates are in screen (pixels) or graph units.
 カーソル 位置 の座標値を示します。座標は コンピューター 画面のピクセル  (数) またはグラフ 上での単位のいずれでも示すことが可能です。精度は (つまり一つのピクセルのサイズは) グラフ の単位で示されます。グラフ の 単位での表示は座標軸の基準となる ポイント の設定が終わっていないと選択できません。</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="134" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="132" />
         <source>Select zoom.</source>
         <translation>拡大縮小 率を設定</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="135" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="133" />
         <source>Select Zoom
 
 Points can be more accurately placed by zooming in.</source>

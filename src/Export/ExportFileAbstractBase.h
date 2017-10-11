@@ -47,6 +47,11 @@ protected:
                             ExportHeader exportHeader,
                             QTextStream &str) const;
 
+  /// RFC 4180 says if values are delimited by a comma AND a value has commas in it (for locale like
+  /// English/Switzerland when dealing with numbers) then double quotes are required for the value.
+  /// In other cases this method is a noop
+  QString wrapInDoubleQuotesIfNeeded (const DocumentModelExportFormat &modelExportOverride,
+                                      const QString &valueString) const;
 };
 
 #endif // EXPORT_FILE_ABSTRACT_BASE_H
