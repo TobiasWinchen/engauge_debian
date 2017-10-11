@@ -85,3 +85,18 @@ void ExportFileAbstractBase::insertLineSeparator (bool isFirst,
     }
   }
 }
+
+QString ExportFileAbstractBase::wrapInDoubleQuotesIfNeeded (const DocumentModelExportFormat &modelExportOverride,
+                                                            const QString &valueString) const
+{
+  QString newValueString = valueString;
+
+  if ((modelExportOverride.delimiter () == EXPORT_DELIMITER_COMMA) &&
+      (valueString.indexOf (",") >= 0)) {
+
+    // Eliminate ambiguities according to RFC 4180
+    newValueString = QString ("\"%1\"").arg (valueString);
+  }
+
+  return newValueString;
+}

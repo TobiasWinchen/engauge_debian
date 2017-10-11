@@ -14,9 +14,11 @@
 #        qmake "CONFIG+=debug jpeg2000"
 #    At some point, Qt may provide its own support for this format, at which point this can be skipped
 # 4) Add 'pdf' to the qmake command line to include support for PDF input files. Requires
-#        1) previous installation of the poppler-qt5 development package
-#        2) POPPLER_INCLUDE environment variable pointing to directory containing poppler-qt5.h
-#        3) POPPLER_LIB environment variable pointing to directory containing libpoppler-qt5.so
+#        1) Linux and Mac OSX builds only. Unfortunately, the old software libraries needed to support
+#           PDF in Windows no longer compile and link correctly with newer Engauge builds. 
+#        2) previous installation of the poppler-qt5 development package
+#        3) POPPLER_INCLUDE environment variable pointing to directory containing poppler-qt5.h
+#        4) POPPLER_LIB environment variable pointing to directory containing libpoppler-qt5.so
 #    Sample command lines:
 #        qmake CONFIG+=pdf
 #        qmake "CONFIG+=debug pdf"
@@ -33,7 +35,7 @@
 
 QT += core gui printsupport widgets xml
 
-win32-*|linux-*|unix-* {
+!mac {
 QT += help
 HEADERS += src/Help/HelpBrowser.h \
            src/Help/HelpWindow.h
