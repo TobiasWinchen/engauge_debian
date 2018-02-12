@@ -1,3 +1,14 @@
+engauge-digitizer (10.4+ds.1-2) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Fix FTCBFS: Let dh_auto_configure pass cross flags to qmake.
+    (Closes: #889801)
+
+  [Tobias Winchen]
+  * Update to ch compat 10
+
+ -- Tobias Winchen <tobias@winchen.de>  Mon, 12 Feb 2018 17:25:24 +0100
+
 engauge-digitizer (10.4+ds.1-1) unstable; urgency=medium
 
   * New upstream release

@@ -11,7 +11,7 @@ export POPPLER_INCLUDE := /usr/include/poppler/qt5
 	dh $@ --parallel
 
 override_dh_auto_configure:
-	ENGAUGE_RELEASE=1	 qmake engauge.pro CONFIG+=jpeg2000 CONFIG+=pdf
+	ENGAUGE_RELEASE=1 dh_auto_configure -- engauge.pro CONFIG+=jpeg2000 CONFIG+=pdf
 
 override_dh_auto_build:
 	# build documentation
