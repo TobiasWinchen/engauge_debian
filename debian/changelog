@@ -6,6 +6,9 @@ engauge-digitizer (10.4+ds.1-2) unstable; urgency=medium
 
   [Tobias Winchen]
   * Update to ch compat 10
+    - Drop --parallel from dh $@
+  * Install icons in usr/share/icons instead of usr/share/pixmaps\
+    - Install SVG icon using engauge-digitizer.install
 
  -- Tobias Winchen <tobias@winchen.de>  Mon, 12 Feb 2018 17:25:24 +0100
 

@@ -8,7 +8,7 @@ export OPENJPEG_INCLUDE = $(shell find /usr/include/ -name openjpeg.h -exec dirn
 export POPPLER_INCLUDE := /usr/include/poppler/qt5
 
 %:
-	dh $@ --parallel
+	dh $@
 
 override_dh_auto_configure:
 	ENGAUGE_RELEASE=1 dh_auto_configure -- engauge.pro CONFIG+=jpeg2000 CONFIG+=pdf
@@ -21,12 +21,12 @@ override_dh_auto_build:
 	mv help/engauge.qch bin/
 	dh_auto_build
 
-override_dh_clean:
-	rm -rf bin/
-	rm -rf engauge.log
-	dh_clean
+#override_dh_clean:
+#	rm -rf bin/
+#	rm -rf engauge.log
+#	dh_clean
 
-override_dh_install:
-	mkdir -p debian/engauge-digitizer/usr/share/pixmaps/
-	install -m644 src/img/bannerapp_128.xpm debian/engauge-digitizer/usr/share/pixmaps/engauge-digitizer.xpm
-	dh_install
+#override_dh_install:
+#	mkdir -p debian/engauge-digitizer/usr/share/pixmaps/
+#	install -m644 src/img/bannerapp_128.xpm debian/engauge-digitizer/usr/share/pixmaps/engauge-digitizer.xpm
+#	dh_install

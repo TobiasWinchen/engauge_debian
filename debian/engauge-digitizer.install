@@ -1,3 +1,4 @@
 bin/engauge		usr/bin
 dev/engauge-digitizer.desktop usr/share/applications
 dev/gnome/engauge-digitizer.appdata.xml usr/share/metainfo
+src/img/engauge-digitizer.svg usr/share/icons/hicolor/scalable/apps/
