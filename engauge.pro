@@ -6,7 +6,8 @@
 #    To get a 'debug' build, add 'CONFIG=debug' to the qmake command line:
 #        qmake CONFIG=debug
 # 3) Add 'jpeg2000' to the qmake command line to include support for JPEG2000 input files. Requires:
-#        1) previous installation of OpenJPEG development package
+#        1) previous installation of OpenJPEG development package. According to Debian Security
+#           Advisory DSA-4013-1 the version should be newer than 2.1.2-1.1.
 #        2) OPENJPEG_INCLUDE environment variable pointing to directory with openjpeg.h
 #        3) OPENJPEG_LIB environment variable pointing to directory with libopenjp2.so
 #    Sample command lines:
@@ -730,17 +731,6 @@ win32-* {
   CONFIG += windows
 }
 
-win32-msvc* {
-  QMAKE_CXXFLAGS += -EHsc /F 32000000
-  LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell32.lib
-} else {
-  win32-g++* {
-    LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
-    QMAKE_LFLAGS += -Wl,--stack,32000000
-  }
-  LIBS += -lfftw3 -llog4cpp
-}
-
 linux-* {
   QT += network
   DEFINES += "NETWORKING"
@@ -751,6 +741,22 @@ linux-* {
   INCLUDEPATH += $$(FFTW_HOME)/include \
                  $$(LOG4CPP_HOME)/include
   LIBS += -L/$$(FFTW_HOME)/lib -L$$(LOG4CPP_HOME)/lib
+}
+  
+win32-msvc* {
+  QMAKE_CXXFLAGS += -EHsc /F 32000000
+  contains(QT_ARCH,i386) {
+    LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell32.lib
+    QMAKE_LFLAGS += /MACHINE:i386
+  } else {
+    LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib 
+  }
+} else {
+  win32-g++* {
+    LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
+    QMAKE_LFLAGS += -Wl,--stack,32000000
+  }
+  LIBS += -lfftw3 -llog4cpp
 }
 
 INCLUDEPATH += src \

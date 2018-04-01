@@ -27,8 +27,8 @@ before_install:
      sudo apt-get install --yes --no-install-recommends qtbase5-dev qttools5-dev qt5-default qttools5-dev-tools qt5-qmake liblog4cpp5-dev libfftw3-dev libqt5sql5-sqlite xvfb;
    elif [ `uname` = "Darwin" ]; then
      brew update;
-     brew install homebrew/versions/qt55 fftw log4cpp;
-     export QT5BREWHOME=`brew --prefix homebrew/versions/qt55`;
+     brew install homebrew/core/qt@5.5 fftw log4cpp;
+     export QT5BREWHOME=`brew --prefix homebrew/core/qt@5.5`;
    fi
 
 script:
@@ -36,8 +36,8 @@ script:
     export CPPFLAGS="-I$QT5BREWHOME/include";
     export LDFLAGS="-L$QT5BREWHOME/lib";
     export PATH=$QT5BREWHOME/bin:$PATH;
-    export FFTW_HOME="/usr/local/Cellar/fftw/3.3.6-pl2";
-    export LOG4CPP_HOME="/usr/local/Cellar/log4cpp/1.1.3";
+    export FFTW_HOME=`brew --prefix homebrew/core/fftw`;
+    export LOG4CPP_HOME=`brew --prefix homebrew/core/log4cpp`;
    fi
  - if [ "$BUILD_DEBUG" = "1" ]; then
     export BUILD_FLAGS="CONFIG+=debug";
