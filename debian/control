@@ -1,12 +1,12 @@
 Source: engauge-digitizer
 Section: science
 Priority: optional
-Maintainer: Tobias Winchen <tobias@winchen.de> 
+Maintainer: Tobias Winchen <tobias@winchen.de>
 Build-Depends: dpkg-dev (>= 1.16.1~), debhelper (>= 10), qtbase5-dev, qtbase5-dev-tools, qttools5-dev, qttools5-dev-tools, libqt5sql5-sqlite, libfftw3-dev, libjpeg-dev, liblog4cpp5-dev, libopenjp2-7-dev, libpoppler-qt5-dev
 Standards-Version: 4.1.1
 Vcs-Git: https://github.com/TobiasWinchen/engauge_debian.git
 Vcs-Browser: https://github.com/winchen/engauge_debian
-Homepage: http://markummitchell.github.io/engauge-digitizer
+Homepage: https://markummitchell.github.io/engauge-digitizer
 
 Package: engauge-digitizer
 Architecture: any
@@ -27,18 +27,18 @@ Description: interactively extracts numbers from bitmap graphs or maps
     * Automatic point and axis matching
     * Automatic curve tracing
     * Image processing for separating important details from background
-      information 
-    * A wizard providing an interactive tutorial to explain the basic steps 
+      information
+    * A wizard providing an interactive tutorial to explain the basic steps
     * Multiple coordinate systems in the same image can be digitized in
       advanced mode
     * Cubic spline interpolation between points gives more accurate curves with
-      fewer points 
+      fewer points
     * Handling of Cartesian, polar, linear and logarithmic graphs
     * Support for drag-and-drop and copy-and-paste
     * Context sensitive help, user manual and tutorials explaining every
       feature
     * Preview windows to give immediate feedback while modifying settings
-    * Automated line and point extraction to rapidly digitizes data 
+    * Automated line and point extraction to rapidly digitizes data
 
 Package: engauge-digitizer-doc
 Section: doc
