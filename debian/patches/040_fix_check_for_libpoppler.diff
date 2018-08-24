@@ -3,9 +3,9 @@ Last-Update: 2016-07-09
 
 --- a/engauge.pro
 +++ b/engauge.pro
-@@ -788,16 +788,11 @@
+@@ -878,16 +878,11 @@
  pdf {
-     message("PDF support:      yes")
+     message("PDF support:        yes")
      _POPPLER_INCLUDE = $$(POPPLER_INCLUDE)
 -    _POPPLER_LIB = $$(POPPLER_LIB)
      isEmpty(_POPPLER_INCLUDE) {

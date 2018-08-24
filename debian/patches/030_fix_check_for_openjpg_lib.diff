@@ -3,7 +3,7 @@ Last-Update: 2016-07-09
 
 --- a/engauge.pro
 +++ b/engauge.pro
-@@ -723,15 +723,11 @@
+@@ -855,15 +855,11 @@
      _OPENJPEG_LIB = $$(OPENJPEG_LIB)
      isEmpty(_OPENJPEG_INCLUDE) {
        error("OPENJPEG_INCLUDE and OPENJPEG_LIB environment variables must be defined")
@@ -22,11 +22,11 @@ Last-Update: 2016-07-09
      HEADERS += src/Jpeg2000/Jpeg2000.h \
                 src/Jpeg2000/Jpeg2000Callbacks.h \
                 src/Jpeg2000/Jpeg2000Color.h \
-@@ -742,7 +738,6 @@
+@@ -874,7 +870,6 @@
                 src/Jpeg2000/Jpeg2000Color.cpp \
                 src/Jpeg2000/Jpeg2000Convert.cpp
      QMAKE_LFLAGS += -Wl,-rpath=\'\$\$ORIGIN\'
 -    QMAKE_POST_LINK += cp $$(OPENJPEG_LIB)/libopenjp2.so.7 bin
  
  } else {
-     message("JPEG2000 support: no")
+     message("JPEG2000 support:   no")
