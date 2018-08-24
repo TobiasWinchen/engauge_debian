@@ -1,5 +1,9 @@
-version=3
-opts="dversionmangle=s/\+ds\.\d+$//,filenamemangle=s/\S+\/v?(\S+)\.tar\.gz/engauge-$1\.tar\.gz/" \
+version=4
+opts=\
+repacksuffix=+ds,\
+repack,compression=xz,\
+dversionmangle=s/\+(debian|dfsg|ds|deb)(\.\d+)?$//,\
+filenamemangle=s/\S+\/v?(\S+)\.tar\.gz/engauge-$1\.tar\.gz/ \
 https://github.com/markummitchell/engauge-digitizer/tags .*/v?(\d\S*)\.tar\.gz
 
 
