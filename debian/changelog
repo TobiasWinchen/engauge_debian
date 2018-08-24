@@ -1,7 +1,16 @@
+engauge-digitizer (10.9+ds.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * Handle repacking in watch file and list excluded files in copyright
+  * Update to dh compat 11
+  * Updated to standards version 4.2.0
+
+ -- Tobias Winchen <tobias@winchen.de>  Fri, 24 Aug 2018 13:56:15 +0200
+
 engauge-digitizer (10.5+ds.1-1) unstable; urgency=medium
 
-  *  New upstream release
-  *  Updated to standards version 4.1.3
+  * New upstream release
+  * Updated to standards version 4.1.3
   * Use https link for homepage
 
  -- Tobias Winchen <tobias@winchen.de>  Sun, 01 Apr 2018 13:03:31 +0200
@@ -13,7 +22,7 @@ engauge-digitizer (10.4+ds.1-2) unstable; urgency=medium
     (Closes: #889801)
 
   [Tobias Winchen]
-  * Update to ch compat 10
+  * Update to dh compat 10
     - Drop --parallel from dh $@
   * Install icons in usr/share/icons instead of usr/share/pixmaps\
     - Install SVG icon using engauge-digitizer.install
