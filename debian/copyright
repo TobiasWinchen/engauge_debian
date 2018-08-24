@@ -1,9 +1,8 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: engauge-digitizer
 Upstream-Contact: Mark Mitchell <markummitchell@gmail.com>
 Source: http://markummitchell.github.io/engauge-digitizer/
 Files-Excluded: dev/windows/* dev/osx/* samples/* dev/linux/* dev/banner_generator.cpp dev/engauge.pro.user.mmitchell.linux dev/engauge.pro.user.mmitchell.osx dev/engauge.pro.user.mmitchell.windows dev/huge.gnuplot dev/plot_cartesian.gnuplot dev/plot_map.cpp dev/plot_map.dat dev/plot_map.gnuplot dev/plot_polar.gnuplot dev/ProcessFlowchart.odp dev/README_platforms.txt dev/SpreadsheetsForDoc.odp dev/SpreadsheetsForDocs.ods dev/update_graphs.py dev/world.dat
-
 
 Files: *
 Copyright: 2002-2018, Mark Mitchell <markummitchell@gmail.com>
@@ -60,38 +59,3 @@ License: BSD-2-clause
 License: GPL-2+
   On Debian systems, the complete text of the GNU General
   Public License version 2 can be found in `/usr/share/common-licenses/GPL-2'.
-
-Files-Excluded:
-  bin/*
-  contrib/*
-	dev/cygport/*
-	dev/flatpak/*
-	dev/linux/*
-	dev/osx/*
-	dev/snapcraft/*
-	dev/windows/*
-  dev/banner_generator.cpp
-  dev/engauge.pro.user.mmitchell.linux
-  dev/engauge.pro.user.mmitchell.osx
-  dev/engauge.pro.user.mmitchell.windows
-  dev/huge.gnuplot
-  dev/plot_cartesian.gnuplot
-  dev/plot_map.cpp
-  dev/plot_map.dat
-  dev/plot_map.gnuplot
-  dev/plot_polar.gnuplot
-  dev/ProcessFlowchart.odp
-  dev/README_links.txt
-  dev/README_platforms.txt
-  dev/SpreadsheetsForDoc.odp
-  dev/SpreadsheetsForDocs.ods
-  dev/update_graphs.py
-  dev/world.dat
-	doc/*
-	samples/*
-	test/*
-	.gitignore
-	.travis.yml
-	appveyor.yml
-
-Comment: The files were excluded as they are usefull for generating non-deban binary distributions repsectively manual testing.

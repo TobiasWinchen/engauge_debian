@@ -1,7 +1,7 @@
 engauge-digitizer (10.9+ds.1-1) unstable; urgency=medium
 
   * New upstream release
-  * Handle repacking in watch file and list excluded files in copyright
+  * Handle repacking in watch file
   * Update to dh compat 11
   * Updated to standards version 4.2.0
 
