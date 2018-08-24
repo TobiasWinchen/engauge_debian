@@ -42,6 +42,7 @@ HEADERS  += \
     Callback/CallbackCheckAddPointAxis.h \
     Callback/CallbackCheckEditPointAxis.h \
     Callback/CallbackDocumentHash.h \
+    Callback/CallbackDocumentScrub.h \
     Callback/CallbackGatherXThetaValuesFunctions.h \
     Callback/CallbackNextOrdinal.h \
     Callback/CallbackPointOrdinal.h \
@@ -149,7 +150,6 @@ HEADERS  += \
     Dlg/DlgEditScale.h \    
     Dlg/DlgErrorReportAbstractBase.h \
     Dlg/DlgErrorReportLocal.h \    
-    Dlg/DlgErrorReportNetworking.h \
     Dlg/DlgFilterCommand.h \
     Dlg/DlgFilterThread.h \
     Dlg/DlgFilterWorker.h \
@@ -191,6 +191,7 @@ HEADERS  += \
     Document/DocumentModelGridRemoval.h \
     Document/DocumentModelPointMatch.h \
     Document/DocumentModelSegments.h \
+    Document/DocumentScrub.h \
     Document/DocumentSerialize.h \
     include/EngaugeAssert.h \
     util/EnumsToQt.h \
@@ -283,6 +284,7 @@ HEADERS  += \
     Load/LoadImageFromUrl.h \
     Logger/Logger.h \
     Logger/LoggerUpload.h \
+    main/MainDirectoryPersist.h \
     main/MainTitleBarFormat.h \
     main/MainWindow.h \
     main/MainWindowModel.h \
@@ -378,6 +380,7 @@ SOURCES += \
     Callback/CallbackCheckAddPointAxis.cpp \
     Callback/CallbackCheckEditPointAxis.cpp \
     Callback/CallbackDocumentHash.cpp \
+    Callback/CallbackDocumentScrub.cpp \
     Callback/CallbackGatherXThetaValuesFunctions.cpp \
     Callback/CallbackNextOrdinal.cpp \
     Callback/CallbackPointOrdinal.cpp \
@@ -481,7 +484,6 @@ SOURCES += \
     Dlg/DlgEditScale.cpp \        
     Dlg/DlgErrorReportAbstractBase.cpp \
     Dlg/DlgErrorReportLocal.cpp \        
-    Dlg/DlgErrorReportNetworking.cpp \    
     Dlg/DlgFilterCommand.cpp \
     Dlg/DlgFilterThread.cpp \
     Dlg/DlgFilterWorker.cpp \
@@ -521,6 +523,7 @@ SOURCES += \
     Document/DocumentModelGridRemoval.cpp \
     Document/DocumentModelPointMatch.cpp \
     Document/DocumentModelSegments.cpp \
+    Document/DocumentScrub.cpp \
     Document/DocumentSerialize.cpp \
     util/EnumsToQt.cpp \
     Export/ExportAlignLinear.cpp \
@@ -604,6 +607,7 @@ SOURCES += \
     Logger/Logger.cpp \
     Logger/LoggerUpload.cpp \
     Matrix/Matrix.cpp \
+    main/MainDirectoryPersist.cpp \
     main/MainWindow.cpp \
     main/MainWindowModel.cpp \
     util/MigrateToVersion6.cpp \
