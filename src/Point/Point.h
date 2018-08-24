@@ -19,6 +19,8 @@ enum ApplyHasCheck {
   SKIP_HAS_CHECK
 };
 
+extern const QString POINT_IDENTIFIER_DELIMITER_SAFE;
+
 /// Class that represents one digitized point. The screen-to-graph coordinate transformation is always external to this class
 class Point
 {
@@ -132,6 +134,10 @@ public:
   static double UNDEFINED_ORDINAL () { return -1.0; }
 
 private:
+
+  /// Version 10.7 was known to have unwanted underscores in points rather than the correct
+  /// tabs, in issue #273
+  QString fixUnderscores (const QString &identifer) const;
 
   /// Load from serialized xml
   void loadXml(QXmlStreamReader &reader);

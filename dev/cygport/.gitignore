@@ -1,0 +1,7 @@
+engauge-digitizer.cygport
+engauge-digitizer-*.x86_64
+v*.tar.gz
+*.tmp
+*.zip
+build_version.log
+

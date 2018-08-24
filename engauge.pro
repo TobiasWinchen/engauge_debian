@@ -31,6 +31,9 @@
 #    Likewise, it is not included for OSX since it is interpretted as a threat. 
 #    The network module can download files, which is what malware does to install bad things
 # 8) In OSX, QtHelp requires QtNetwork which is rejected by the operating system, so QtHelp is disabled
+# 9) To include log4cpp_null as part of the build, add the 'log4cpp_null' config argument. This is meant only for
+#    building the snap package.
+#        qmake CONFIG+=log4cpp_null
 #
 # More comments are in the INSTALL file, and below
 
@@ -76,6 +79,7 @@ HEADERS  += \
     src/Callback/CallbackCheckAddPointAxis.h \
     src/Callback/CallbackCheckEditPointAxis.h \
     src/Callback/CallbackDocumentHash.h \
+    src/Callback/CallbackDocumentScrub.h \
     src/Callback/CallbackGatherXThetaValuesFunctions.h \
     src/Callback/CallbackNextOrdinal.h \
     src/Callback/CallbackPointOrdinal.h \
@@ -183,7 +187,6 @@ HEADERS  += \
     src/Dlg/DlgEditScale.h \    
     src/Dlg/DlgErrorReportAbstractBase.h \    
     src/Dlg/DlgErrorReportLocal.h \
-    src/Dlg/DlgErrorReportNetworking.h \    
     src/Dlg/DlgFilterCommand.h \
     src/Dlg/DlgFilterThread.h \
     src/Dlg/DlgFilterWorker.h \
@@ -225,6 +228,7 @@ HEADERS  += \
     src/Document/DocumentModelGridRemoval.h \
     src/Document/DocumentModelPointMatch.h \
     src/Document/DocumentModelSegments.h \
+    src/Document/DocumentScrub.h \
     src/Document/DocumentSerialize.h \
     src/include/EngaugeAssert.h \
     src/util/EnumsToQt.h \
@@ -315,6 +319,7 @@ HEADERS  += \
     src/Logger/Logger.h \
     src/Logger/LoggerUpload.h \
     src/Matrix/Matrix.h \
+    src/main/MainDirectoryPersist.h \
     src/main/MainTitleBarFormat.h \
     src/main/MainWindow.h \
     src/main/MainWindowModel.h \
@@ -407,6 +412,7 @@ SOURCES += \
     src/Callback/CallbackCheckAddPointAxis.cpp \
     src/Callback/CallbackCheckEditPointAxis.cpp \
     src/Callback/CallbackDocumentHash.cpp \
+    src/Callback/CallbackDocumentScrub.cpp \
     src/Callback/CallbackGatherXThetaValuesFunctions.cpp \
     src/Callback/CallbackNextOrdinal.cpp \
     src/Callback/CallbackPointOrdinal.cpp \
@@ -510,7 +516,6 @@ SOURCES += \
     src/Dlg/DlgEditScale.cpp \        
     src/Dlg/DlgErrorReportAbstractBase.cpp \
     src/Dlg/DlgErrorReportLocal.cpp \
-    src/Dlg/DlgErrorReportNetworking.cpp \
     src/Dlg/DlgFilterCommand.cpp \
     src/Dlg/DlgFilterThread.cpp \
     src/Dlg/DlgFilterWorker.cpp \
@@ -550,6 +555,7 @@ SOURCES += \
     src/Document/DocumentModelGridRemoval.cpp \
     src/Document/DocumentModelPointMatch.cpp \
     src/Document/DocumentModelSegments.cpp \
+    src/Document/DocumentScrub.cpp \
     src/Document/DocumentSerialize.cpp \
     src/util/EnumsToQt.cpp \
     src/Export/ExportAlignLinear.cpp \
@@ -631,6 +637,7 @@ SOURCES += \
     src/Logger/LoggerUpload.cpp \
     src/Matrix/Matrix.cpp \
     src/main/main.cpp \
+    src/main/MainDirectoryPersist.cpp \
     src/main/MainWindow.cpp \
     src/main/MainWindowModel.cpp \
     src/util/MigrateToVersion6.cpp \
@@ -727,10 +734,6 @@ macx-* {
   DESTDIR = bin
 }
 
-win32-* {
-  CONFIG += windows
-}
-
 linux-* {
   QT += network
   DEFINES += "NETWORKING"
@@ -738,25 +741,51 @@ linux-* {
              src/Network/NetworkClient.h
   SOURCES += src/Load/LoadImageFromUrl.cpp \
              src/Network/NetworkClient.cpp
-  INCLUDEPATH += $$(FFTW_HOME)/include \
-                 $$(LOG4CPP_HOME)/include
-  LIBS += -L/$$(FFTW_HOME)/lib -L$$(LOG4CPP_HOME)/lib
+  INCLUDEPATH += $$(FFTW_HOME)/include
+  LIBS += -L/$$(FFTW_HOME)/lib
+  !log4cpp_null {
+    INCLUDEPATH += $$(LOG4CPP_HOME)/include
+    LIBS += -L$$(LOG4CPP_HOME)/lib
+  }
 }
   
 win32-msvc* {
   QMAKE_CXXFLAGS += -EHsc /F 32000000
+  !log4cpp_null {
+    LIBS += $$(LOG4CPP_HOME)/lib/log4cpp.lib
+  }
+  LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib
   contains(QT_ARCH,i386) {
-    LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib shell32.lib
+    LIBS += shell32.lib
     QMAKE_LFLAGS += /MACHINE:i386
-  } else {
-    LIBS += $$(FFTW_HOME)/lib/libfftw3-3.lib $$(LOG4CPP_HOME)/lib/log4cpp.lib 
   }
 } else {
   win32-g++* {
-    LIBS += -L$$(LOG4CPP_HOME)/lib -L$$(FFTW_HOME)/lib
+    !log4cpp_null {
+      LIBS += -L$$(LOG4CPP_HOME)/lib
+    }
+    LIBS +=  -L$$(FFTW_HOME)/lib
     QMAKE_LFLAGS += -Wl,--stack,32000000
   }
-  LIBS += -lfftw3 -llog4cpp
+  LIBS += -lfftw3
+  !log4cpp_null {
+    LIBS += -llog4cpp
+  }
+}
+win32-* {
+  CONFIG += windows
+  INCLUDEPATH += $$(FFTW_HOME)/include
+  !log4cpp_null {
+    INCLUDEPATH += $$(LOG4CPP_HOME)/include
+  }
+}
+
+cygport {
+    message("cygport build:      yes")
+    INCLUDEPATH += $$(FFTW_HOME)/include
+    LIBS += -L/$$(FFTW_HOME)/lib
+} else {
+    message("cygport build:      no")
 }
 
 INCLUDEPATH += src \
@@ -812,21 +841,16 @@ INCLUDEPATH += src \
                src/Window \
                src/Zoom
 
-win32-* {
-  INCLUDEPATH += $$(FFTW_HOME)/include \
-                 $$(LOG4CPP_HOME)/include
-}
-
 RESOURCES += src/engauge.qrc
 
 CONFIG(debug,debug|release) {
-  message("Build type:       debug")
+  message("Build type:         debug")
 } else {
-  message("Build type:       release")
+  message("Build type:         release")
 }
 
 jpeg2000 {
-    message("JPEG2000 support: yes")
+    message("JPEG2000 support:   yes")
     _OPENJPEG_INCLUDE = $$(OPENJPEG_INCLUDE)
     _OPENJPEG_LIB = $$(OPENJPEG_LIB)
     isEmpty(_OPENJPEG_INCLUDE) {
@@ -853,11 +877,11 @@ jpeg2000 {
     QMAKE_POST_LINK += cp $$(OPENJPEG_LIB)/libopenjp2.so.7 bin
 
 } else {
-    message("JPEG2000 support: no")
+    message("JPEG2000 support:   no")
 }
 
 pdf {
-    message("PDF support:      yes")
+    message("PDF support:        yes")
     _POPPLER_INCLUDE = $$(POPPLER_INCLUDE)
     _POPPLER_LIB = $$(POPPLER_LIB)
     isEmpty(_POPPLER_INCLUDE) {
@@ -882,7 +906,38 @@ pdf {
                src/Pdf/PdfFrameHandle.cpp
 
 } else {
-    message("PDF support:      no")
+    message("PDF support:        no")
+}
+
+log4cpp_null {
+    message("log4cpp_null build: yes")
+    INCLUDEPATH += src/log4cpp_null/include
+    HEADERS += src/log4cpp_null/include/log4cpp/Appender.hh \
+               src/log4cpp_null/include/log4cpp/Category.hh \
+               src/log4cpp_null/include/log4cpp/CategoryStream.hh \
+               src/log4cpp_null/include/log4cpp/Configurator.hh \
+               src/log4cpp_null/include/log4cpp/convenience.h \
+               src/log4cpp_null/include/log4cpp/FileAppender.hh \
+               src/log4cpp_null/include/log4cpp/Layout.hh \
+               src/log4cpp_null/include/log4cpp/LayoutAppender.hh \
+               src/log4cpp_null/include/log4cpp/LoggingEvent.hh \
+               src/log4cpp_null/include/log4cpp/PatternLayout.hh \
+               src/log4cpp_null/include/log4cpp/Priority.hh \
+               src/log4cpp_null/include/log4cpp/PropertyConfigurator.hh \
+               src/log4cpp_null/include/log4cpp/RollingFileAppender.hh
+    SOURCES += src/log4cpp_null/src/Appender.cpp \
+               src/log4cpp_null/src/Category.cpp \
+               src/log4cpp_null/src/CategoryStream.cpp \
+               src/log4cpp_null/src/Configurator.cpp \
+               src/log4cpp_null/src/FileAppender.cpp \
+               src/log4cpp_null/src/Layout.cpp \
+               src/log4cpp_null/src/LayoutAppender.cpp \
+               src/log4cpp_null/src/LoggingEvent.cpp \
+               src/log4cpp_null/src/PatternLayout.cpp \
+               src/log4cpp_null/src/PropertyConfigurator.cpp \
+               src/log4cpp_null/src/RollingFileAppender.cpp
+} else {
+    message("log4cpp_null build: no")
 }
 
 # People interested in translating a language can contact the developers for help. 
