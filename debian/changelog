@@ -1,6 +1,7 @@
 engauge-digitizer (10.10+ds.1-1) unstable; urgency=medium
 
   * New upstream release
+  * Updated to standards version 4.2.1
 
  -- Tobias Winchen <tobias@winchen.de>  Tue, 02 Oct 2018 22:23:05 +0200
 
