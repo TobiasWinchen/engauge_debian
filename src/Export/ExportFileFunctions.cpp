@@ -4,7 +4,8 @@
  * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
  ******************************************************************************************************/
 
-#include "CallbackGatherXThetaValuesFunctions.h"
+#include "CallbackGatherXThetasInCurves.h"
+#include "CallbackGatherXThetasInGridLines.h"
 #include "CurveConnectAs.h"
 #include "Document.h"
 #include "DocumentModelGeneral.h"
@@ -14,6 +15,7 @@
 #include "ExportOrdinalsSmooth.h"
 #include "ExportXThetaValuesMergedFunctions.h"
 #include "FormatCoordsUnits.h"
+#include "GridLineLimiter.h"
 #include "LinearToLog.h"
 #include "Logger.h"
 #include <qmath.h>
@@ -39,6 +41,8 @@ void ExportFileFunctions::exportAllPerLineXThetaValuesMerged (const DocumentMode
                                                               const Transformation &transformation,
                                                               bool isLogXTheta,
                                                               bool isLogYRadius,
+                                                              const CurveLimits curveLimitsMin,
+                                                              const CurveLimits curveLimitsMax,
                                                               QTextStream &str,
                                                               unsigned int &numWritesSoFar) const
 {
@@ -58,6 +62,8 @@ void ExportFileFunctions::exportAllPerLineXThetaValuesMerged (const DocumentMode
                      isLogXTheta,
                      isLogYRadius,
                      xThetaValues,
+                     curveLimitsMin,
+                     curveLimitsMax,
                      yRadiusValues);
 
   outputXThetaYRadiusValues (modelExportOverride,
@@ -83,6 +89,8 @@ void ExportFileFunctions::exportOnePerLineXThetaValuesMerged (const DocumentMode
                                                               const Transformation &transformation,
                                                               bool isLogXTheta,
                                                               bool isLogYRadius,
+                                                              const CurveLimits curveLimitsMin,
+                                                              const CurveLimits curveLimitsMax,
                                                               QTextStream &str,
                                                               unsigned int &numWritesSoFar) const
 {
@@ -94,27 +102,29 @@ void ExportFileFunctions::exportOnePerLineXThetaValuesMerged (const DocumentMode
     // This curve
     const int CURVE_COUNT = 1;
     QString curveIncluded = *itr;
-    QStringList curvesIncluded (curveIncluded);
+    QStringList curvesIncludedIter (curveIncluded);
 
     int xThetaCount = xThetaValues.count();
     QVector<QVector<QString*> > yRadiusValues (CURVE_COUNT, QVector<QString*> (xThetaCount));
-    initializeYRadiusValues (curvesIncluded,
+    initializeYRadiusValues (curvesIncludedIter,
                              xThetaValues,
                              yRadiusValues);
     loadYRadiusValues (modelExportOverride,
                        document,
                        modelMainWindow,
-                       curvesIncluded,
+                       curvesIncludedIter,
                        transformation,
                        isLogXTheta,
                        isLogYRadius,
                        xThetaValues,
+                       curveLimitsMin,
+                       curveLimitsMax,
                        yRadiusValues);
     outputXThetaYRadiusValues (modelExportOverride,
                                document.modelCoords(),
                                document.modelGeneral(),
                                modelMainWindow,
-                               curvesIncluded,
+                               curvesIncludedIter,
                                xThetaValues,
                                transformation,
                                yRadiusValues,
@@ -149,17 +159,37 @@ void ExportFileFunctions::exportToFile (const DocumentModelExportFormat &modelEx
   const QString delimiter = exportDelimiterToText (modelExportOverride.delimiter(),
                                                    modelExportOverride.header() == EXPORT_HEADER_GNUPLOT);
 
-  // Get x/theta values to be used
-  CallbackGatherXThetaValuesFunctions ftor (modelExportOverride,
-                                            curvesIncluded,
-                                            transformation);
-  Functor2wRet<const QString &, const Point &, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
-                                                                                                     &CallbackGatherXThetaValuesFunctions::callback);
-  document.iterateThroughCurvesPointsGraphs(ftorWithCallback);
+  // Get x/theta values to be used. Also get the endpoint limits, if any
+  CurveLimits curveLimitsMin, curveLimitsMax;
+  ValuesVectorXOrY valuesVector;
+  if (modelExportOverride.pointsSelectionFunctions() == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_GRID_LINES) {
+    CallbackGatherXThetasInGridLines ftor (modelMainWindow,
+                                           modelExportOverride,
+                                           curvesIncluded,
+                                           transformation,
+                                           document);
+    Functor2wRet<const QString &, const Point &, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
+                                                                                                       &CallbackGatherXThetasInGridLines::callback);
+    document.iterateThroughCurvesPointsGraphs(ftorWithCallback);
+    valuesVector = ftor.xThetaValuesRaw();
+    curveLimitsMin = ftor.curveLimitsMin();
+    curveLimitsMax = ftor.curveLimitsMax();
+  } else {
+    CallbackGatherXThetasInCurves ftor (modelExportOverride,
+                                        curvesIncluded,
+                                        transformation);
+    Functor2wRet<const QString &, const Point &, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
+                                                                                                       &CallbackGatherXThetasInCurves::callback);
+    document.iterateThroughCurvesPointsGraphs(ftorWithCallback);
+    valuesVector = ftor.xThetaValuesRaw();
+    curveLimitsMin = ftor.curveLimitsMin();
+    curveLimitsMax = ftor.curveLimitsMax();
+  }
 
   ExportXThetaValuesMergedFunctions exportXTheta (modelExportOverride,
-                                                  ftor.xThetaValuesRaw(),
+                                                  valuesVector,
                                                   transformation);
+
   ExportValuesXOrY xThetaValuesMerged = exportXTheta.xThetaValues ();
 
   // Skip if every curve was a relation
@@ -176,6 +206,8 @@ void ExportFileFunctions::exportToFile (const DocumentModelExportFormat &modelEx
                                           transformation,
                                           isLogXTheta,
                                           isLogYRadius,
+                                          curveLimitsMin,
+                                          curveLimitsMax,
                                           str,
                                           numWritesSoFar);
     } else {
@@ -188,6 +220,8 @@ void ExportFileFunctions::exportToFile (const DocumentModelExportFormat &modelEx
                                           transformation,
                                           isLogXTheta,
                                           isLogYRadius,
+                                          curveLimitsMin,
+                                          curveLimitsMax,
                                           str,
                                           numWritesSoFar);
     }
@@ -219,7 +253,7 @@ double ExportFileFunctions::linearlyInterpolate (const Points &points,
   // If point is within the range of the function points then interpolation will be used, otherwise
   // extrapolation will be used
   double yRadius = 0;
-  QPointF posGraphBefore, posScreenBefore; // Not set until ip=1
+  QPointF posGraphBefore; // Not set until ip=1
   bool foundIt = false;
   for (int ip = 0; !foundIt && (ip < points.count()); ip++) {
 
@@ -292,6 +326,8 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
                                              bool isLogXTheta,
                                              bool isLogYRadius,
                                              const ExportValuesXOrY &xThetaValues,
+                                             const CurveLimits &curveLimitsMin,
+                                             const CurveLimits &curveLimitsMax,
                                              QVector<QVector<QString*> > &yRadiusValues) const
 {
   LOG4CPP_INFO_S ((*mainCat)) << "ExportFileFunctions::loadYRadiusValues";
@@ -314,6 +350,9 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
                                     points,
                                     xThetaValues,
                                     transformation,
+                                    curveName,
+                                    curveLimitsMin,
+                                    curveLimitsMax,
                                     yRadiusValues [col]);
     } else {
 
@@ -328,6 +367,9 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
                                                      transformation,
                                                      isLogXTheta,
                                                      isLogYRadius,
+                                                     curveName,
+                                                     curveLimitsMin,
+                                                     curveLimitsMax,
                                                      yRadiusValues [col]);
 
       } else {
@@ -338,6 +380,9 @@ void ExportFileFunctions::loadYRadiusValues (const DocumentModelExportFormat &mo
                                                        points,
                                                        xThetaValues,
                                                        transformation,
+                                                       curveName,
+                                                       curveLimitsMin,
+                                                       curveLimitsMax,
                                                        yRadiusValues [col]);
       }
     }
@@ -352,6 +397,9 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth (const Doc
                                                                        const Transformation &transformation,
                                                                        bool isLogXTheta,
                                                                        bool isLogYRadius,
+                                                                       const QString &curveName,
+                                                                       const CurveLimits &curveLimitsMin,
+                                                                       const CurveLimits &curveLimitsMax,
                                                                        QVector<QString*> &yRadiusValues) const
 {
   LOG4CPP_INFO_S ((*mainCat)) << "ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth";
@@ -394,22 +442,31 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth (const Doc
         double x1 = xy.at (1).x ();
         double y0 = xy.at (0).y ();
         double y1 = xy.at (1).y ();
-        if (x0 == x1) {
+        double numerator = (xTheta - x0);
+        double denominator = (x1 - x0);
+        if (qAbs (denominator) < qAbs (numerator) / 1.0e6) {
           // Cannot do linear interpolation using two points at the same x value
           yRadius = xy.at (0).y ();
         } else {
-          double s = (xTheta - x0) / (x1 - x0);
+          double s = numerator / denominator;
           yRadius = (1.0 - s) * y0 + s * y1;
         }
       }
-      format.unformattedToFormatted (xTheta,
-                                     yRadius,
-                                     modelCoords,
-                                     modelGeneral,
-                                     modelMainWindow,
-                                     dummyXThetaOut,
-                                     *(yRadiusValues [row]),
-                                     transformation);
+      if (xThetaIsNotOutOfBounds (xTheta,
+                                  curveName,
+                                  curveLimitsMin,
+                                  curveLimitsMax)) {
+        format.unformattedToFormatted (xTheta,
+                                       yRadius,
+                                       modelCoords,
+                                       modelGeneral,
+                                       modelMainWindow,
+                                       dummyXThetaOut,
+                                       *(yRadiusValues [row]),
+                                       transformation);
+      } else {
+        *(yRadiusValues [row]) = "";
+      }
     }
 
   } else {
@@ -440,7 +497,60 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth (const Doc
                                                   isLogYRadius);
 
         // Save y/radius value for this row into yRadiusValues, after appropriate formatting
-        QString dummyXThetaOut;
+        if (xThetaIsNotOutOfBounds (xTheta,
+                                    curveName,
+                                    curveLimitsMin,
+                                    curveLimitsMax)) {
+          format.unformattedToFormatted (xTheta,
+                                         yRadius,
+                                         modelCoords,
+                                         modelGeneral,
+                                         modelMainWindow,
+                                         dummyXThetaOut,
+                                         *(yRadiusValues [row]),
+                                         transformation);
+        } else {
+          *(yRadiusValues [row]) = "";
+        }
+      }
+    }
+  }
+}
+
+void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedStraight (const DocumentModelCoords &modelCoords,
+                                                                         const DocumentModelGeneral &modelGeneral,
+                                                                         const MainWindowModel &modelMainWindow,
+                                                                         const Points &points,
+                                                                         const ExportValuesXOrY &xThetaValues,
+                                                                         const Transformation &transformation,
+                                                                         const QString &curveName,
+                                                                         const CurveLimits &curveLimitsMin,
+                                                                         const CurveLimits &curveLimitsMax,
+                                                                         QVector<QString*> &yRadiusValues) const
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedStraight";
+
+  FormatCoordsUnits format;
+
+  // Get value at desired points
+  QString dummyXThetaOut;
+  for (int row = 0; row < xThetaValues.count(); row++) {
+
+    double xTheta = xThetaValues.at (row);
+
+    // Interpolation on curve with no points will trigger an assert so check the point count
+    *(yRadiusValues [row]) = "";
+    if (points.count () > 0) {
+
+      double yRadius = linearlyInterpolate (points,
+                                            xTheta,
+                                            transformation);
+
+      // Save y/radius value for this row into yRadiusValues, after appropriate formatting
+      if (xThetaIsNotOutOfBounds (xTheta,
+                                  curveName,
+                                  curveLimitsMin,
+                                  curveLimitsMax)) {
         format.unformattedToFormatted (xTheta,
                                        yRadius,
                                        modelCoords,
@@ -454,46 +564,15 @@ void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedSmooth (const Doc
   }
 }
 
-void ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedStraight (const DocumentModelCoords &modelCoords,
-                                                                         const DocumentModelGeneral &modelGeneral,
-                                                                         const MainWindowModel &modelMainWindow,
-                                                                         const Points &points,
-                                                                         const ExportValuesXOrY &xThetaValues,
-                                                                         const Transformation &transformation,
-                                                                         QVector<QString*> &yRadiusValues) const
-{
-  LOG4CPP_INFO_S ((*mainCat)) << "ExportFileFunctions::loadYRadiusValuesForCurveInterpolatedStraight";
-
-  FormatCoordsUnits format;
-
-  // Get value at desired points
-  for (int row = 0; row < xThetaValues.count(); row++) {
-
-    double xThetaValue = xThetaValues.at (row);
-
-    double yRadius = linearlyInterpolate (points,
-                                          xThetaValue,
-                                          transformation);
-
-    // Save y/radius value for this row into yRadiusValues, after appropriate formatting
-    QString dummyXThetaOut;
-    format.unformattedToFormatted (xThetaValue,
-                                   yRadius,
-                                   modelCoords,
-                                   modelGeneral,
-                                   modelMainWindow,
-                                   dummyXThetaOut,
-                                   *(yRadiusValues [row]),
-                                   transformation);
-  }
-}
-
 void ExportFileFunctions::loadYRadiusValuesForCurveRaw (const DocumentModelCoords &modelCoords,
                                                         const DocumentModelGeneral &modelGeneral,
                                                         const MainWindowModel &modelMainWindow,
                                                         const Points &points,
                                                         const ExportValuesXOrY &xThetaValues,
                                                         const Transformation &transformation,
+                                                        const QString &curveName,
+                                                        const CurveLimits &curveLimitsMin,
+                                                        const CurveLimits &curveLimitsMax,
                                                         QVector<QString*> &yRadiusValues) const
 {
   LOG4CPP_INFO_S ((*mainCat)) << "ExportFileFunctions::loadYRadiusValuesForCurveRaw";
@@ -516,9 +595,9 @@ void ExportFileFunctions::loadYRadiusValuesForCurveRaw (const DocumentModelCoord
     int rowClosest = 0;
     for (int row = 0; row < xThetaValues.count(); row++) {
 
-      double xThetaValue = xThetaValues.at (row);
+      double xTheta = xThetaValues.at (row);
 
-      double separation = qAbs (posGraph.x() - xThetaValue);
+      double separation = qAbs (posGraph.x() - xTheta);
 
       if ((row == 0) ||
           (separation < closestSeparation)) {
@@ -530,15 +609,22 @@ void ExportFileFunctions::loadYRadiusValuesForCurveRaw (const DocumentModelCoord
     }
 
     // Save y/radius value for this row into yRadiusValues, after appropriate formatting
-    QString dummyXThetaOut;
-    format.unformattedToFormatted (posGraph.x(),
-                                   posGraph.y(),
-                                   modelCoords,
-                                   modelGeneral,
-                                   modelMainWindow,
-                                   dummyXThetaOut,
-                                   *(yRadiusValues [rowClosest]),
-                                   transformation);
+    if (xThetaIsNotOutOfBounds (posGraph.x(),
+                                curveName,
+                                curveLimitsMin,
+                                curveLimitsMax)) {
+      QString dummyXThetaOut;
+      format.unformattedToFormatted (posGraph.x(),
+                                     posGraph.y(),
+                                     modelCoords,
+                                     modelGeneral,
+                                     modelMainWindow,
+                                     dummyXThetaOut,
+                                     *(yRadiusValues [rowClosest]),
+                                     transformation);
+    } else {
+      *(yRadiusValues [rowClosest]) = "";
+    }
   }
 }
 
@@ -628,4 +714,22 @@ bool ExportFileFunctions::rowHasAtLeastOneYRadiusEntry (const QVector<QVector<QS
   }
 
   return hasEntry;
+}
+
+bool ExportFileFunctions::xThetaIsNotOutOfBounds (double xTheta,
+                                                  const QString &curveName,
+                                                  const CurveLimits &curveLimitsMin,
+                                                  const CurveLimits &curveLimitsMax) const
+{
+  bool ok = true;
+
+  if (curveLimitsMin.contains (curveName)) {
+    ok = ok && (curveLimitsMin [curveName] <= xTheta);
+  }
+
+  if (curveLimitsMax.contains (curveName)) {
+    ok = ok && (xTheta <= curveLimitsMax [curveName]);
+  }
+
+  return ok;
 }

@@ -21,7 +21,8 @@ TEMPLATE    = app
 #       qmake "CONFIG+=debug pdf"
 # 3) Gratuitous warning about import_qpa_plugin in Fedora is due to 'CONFIG=qt' but that option takes care of 
 #    include/library files in an automated and platform-independent manner, so it will not be removed
-CONFIG      += qt warn_on thread testcase 
+# 4) c++11 is required for nullptr
+CONFIG      += qt warn_on thread testcase c++11
 
 OBJECTS_DIR = .objs_test
 MOC_DIR = .moc_test
@@ -43,7 +44,9 @@ HEADERS  += \
     Callback/CallbackCheckEditPointAxis.h \
     Callback/CallbackDocumentHash.h \
     Callback/CallbackDocumentScrub.h \
-    Callback/CallbackGatherXThetaValuesFunctions.h \
+    Callback/CallbackGatherXThetasAbstractBase.h \
+    Callback/CallbackGatherXThetasInCurves.h \
+    Callback/CallbackGatherXThetasInGridLines.h \
     Callback/CallbackNextOrdinal.h \
     Callback/CallbackPointOrdinal.h \
     Callback/CallbackRemovePointsInCurvesGraphs.h \
@@ -81,7 +84,7 @@ HEADERS  += \
     Cmd/CmdSettingsAxesChecker.h \
     Cmd/CmdSettingsColorFilter.h \
     Cmd/CmdSettingsCoords.h \
-    Cmd/CmdSettingsCurveAddRemove.h \
+    Cmd/CmdSettingsCurveList.h \
     Cmd/CmdSettingsCurveProperties.h \
     Cmd/CmdSettingsDigitizeCurve.h \
     Cmd/CmdSettingsExportFormat.h \
@@ -145,6 +148,8 @@ HEADERS  += \
     Curve/Curve.h \
     Curve/CurveConnectAs.h \
     Curve/CurveNameList.h \
+    include/CurveLimits.h \
+    include/CurvesIncludedHash.h \
     Curve/CurveSettingsInt.h \
     Curve/CurvesGraphs.h \
     Curve/CurveStyle.h \
@@ -177,7 +182,7 @@ HEADERS  += \
     Dlg/DlgSettingsAxesChecker.h \
     Dlg/DlgSettingsColorFilter.h \
     Dlg/DlgSettingsCoords.h \
-    Dlg/DlgSettingsCurveAddRemove.h \
+    Dlg/DlgSettingsCurveList.h \
     Dlg/DlgSettingsCurveProperties.h \
     Dlg/DlgSettingsDigitizeCurve.h \
     Dlg/DlgSettingsExportFormat.h \
@@ -344,6 +349,7 @@ HEADERS  += \
     Settings/SettingsForGraph.h \
     Spline/Spline.h \
     Spline/SplineCoeff.h \
+    Spline/SplineDrawer.h \
     Spline/SplinePair.h \
     StatusBar/StatusBar.h \
     StatusBar/StatusBarMode.h \
@@ -406,7 +412,9 @@ SOURCES += \
     Callback/CallbackCheckEditPointAxis.cpp \
     Callback/CallbackDocumentHash.cpp \
     Callback/CallbackDocumentScrub.cpp \
-    Callback/CallbackGatherXThetaValuesFunctions.cpp \
+    Callback/CallbackGatherXThetasAbstractBase.cpp \
+    Callback/CallbackGatherXThetasInCurves.cpp \
+    Callback/CallbackGatherXThetasInGridLines.cpp \
     Callback/CallbackNextOrdinal.cpp \
     Callback/CallbackPointOrdinal.cpp \
     Callback/CallbackRemovePointsInCurvesGraphs.cpp \
@@ -443,7 +451,7 @@ SOURCES += \
     Cmd/CmdSettingsAxesChecker.cpp \
     Cmd/CmdSettingsColorFilter.cpp \
     Cmd/CmdSettingsCoords.cpp \
-    Cmd/CmdSettingsCurveAddRemove.cpp \
+    Cmd/CmdSettingsCurveList.cpp \
     Cmd/CmdSettingsCurveProperties.cpp \
     Cmd/CmdSettingsDigitizeCurve.cpp \
     Cmd/CmdSettingsExportFormat.cpp \
@@ -536,7 +544,7 @@ SOURCES += \
     Dlg/DlgSettingsAxesChecker.cpp \
     Dlg/DlgSettingsColorFilter.cpp \
     Dlg/DlgSettingsCoords.cpp \
-    Dlg/DlgSettingsCurveAddRemove.cpp \
+    Dlg/DlgSettingsCurveList.cpp \
     Dlg/DlgSettingsCurveProperties.cpp \
     Dlg/DlgSettingsDigitizeCurve.cpp \
     Dlg/DlgSettingsExportFormat.cpp \
@@ -654,10 +662,10 @@ SOURCES += \
     Load/LoadImageFromUrl.cpp \
     Logger/Logger.cpp \
     Logger/LoggerUpload.cpp \
-    Matrix/Matrix.cpp \
     main/MainDirectoryPersist.cpp \
     main/MainWindow.cpp \
     main/MainWindowModel.cpp \
+    Matrix/Matrix.cpp \
     util/MigrateToVersion6.cpp \
     Mime/MimePointsDetector.cpp \
     Mime/MimePointsExport.cpp \
@@ -686,8 +694,10 @@ SOURCES += \
     Settings/SettingsForGraph.cpp \
     Spline/Spline.cpp \
     Spline/SplineCoeff.cpp \
+    Spline/SplineDrawer.cpp \
     Spline/SplinePair.cpp \
     StatusBar/StatusBar.cpp \
+    StatusBar/StatusBarMode.cpp \
     Test/TEST.cpp \
     Transformation/Transformation.cpp \
     Transformation/TransformationStateAbstractBase.cpp \
@@ -862,4 +872,10 @@ pdf {
 
 } else {
     message("PDF support:      no")
+}
+
+contains (DEFINES, NETWORKING) {
+    message("networking build: yes")
+} else {
+    message("networking build: no")
 }

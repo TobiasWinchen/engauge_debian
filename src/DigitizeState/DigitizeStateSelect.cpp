@@ -144,7 +144,7 @@ void DigitizeStateSelect::handleContextMenuEventAxis2 (CmdMediator *cmdMediator)
     bool isError;
     QString errorMessage;
 
-    bool isXNonzero = (posGraphBefore.x() != 0); // Identify which coordinate is to be edited
+    bool isXNonzero = (qAbs (posGraphBefore.x()) > 0); // Identify which coordinate is to be edited
     QPointF posGraphAfter (isXNonzero ? scaleLength : 0,
                            isXNonzero ? 0 : scaleLength);
     context().mainWindow().cmdMediator()->document().checkEditPointAxis(pointIdentifier,
@@ -155,7 +155,7 @@ void DigitizeStateSelect::handleContextMenuEventAxis2 (CmdMediator *cmdMediator)
 
     if (isError) {
 
-      QMessageBox::warning (0,
+      QMessageBox::warning (nullptr,
                             engaugeWindowTitle(),
                             errorMessage);
 
@@ -216,7 +216,7 @@ void DigitizeStateSelect::handleContextMenuEventAxis34 (CmdMediator *cmdMediator
 
     if (isError) {
 
-      QMessageBox::warning (0,
+      QMessageBox::warning (nullptr,
                             engaugeWindowTitle(),
                             errorMessage);
 
@@ -241,56 +241,62 @@ void DigitizeStateSelect::handleContextMenuEventGraph (CmdMediator *cmdMediator,
   LOG4CPP_INFO_S ((*mainCat)) << "DigitizeStateSelect::handleContextMenuEventGraph "
                               << "points=" << pointIdentifiers.join(",").toLatin1 ().data ();
 
-  double *x = 0, *y = 0;
+  // Editing graph coordinates before the axes are defined is not useful because:
+  // 1) That functionality is for fine tuning point placement based on defined axes
+  // 2) The transformation from screen to graph coordinates below will crash
+  if (context().mainWindow().transformation().transformIsDefined()) {
 
-  if (pointIdentifiers.count() == 1) {
+    double *x = nullptr, *y = nullptr;
 
-    // There is exactly one point so pass its coordinates to the dialog
-    x = new double;
-    y = new double;
+    if (pointIdentifiers.count() == 1) {
 
-    QPointF posScreenBefore = cmdMediator->document().positionScreen (pointIdentifiers.first());
-    QPointF posGraphBefore;
-    context().mainWindow().transformation().transformScreenToRawGraph (posScreenBefore,
-                                                                       posGraphBefore);
+      // There is exactly one point so pass its coordinates to the dialog
+      x = new double;
+      y = new double;
 
-    // Ask user for coordinates
-    *x = posGraphBefore.x();
-    *y = posGraphBefore.y();
-  }
+      QPointF posScreenBefore = cmdMediator->document().positionScreen (pointIdentifiers.first());
+      QPointF posGraphBefore;
+      context().mainWindow().transformation().transformScreenToRawGraph (posScreenBefore,
+                                                                         posGraphBefore);
 
-  DlgEditPointGraph *dlg = new DlgEditPointGraph (context().mainWindow(),
-                                                  cmdMediator->document().modelCoords(),
-                                                  cmdMediator->document().modelGeneral(),
-                                                  context().mainWindow().modelMainWindow(),
-                                                  context().mainWindow().transformation(),
-                                                  x,
-                                                  y);
-  delete x;
-  delete y;
+      // Ask user for coordinates
+      *x = posGraphBefore.x();
+      *y = posGraphBefore.y();
+    }
 
-  x = 0;
-  y = 0;
+    DlgEditPointGraph *dlg = new DlgEditPointGraph (context().mainWindow(),
+                                                    cmdMediator->document().modelCoords(),
+                                                    cmdMediator->document().modelGeneral(),
+                                                    context().mainWindow().modelMainWindow(),
+                                                    context().mainWindow().transformation(),
+                                                    x,
+                                                    y);
+    delete x;
+    delete y;
 
-  int rtn = dlg->exec ();
+    x = nullptr;
+    y = nullptr;
 
-  bool isXGiven, isYGiven;
-  double xGiven, yGiven;
-  dlg->posGraph (isXGiven, xGiven, isYGiven, yGiven); // One or both coordinates are returned
-  delete dlg;
+    int rtn = dlg->exec ();
 
-  if (rtn == QDialog::Accepted) {
+    bool isXGiven, isYGiven;
+    double xGiven, yGiven;
+    dlg->posGraph (isXGiven, xGiven, isYGiven, yGiven); // One or both coordinates are returned
+    delete dlg;
 
-    // Create a command to edit the point
-    CmdEditPointGraph *cmd = new CmdEditPointGraph (context().mainWindow(),
-                                                    cmdMediator->document(),
-                                                    pointIdentifiers,
-                                                    isXGiven,
-                                                    isYGiven,
-                                                    xGiven,
-                                                    yGiven);
-    context().appendNewCmd(cmdMediator,
-                           cmd);
+    if (rtn == QDialog::Accepted) {
+
+      // Create a command to edit the point
+      CmdEditPointGraph *cmd = new CmdEditPointGraph (context().mainWindow(),
+                                                      cmdMediator->document(),
+                                                      pointIdentifiers,
+                                                      isXGiven,
+                                                      isYGiven,
+                                                      xGiven,
+                                                      yGiven);
+      context().appendNewCmd(cmdMediator,
+                             cmd);
+    }
   }
 }
 
@@ -349,8 +355,8 @@ void DigitizeStateSelect::handleMouseRelease (CmdMediator *cmdMediator,
   bool positionHasChanged = (positionHasChangedIdentifers.count () > 0);
 
   if (positionHasChanged && (
-        deltaScreen.x () != 0 ||
-        deltaScreen.y () != 0)) {
+        qAbs (deltaScreen.x ()) > 0 ||
+        qAbs (deltaScreen.y ()) > 0)) {
 
     QString moveText = moveTextFromDeltaScreen (deltaScreen);
 

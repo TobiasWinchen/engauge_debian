@@ -11,8 +11,10 @@
 #include "Logger.h"
 #include "MainWindow.h"
 #include "MainWindowModel.h"
+#include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDir>
 #include <QDoubleSpinBox>
 #include <QGraphicsScene>
 #include <QGridLayout>
@@ -22,6 +24,7 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include "QtToString.h"
+#include "TranslatorContainer.h"
 #include "ZoomControl.h"
 #include "ZoomFactorInitial.h"
 #include "ZoomLabels.h"
@@ -40,8 +43,8 @@ DlgSettingsMainWindow::DlgSettingsMainWindow(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Main Window"),
                            "DlgSettingsMainWindow",
                            mainWindow),
-  m_modelMainWindowBefore (0),
-  m_modelMainWindowAfter (0)
+  m_modelMainWindowBefore (nullptr),
+  m_modelMainWindowAfter (nullptr)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::DlgSettingsMainWindow";
 
@@ -66,17 +69,17 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
   layout->addWidget (labelZoomFactor, row, 1);
 
   m_cmbZoomFactor = new QComboBox;
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_16_TO_1  , QVariant (ZOOM_INITIAL_16_TO_1));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_8_TO_1   , QVariant (ZOOM_INITIAL_8_TO_1));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_4_TO_1   , QVariant (ZOOM_INITIAL_4_TO_1));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_2_TO_1   , QVariant (ZOOM_INITIAL_2_TO_1));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_1_TO_1   , QVariant (ZOOM_INITIAL_1_TO_1));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_1_TO_2   , QVariant (ZOOM_INITIAL_1_TO_2));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_1_TO_4   , QVariant (ZOOM_INITIAL_1_TO_4));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_1_TO_8   , QVariant (ZOOM_INITIAL_1_TO_8));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_1_TO_16  , QVariant (ZOOM_INITIAL_1_TO_16));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_FILL     , QVariant (ZOOM_INITIAL_FILL));
-  m_cmbZoomFactor->addItem (LABEL_ZOOM_PREVIOUS , QVariant (ZOOM_INITIAL_PREVIOUS));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_16_TO_1  , QVariant (ZOOM_INITIAL_16_TO_1));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_8_TO_1   , QVariant (ZOOM_INITIAL_8_TO_1));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_4_TO_1   , QVariant (ZOOM_INITIAL_4_TO_1));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_2_TO_1   , QVariant (ZOOM_INITIAL_2_TO_1));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_1_TO_1   , QVariant (ZOOM_INITIAL_1_TO_1));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_1_TO_2   , QVariant (ZOOM_INITIAL_1_TO_2));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_1_TO_4   , QVariant (ZOOM_INITIAL_1_TO_4));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_1_TO_8   , QVariant (ZOOM_INITIAL_1_TO_8));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_1_TO_16  , QVariant (ZOOM_INITIAL_1_TO_16));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_FILL     , QVariant (ZOOM_INITIAL_FILL));
+  m_cmbZoomFactor->addItem (*LABEL_ZOOM_PREVIOUS , QVariant (ZOOM_INITIAL_PREVIOUS));
   m_cmbZoomFactor->setWhatsThis(tr ("Initial Zoom\n\n"
                                     "Select the initial zoom factor when a new document is loaded. Either the previous "
                                     "zoom can be kept, or the specified zoom can be applied."));
@@ -96,7 +99,7 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
   connect (m_cmbZoomControl, SIGNAL (currentTextChanged (const QString)), this, SLOT (slotZoomControl(const QString)));
   layout->addWidget (m_cmbZoomControl, row++, 2);
 
-  QLabel *labelLocale = new QLabel (QString ("%1:").arg (tr ("Locale")));
+  QLabel *labelLocale = new QLabel (QString ("%1:").arg (tr ("Locale (requires restart)")));
   layout->addWidget (labelLocale, row, 1);
 
   // Initialization of combobox is liberated from Qt Calendar example
@@ -107,15 +110,15 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
                                 "The locale determines how numbers are formatted. Specifically, either commas or "
                                 "periods will be used as group delimiters in each number entered "
                                 "by the user, displayed in the user interface, or exported to a file."));
-  for (int indexLang = QLocale::C; indexLang <= QLocale::LastLanguage; indexLang++) {
-    QLocale::Language lang = static_cast<QLocale::Language> (indexLang);
-    QList<QLocale::Country> countries = QLocale::countriesForLanguage(lang);
-    for (int indexCountry = 0; indexCountry < countries.count(); indexCountry++) {
-      QLocale::Country country = countries.at(indexCountry);
-      QLocale locale (lang, country);
-      QString label = QLocaleToString (locale);
-      m_cmbLocale->addItem (label, locale);
-    }
+  QStringList qmFilenames;
+  qmFilenames << gatherQmFilenames ();
+  for (int i = 0; i < qmFilenames.size(); i++) {
+    QString localeSelector = qmFilenames [i]; // "engauge_de.qm"
+    localeSelector.truncate (localeSelector.lastIndexOf ('.')); // "engauge_de"
+    localeSelector.remove (0, localeSelector.indexOf ('_') + 1); // "de"
+    QLocale locale (localeSelector);
+    QString label = QLocaleToString (locale);
+    m_cmbLocale->addItem (label, locale);
   }
   m_cmbLocale->model()->sort(COLUMN0); // Sort the new entries
   connect (m_cmbLocale, SIGNAL (currentIndexChanged (int)), this, SLOT (slotLocale (int)));
@@ -225,6 +228,17 @@ void DlgSettingsMainWindow::createControls (QGridLayout *layout,
   connect (m_chkDragDropExport, SIGNAL (toggled (bool)), this, SLOT (slotDragDropExport (bool)));
   layout->addWidget (m_chkDragDropExport, row++, 2);
 
+  QLabel *labelImageReplaceRenamesDocument = new QLabel (QString ("%1:").arg (tr ("Image replace renames document")));
+  layout->addWidget (labelImageReplaceRenamesDocument, row, 1);
+
+  m_chkImageReplaceRenamesDocument = new QCheckBox;
+  m_chkImageReplaceRenamesDocument->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+  m_chkImageReplaceRenamesDocument->setWhatsThis (tr ("Image Replace Renames Document\n\n"
+                                                      "When an image is imported to replace the current image, the document "
+                                                      "will be renamed if this is true, otherwise the name will stay the same."));
+  connect (m_chkImageReplaceRenamesDocument, SIGNAL (toggled (bool)), this, SLOT (slotImageReplaceRenamesDocument (bool)));
+  layout->addWidget (m_chkImageReplaceRenamesDocument, row++, 2);
+
   QLabel *labelSignificantDigits = new QLabel (QString ("%1:").arg (tr ("Significant digits")));
   layout->addWidget (labelSignificantDigits, row, 1);
 
@@ -264,6 +278,16 @@ QWidget *DlgSettingsMainWindow::createSubPanel ()
   return subPanel;
 }
 
+QStringList DlgSettingsMainWindow::gatherQmFilenames () const
+{
+  // Get available locales. The static QLocale::matchingLocales gives the few available translations
+  // but also the many unavailable translations. We use a list of translation files to see what is available
+  QDir translationPath (TranslatorContainer::qmDirectory ());
+  QStringList filenames = translationPath.entryList (QStringList ("engauge_*.qm"));
+
+  return filenames;
+}
+
 void DlgSettingsMainWindow::handleOk ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::handleOk";
@@ -272,6 +296,7 @@ void DlgSettingsMainWindow::handleOk ()
 
   hide ();
 }
+
 void DlgSettingsMainWindow::load (CmdMediator & /* cmdMediator */)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::load";
@@ -301,6 +326,11 @@ void DlgSettingsMainWindow::loadMainWindowModel (CmdMediator &cmdMediator,
   m_cmbZoomControl->setCurrentIndex (index);
   QString locLabel = QLocaleToString (m_modelMainWindowAfter->locale());
   index = m_cmbLocale->findText (locLabel);
+  if (index < 0) {
+    // Somehow an invalid locale is selected. Fix it by setting to default
+    locLabel = QLocaleToString (QLocale::system().name());
+    index = m_cmbLocale->findText (locLabel);
+  }
   m_cmbLocale->setCurrentIndex(index);
   index = m_cmbImportCropping->findData (m_modelMainWindowAfter->importCropping());
   m_cmbImportCropping->setCurrentIndex (index);
@@ -314,6 +344,7 @@ void DlgSettingsMainWindow::loadMainWindowModel (CmdMediator &cmdMediator,
   m_chkSmallDialogs->setChecked (m_modelMainWindowAfter->smallDialogs());
   m_chkDragDropExport->setChecked (m_modelMainWindowAfter->dragDropExport());
   m_spinSignificantDigits->setValue (m_modelMainWindowAfter->significantDigits ());
+  m_chkImageReplaceRenamesDocument->setChecked (m_modelMainWindowAfter->imageReplaceRenamesDocument());
 
   updateControls ();
   enableOk (false); // Disable Ok button since there not yet any changes
@@ -339,11 +370,19 @@ void DlgSettingsMainWindow::slotHighlightOpacity(double)
   updateControls();
 }
 
+void DlgSettingsMainWindow::slotImageReplaceRenamesDocument (bool)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::slotImageReplaceRenamesDocument";
+
+  m_modelMainWindowAfter->setImageReplaceRenamesDocument (m_chkImageReplaceRenamesDocument->isChecked());
+  updateControls ();
+}
+
 void DlgSettingsMainWindow::slotImportCropping (int index)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::slotImportCropping";
 
-  m_modelMainWindowAfter->setImportCropping ((ImportCropping) m_cmbImportCropping->itemData (index).toInt ());
+  m_modelMainWindowAfter->setImportCropping (static_cast<ImportCropping> (m_cmbImportCropping->itemData (index).toInt ()));
   updateControls();
 }
 
@@ -351,7 +390,9 @@ void DlgSettingsMainWindow::slotLocale (int index)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::slotLocale";
 
-  m_modelMainWindowAfter->setLocale (m_cmbLocale->itemData (index).toLocale());
+  QLocale locale = m_cmbLocale->itemData (index).toLocale();
+
+  m_modelMainWindowAfter->setLocale (locale);
   updateControls();
 }
 
@@ -411,7 +452,7 @@ void DlgSettingsMainWindow::slotZoomControl(const QString)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWindow::slotZoomControl";
 
-  m_modelMainWindowAfter->setZoomControl ((ZoomControl) m_cmbZoomControl->currentData().toInt());
+  m_modelMainWindowAfter->setZoomControl (static_cast<ZoomControl> (m_cmbZoomControl->currentData().toInt()));
   updateControls();
 }
 
@@ -419,7 +460,7 @@ void DlgSettingsMainWindow::slotZoomFactor(const QString)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsMainWIndow::slotZoomFactor";
 
-  m_modelMainWindowAfter->setZoomFactorInitial((ZoomFactorInitial) m_cmbZoomFactor->currentData().toInt());
+  m_modelMainWindowAfter->setZoomFactorInitial(static_cast<ZoomFactorInitial> (m_cmbZoomFactor->currentData().toInt()));
   updateControls();
 }
 

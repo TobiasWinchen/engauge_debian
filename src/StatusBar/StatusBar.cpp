@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QWhatsThis>
 #include "StatusBar.h"
+#include "StatusBarMode.h"
 #include "ZoomFactor.h"
 #include "ZoomLabels.h"
 
@@ -27,8 +28,9 @@ const int MAX_HEIGHT_EDIT_COORDS = 24;
 StatusBar::StatusBar(QStatusBar &statusBar) :
   m_statusBar (statusBar),
   m_statusBarMode (STATUS_BAR_MODE_ALWAYS),
-  m_timer (0)
+  m_timer (nullptr)
 {
+  createZoomLabels ();
   createZoom ();
   createZoomMaps ();
   createGroupUnits ();
@@ -75,9 +77,9 @@ void StatusBar::createGroupUnits ()
 
   m_groupUnits = new QFrame;
   m_groupUnits->setFrameStyle (QFrame::Box);
-  QPalette *palette = new QPalette;
-  palette->setColor (QPalette::Foreground, Qt::gray);
-  m_groupUnits->setPalette (*palette);
+  QPalette palette;
+  palette.setColor (QPalette::Foreground, Qt::gray);
+  m_groupUnits->setPalette (palette);
 
   QHBoxLayout *groupLayout = new QHBoxLayout;
   m_groupUnits->setLayout (groupLayout);
@@ -94,33 +96,33 @@ void StatusBar::createZoom ()
   m_cmbZoom = new QComboBox ();
   m_cmbZoom->setEnabled (false); // Disabled until file is opened
   m_cmbZoom->setMinimumWidth (MIN_WIDTH_ZOOM);
-  m_cmbZoom->addItem (LABEL_ZOOM_16_TO_1);
-  m_cmbZoom->addItem (LABEL_ZOOM_16_TO_1_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_8_TO_1_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_8_TO_1);
-  m_cmbZoom->addItem (LABEL_ZOOM_8_TO_1_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_4_TO_1_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_4_TO_1);
-  m_cmbZoom->addItem (LABEL_ZOOM_4_TO_1_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_2_TO_1_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_2_TO_1);
-  m_cmbZoom->addItem (LABEL_ZOOM_2_TO_1_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_1_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_1);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_1_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_2_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_2);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_2_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_4_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_4);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_4_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_8_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_8);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_8_FARTHER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_16_CLOSER);
-  m_cmbZoom->addItem (LABEL_ZOOM_1_TO_16);
-  m_cmbZoom->addItem (LABEL_ZOOM_FILL);
-  m_cmbZoom->setCurrentText (LABEL_ZOOM_1_TO_1);
+  m_cmbZoom->addItem (*LABEL_ZOOM_16_TO_1);
+  m_cmbZoom->addItem (*LABEL_ZOOM_16_TO_1_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_8_TO_1_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_8_TO_1);
+  m_cmbZoom->addItem (*LABEL_ZOOM_8_TO_1_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_4_TO_1_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_4_TO_1);
+  m_cmbZoom->addItem (*LABEL_ZOOM_4_TO_1_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_2_TO_1_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_2_TO_1);
+  m_cmbZoom->addItem (*LABEL_ZOOM_2_TO_1_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_1_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_1);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_1_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_2_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_2);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_2_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_4_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_4);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_4_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_8_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_8);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_8_FARTHER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_16_CLOSER);
+  m_cmbZoom->addItem (*LABEL_ZOOM_1_TO_16);
+  m_cmbZoom->addItem (*LABEL_ZOOM_FILL);
+  m_cmbZoom->setCurrentText (*LABEL_ZOOM_1_TO_1);
   m_cmbZoom->setMaximumWidth (80);
   m_cmbZoom->setToolTip (tr ("Select zoom."));
   m_cmbZoom->setWhatsThis (tr("Select Zoom\n\n"
@@ -131,61 +133,92 @@ void StatusBar::createZoom ()
   m_statusBar.addPermanentWidget (m_cmbZoom);
 }
 
+void StatusBar::createZoomLabels ()
+{
+  LABEL_ZOOM_16_TO_1= new QString (tr ("16:1"));
+  LABEL_ZOOM_16_TO_1_FARTHER= new QString (tr ("16:1 farther"));
+  LABEL_ZOOM_8_TO_1_CLOSER= new QString (tr ("8:1 closer"));
+  LABEL_ZOOM_8_TO_1= new QString (tr ("8:1"));
+  LABEL_ZOOM_8_TO_1_FARTHER= new QString (tr ("8:1 farther"));
+  LABEL_ZOOM_4_TO_1_CLOSER= new QString (tr ("4:1 closer"));
+  LABEL_ZOOM_4_TO_1= new QString (tr ("4:1"));
+  LABEL_ZOOM_4_TO_1_FARTHER= new QString (tr ("4:1 farther"));
+  LABEL_ZOOM_2_TO_1_CLOSER= new QString (tr ("2:1 closer"));
+  LABEL_ZOOM_2_TO_1= new QString (tr ("2:1"));
+  LABEL_ZOOM_2_TO_1_FARTHER= new QString (tr ("2:1 farther"));
+  LABEL_ZOOM_1_TO_1_CLOSER= new QString (tr ("1:1 closer"));
+  LABEL_ZOOM_1_TO_1= new QString (tr ("1:1"));
+  LABEL_ZOOM_1_TO_1_FARTHER= new QString (tr ("1:1 farther"));
+  LABEL_ZOOM_1_TO_2_CLOSER= new QString (tr ("1:2 closer"));
+  LABEL_ZOOM_1_TO_2= new QString (tr ("1:2"));
+  LABEL_ZOOM_1_TO_2_FARTHER= new QString (tr ("1:2 farther"));
+  LABEL_ZOOM_1_TO_4_CLOSER= new QString (tr ("1:4 closer"));
+  LABEL_ZOOM_1_TO_4= new QString (tr ("1:4"));
+  LABEL_ZOOM_1_TO_4_FARTHER= new QString (tr ("1:4 farther"));
+  LABEL_ZOOM_1_TO_8_CLOSER= new QString (tr ("1:8 closer"));
+  LABEL_ZOOM_1_TO_8= new QString (tr ("1:8"));
+  LABEL_ZOOM_1_TO_8_FARTHER= new QString (tr ("1:8 farther"));
+  LABEL_ZOOM_1_TO_16_CLOSER= new QString (tr ("1:16 closer"));
+  LABEL_ZOOM_1_TO_16= new QString (tr ("1:16"));
+  LABEL_ZOOM_FILL= new QString (tr ("Fill"));
+  LABEL_ZOOM_PREVIOUS= new QString (tr ("Previous"));
+}
+
 void StatusBar::createZoomMaps ()
 {
-  m_zoomMapToLabel [ZOOM_16_TO_1] = LABEL_ZOOM_16_TO_1;
-  m_zoomMapToLabel [ZOOM_16_TO_1_FARTHER] = LABEL_ZOOM_16_TO_1_FARTHER;
-  m_zoomMapToLabel [ZOOM_8_TO_1_CLOSER] = LABEL_ZOOM_8_TO_1_CLOSER;
-  m_zoomMapToLabel [ZOOM_8_TO_1] = LABEL_ZOOM_8_TO_1;
-  m_zoomMapToLabel [ZOOM_8_TO_1_FARTHER] = LABEL_ZOOM_8_TO_1_FARTHER;
-  m_zoomMapToLabel [ZOOM_4_TO_1_CLOSER] = LABEL_ZOOM_4_TO_1_CLOSER;
-  m_zoomMapToLabel [ZOOM_4_TO_1] = LABEL_ZOOM_4_TO_1;
-  m_zoomMapToLabel [ZOOM_4_TO_1_FARTHER] = LABEL_ZOOM_4_TO_1_FARTHER;
-  m_zoomMapToLabel [ZOOM_2_TO_1_CLOSER] = LABEL_ZOOM_2_TO_1_CLOSER;
-  m_zoomMapToLabel [ZOOM_2_TO_1] = LABEL_ZOOM_2_TO_1;
-  m_zoomMapToLabel [ZOOM_2_TO_1_FARTHER] = LABEL_ZOOM_2_TO_1_FARTHER;
-  m_zoomMapToLabel [ZOOM_1_TO_1_CLOSER] = LABEL_ZOOM_1_TO_1_CLOSER;
-  m_zoomMapToLabel [ZOOM_1_TO_1] = LABEL_ZOOM_1_TO_1;
-  m_zoomMapToLabel [ZOOM_1_TO_1_FARTHER] = LABEL_ZOOM_1_TO_1_FARTHER;
-  m_zoomMapToLabel [ZOOM_1_TO_2_CLOSER] = LABEL_ZOOM_1_TO_2_CLOSER;
-  m_zoomMapToLabel [ZOOM_1_TO_2] = LABEL_ZOOM_1_TO_2;
-  m_zoomMapToLabel [ZOOM_1_TO_2_FARTHER] = LABEL_ZOOM_1_TO_2_FARTHER;
-  m_zoomMapToLabel [ZOOM_1_TO_4_CLOSER] = LABEL_ZOOM_1_TO_4_CLOSER;
-  m_zoomMapToLabel [ZOOM_1_TO_4] = LABEL_ZOOM_1_TO_4;
-  m_zoomMapToLabel [ZOOM_1_TO_4_FARTHER] = LABEL_ZOOM_1_TO_4_FARTHER;
-  m_zoomMapToLabel [ZOOM_1_TO_8_CLOSER] = LABEL_ZOOM_1_TO_8_CLOSER;
-  m_zoomMapToLabel [ZOOM_1_TO_8] = LABEL_ZOOM_1_TO_8;
-  m_zoomMapToLabel [ZOOM_1_TO_8_FARTHER] = LABEL_ZOOM_1_TO_8_FARTHER;
-  m_zoomMapToLabel [ZOOM_1_TO_16_CLOSER] = LABEL_ZOOM_1_TO_16_CLOSER;
-  m_zoomMapToLabel [ZOOM_1_TO_16] = LABEL_ZOOM_1_TO_16;
-  m_zoomMapToLabel [ZOOM_FILL] = LABEL_ZOOM_FILL;
+  m_zoomMapToLabel [ZOOM_16_TO_1] = *LABEL_ZOOM_16_TO_1;
+  m_zoomMapToLabel [ZOOM_16_TO_1_FARTHER] = *LABEL_ZOOM_16_TO_1_FARTHER;
+  m_zoomMapToLabel [ZOOM_8_TO_1_CLOSER] = *LABEL_ZOOM_8_TO_1_CLOSER;
+  m_zoomMapToLabel [ZOOM_8_TO_1] = *LABEL_ZOOM_8_TO_1;
+  m_zoomMapToLabel [ZOOM_8_TO_1_FARTHER] = *LABEL_ZOOM_8_TO_1_FARTHER;
+  m_zoomMapToLabel [ZOOM_4_TO_1_CLOSER] = *LABEL_ZOOM_4_TO_1_CLOSER;
+  m_zoomMapToLabel [ZOOM_4_TO_1] = *LABEL_ZOOM_4_TO_1;
+  m_zoomMapToLabel [ZOOM_4_TO_1_FARTHER] = *LABEL_ZOOM_4_TO_1_FARTHER;
+  m_zoomMapToLabel [ZOOM_2_TO_1_CLOSER] = *LABEL_ZOOM_2_TO_1_CLOSER;
+  m_zoomMapToLabel [ZOOM_2_TO_1] = *LABEL_ZOOM_2_TO_1;
+  m_zoomMapToLabel [ZOOM_2_TO_1_FARTHER] = *LABEL_ZOOM_2_TO_1_FARTHER;
+  m_zoomMapToLabel [ZOOM_1_TO_1_CLOSER] = *LABEL_ZOOM_1_TO_1_CLOSER;
+  m_zoomMapToLabel [ZOOM_1_TO_1] = *LABEL_ZOOM_1_TO_1;
+  m_zoomMapToLabel [ZOOM_1_TO_1_FARTHER] = *LABEL_ZOOM_1_TO_1_FARTHER;
+  m_zoomMapToLabel [ZOOM_1_TO_2_CLOSER] = *LABEL_ZOOM_1_TO_2_CLOSER;
+  m_zoomMapToLabel [ZOOM_1_TO_2] = *LABEL_ZOOM_1_TO_2;
+  m_zoomMapToLabel [ZOOM_1_TO_2_FARTHER] = *LABEL_ZOOM_1_TO_2_FARTHER;
+  m_zoomMapToLabel [ZOOM_1_TO_4_CLOSER] = *LABEL_ZOOM_1_TO_4_CLOSER;
+  m_zoomMapToLabel [ZOOM_1_TO_4] = *LABEL_ZOOM_1_TO_4;
+  m_zoomMapToLabel [ZOOM_1_TO_4_FARTHER] = *LABEL_ZOOM_1_TO_4_FARTHER;
+  m_zoomMapToLabel [ZOOM_1_TO_8_CLOSER] = *LABEL_ZOOM_1_TO_8_CLOSER;
+  m_zoomMapToLabel [ZOOM_1_TO_8] = *LABEL_ZOOM_1_TO_8;
+  m_zoomMapToLabel [ZOOM_1_TO_8_FARTHER] = *LABEL_ZOOM_1_TO_8_FARTHER;
+  m_zoomMapToLabel [ZOOM_1_TO_16_CLOSER] = *LABEL_ZOOM_1_TO_16_CLOSER;
+  m_zoomMapToLabel [ZOOM_1_TO_16] = *LABEL_ZOOM_1_TO_16;
+  m_zoomMapToLabel [ZOOM_FILL] = *LABEL_ZOOM_FILL;
 
-  m_zoomMapFromLabel [LABEL_ZOOM_16_TO_1] = ZOOM_16_TO_1;
-  m_zoomMapFromLabel [LABEL_ZOOM_16_TO_1_FARTHER] = ZOOM_16_TO_1_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_8_TO_1_CLOSER] = ZOOM_8_TO_1_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_8_TO_1] = ZOOM_8_TO_1;
-  m_zoomMapFromLabel [LABEL_ZOOM_8_TO_1_FARTHER] = ZOOM_8_TO_1_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_4_TO_1_CLOSER] = ZOOM_4_TO_1_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_4_TO_1] = ZOOM_4_TO_1;
-  m_zoomMapFromLabel [LABEL_ZOOM_4_TO_1_FARTHER] = ZOOM_4_TO_1_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_2_TO_1_CLOSER] = ZOOM_2_TO_1_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_2_TO_1] = ZOOM_2_TO_1;
-  m_zoomMapFromLabel [LABEL_ZOOM_2_TO_1_FARTHER] = ZOOM_2_TO_1_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_1_CLOSER] = ZOOM_1_TO_1_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_1] = ZOOM_1_TO_1;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_1_FARTHER] = ZOOM_1_TO_1_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_2_CLOSER] = ZOOM_1_TO_2_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_2] = ZOOM_1_TO_2;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_2_FARTHER] = ZOOM_1_TO_2_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_4_CLOSER] = ZOOM_1_TO_4_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_4] = ZOOM_1_TO_4;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_4_FARTHER] = ZOOM_1_TO_4_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_8_CLOSER] = ZOOM_1_TO_8_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_8] = ZOOM_1_TO_8;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_8_FARTHER] = ZOOM_1_TO_8_FARTHER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_16_CLOSER] = ZOOM_1_TO_16_CLOSER;
-  m_zoomMapFromLabel [LABEL_ZOOM_1_TO_16] = ZOOM_1_TO_16;
-  m_zoomMapFromLabel [LABEL_ZOOM_FILL] = ZOOM_FILL;
+  m_zoomMapFromLabel [*LABEL_ZOOM_16_TO_1] = ZOOM_16_TO_1;
+  m_zoomMapFromLabel [*LABEL_ZOOM_16_TO_1_FARTHER] = ZOOM_16_TO_1_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_8_TO_1_CLOSER] = ZOOM_8_TO_1_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_8_TO_1] = ZOOM_8_TO_1;
+  m_zoomMapFromLabel [*LABEL_ZOOM_8_TO_1_FARTHER] = ZOOM_8_TO_1_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_4_TO_1_CLOSER] = ZOOM_4_TO_1_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_4_TO_1] = ZOOM_4_TO_1;
+  m_zoomMapFromLabel [*LABEL_ZOOM_4_TO_1_FARTHER] = ZOOM_4_TO_1_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_2_TO_1_CLOSER] = ZOOM_2_TO_1_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_2_TO_1] = ZOOM_2_TO_1;
+  m_zoomMapFromLabel [*LABEL_ZOOM_2_TO_1_FARTHER] = ZOOM_2_TO_1_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_1_CLOSER] = ZOOM_1_TO_1_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_1] = ZOOM_1_TO_1;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_1_FARTHER] = ZOOM_1_TO_1_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_2_CLOSER] = ZOOM_1_TO_2_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_2] = ZOOM_1_TO_2;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_2_FARTHER] = ZOOM_1_TO_2_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_4_CLOSER] = ZOOM_1_TO_4_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_4] = ZOOM_1_TO_4;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_4_FARTHER] = ZOOM_1_TO_4_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_8_CLOSER] = ZOOM_1_TO_8_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_8] = ZOOM_1_TO_8;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_8_FARTHER] = ZOOM_1_TO_8_FARTHER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_16_CLOSER] = ZOOM_1_TO_16_CLOSER;
+  m_zoomMapFromLabel [*LABEL_ZOOM_1_TO_16] = ZOOM_1_TO_16;
+  m_zoomMapFromLabel [*LABEL_ZOOM_FILL] = ZOOM_FILL;
 }
 
 QString StatusBar::labelCoordsGraph () const
@@ -234,7 +267,9 @@ void StatusBar::setStatusBarMode(StatusBarMode statusBarMode)
 
 void StatusBar::showTemporaryMessage(const QString &message)
 {
-  LOG4CPP_DEBUG_S ((*mainCat)) << "StatusBar::showTemporaryMessage message=" << message.toLatin1 ().data ();
+  LOG4CPP_DEBUG_S ((*mainCat)) << "StatusBar::showTemporaryMessage"
+                               << " mode=" << statusBarModeToString (m_statusBarMode).toLatin1 ().data ()
+                               << " message=" << message.toLatin1 ().data ();
 
   if (m_statusBarMode != STATUS_BAR_MODE_NEVER) {
     if (m_statusBarMode == STATUS_BAR_MODE_TEMPORARY) {
@@ -279,7 +314,7 @@ void StatusBar::slotTimeout()
   LOG4CPP_INFO_S ((*mainCat)) << "StatusBar::slotTimeout";
 
   delete m_timer;
-  m_timer = 0;
+  m_timer = nullptr;
 
   m_statusBar.show();
 }
@@ -289,7 +324,7 @@ void StatusBar::slotZoom(int zoom)
   LOG4CPP_INFO_S ((*mainCat)) << "StatusBar::slotZoom zoom=" << zoom;
 
   // Show string for the numeric zoom value
-  ZoomFactor zoomFactor = (ZoomFactor) zoom;
+  ZoomFactor zoomFactor = static_cast<ZoomFactor> (zoom);
   ENGAUGE_ASSERT (m_zoomMapToLabel.contains (zoomFactor));
   m_cmbZoom->setCurrentText (m_zoomMapToLabel [zoomFactor]);
 }

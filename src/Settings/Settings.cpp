@@ -28,6 +28,7 @@ const QString SETTINGS_GROUP_MAIN_WINDOW ("MainWindow"); // Capitalize both M an
 const QString SETTINGS_HELP_POS ("helpPos");
 const QString SETTINGS_HELP_SIZE ("helpSize");
 const QString SETTINGS_HIGHLIGHT_OPACITY ("highlightOpacity");
+const QString SETTINGS_IMAGE_REPLACE_RENAMES_DOCUMENT ("imageReplaceRenamesDocument");
 const QString SETTINGS_LOCALE_COUNTRY ("country");
 const QString SETTINGS_LOCALE_LANGUAGE ("language");
 const QString SETTINGS_MAIN_TITLE_BAR_FORMAT ("titleBarFormat");
@@ -70,10 +71,12 @@ const QString SETTINGS_GROUP_IMPORT ("Import");
 const QString SETTINGS_IMPORT_CROPPING ("Cropping");
 const QString SETTINGS_IMPORT_PDF_RESOLUTION ("PdfResolution");
 
-// Export group
+// Export group. Any new entries here should probably be added to DlgSettingsExportFormat::slotSaveDefault()
+// and DocumentModelExportFormat::DocumentModelExportFormat()
 const QString SETTINGS_EXPORT_CURVE_NAMES_NOT_EXPORTED ("curveNamesNotExported");
 const QString SETTINGS_EXPORT_DELIMITER ("delimiter");
 const QString SETTINGS_EXPORT_DELIMITER_OVERRIDE_CSV_TSV ("overrideCsvTsv");
+const QString SETTINGS_EXPORT_EXTRAPOLATE_OUTSIDE_ENDPOINTS ("extrapolateOutsideEndpoints");
 const QString SETTINGS_EXPORT_HEADER ("header");
 const QString SETTINGS_EXPORT_LAYOUT_FUNCTIONS ("layoutFunctions");
 const QString SETTINGS_EXPORT_POINTS_INTERVAL_FUNCTIONS ("pointsIntervalFunctions");

@@ -6,7 +6,10 @@
 
 #include "Version.h"
 
-const char *VERSION_NUMBER = "10.10";
+// Every jump in the major version number will need:
+// 1) changes to Document class
+// 2) at least one version-specific test case in the test subdirectory
+const char *VERSION_NUMBER = "12.0";
 
 QString engaugeWindowTitle()
 {

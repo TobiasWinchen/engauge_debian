@@ -7,6 +7,8 @@
 #ifndef SPLINE_PAIR_H
 #define SPLINE_PAIR_H
 
+#include <ostream>
+
 /// Single X/Y pair for cubic spline interpolation initialization and calculations
 class SplinePair
 {
@@ -21,8 +23,11 @@ class SplinePair
   SplinePair(double x,
              double y);
 
-  /// Assigment constructor
-  SplinePair(const SplinePair&other);
+  /// Assignment constructor
+  SplinePair &operator=(const SplinePair &other);
+
+  /// Copy constructor
+  SplinePair(const SplinePair &other);
 
   /// Addition operator
   SplinePair operator+(const SplinePair &other) const;
@@ -47,5 +52,8 @@ class SplinePair
   double m_x;
   double m_y;
 };
+
+/// Insertion operator for qDebug and Logger
+std::ostream &operator<< (std::ostream &str, const SplinePair &pair);
 
 #endif // SPLINE_PAIR_H

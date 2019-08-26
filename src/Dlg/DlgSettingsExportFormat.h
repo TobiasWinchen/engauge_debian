@@ -45,6 +45,7 @@ private slots:
   void slotDelimitersSpaces();
   void slotDelimitersTabs();
   void slotExclude();
+  void slotFunctionsExtrapolateOutsideEndpoints(int);
   void slotFunctionsLayoutAllCurves();
   void slotFunctionsLayoutOneCurve();
   void slotFunctionsPointsAllCurves();
@@ -52,6 +53,7 @@ private slots:
   void slotFunctionsPointsEvenlySpacedInterval(const QString  &);
   void slotFunctionsPointsEvenlySpacedIntervalUnits(const QString &);
   void slotFunctionsPointsFirstCurve();
+  void slotFunctionsPointsGridLines();
   void slotFunctionsPointsRaw();
   void slotHeaderGnuplot();
   void slotHeaderNone();
@@ -59,6 +61,7 @@ private slots:
   void slotInclude();
   void slotListExcluded();
   void slotListIncluded();
+  void slotLoadDefault();
   void slotOverrideCsvTsv(int);
   void slotRelationsPointsEvenlySpaced();
   void slotRelationsPointsEvenlySpacedInterval(const QString &);
@@ -108,8 +111,10 @@ private:
   QLineEdit *m_editFunctionsPointsEvenlySpacing;
   QDoubleValidator *m_validatorFunctionsPointsEvenlySpacing;
   QComboBox *m_cmbFunctionsPointsEvenlySpacingUnits;
+  QRadioButton *m_btnFunctionsPointsGridLines;
   QRadioButton *m_btnFunctionsPointsRaw;
-
+  QCheckBox *m_chkExtrapolateOutsideEndpoints;
+  
   QRadioButton *m_btnCurvesLayoutAllCurves;
   QRadioButton *m_btnCurvesLayoutOneCurve;
 
@@ -134,6 +139,7 @@ private:
   QTextEdit *m_editPreview;
 
   QPushButton *m_btnSaveDefault;
+  QPushButton *m_btnLoadDefault;
 
   DocumentModelExportFormat *m_modelExportBefore;
   DocumentModelExportFormat *m_modelExportAfter;

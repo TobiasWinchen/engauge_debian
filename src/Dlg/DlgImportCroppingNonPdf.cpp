@@ -27,7 +27,8 @@ int DlgImportCroppingNonPdf::MINIMUM_PREVIEW_HEIGHT = 200;
 
 DlgImportCroppingNonPdf::DlgImportCroppingNonPdf(const QString &fileName) :
   m_fileName (fileName),
-  m_pixmap (0)
+  m_pixmap (nullptr),
+  m_nonPdfCropping (nullptr)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgImportCroppingNonPdf::DlgImportCroppingNonPdf";
 
@@ -54,6 +55,8 @@ DlgImportCroppingNonPdf::DlgImportCroppingNonPdf(const QString &fileName) :
 DlgImportCroppingNonPdf::~DlgImportCroppingNonPdf()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgImportCroppingNonPdf::~DlgImportCroppingNonPdf";
+
+  delete m_nonPdfCropping;
 }
 
 void DlgImportCroppingNonPdf::createNonPdfCropping ()
@@ -131,7 +134,7 @@ QImage DlgImportCroppingNonPdf::image () const
 {
   // If the entire page was to be returned, then this method would simply return m_image. However, only the framed
   // portion is to be returned
-  ENGAUGE_ASSERT (m_nonPdfCropping != 0);
+  ENGAUGE_CHECK_PTR (m_nonPdfCropping);
   QRectF rectFramePixels = m_nonPdfCropping->frameRect ();
 
   return m_image.copy (rectFramePixels.toRect ());
@@ -158,7 +161,7 @@ QImage DlgImportCroppingNonPdf::loadImage () const
 void DlgImportCroppingNonPdf::saveGeometryToSettings()
 {
   // Store the settings for use by showEvent
-  QSettings settings;
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   settings.beginGroup (SETTINGS_GROUP_IMPORT_CROPPING);
   settings.setValue (SETTINGS_IMPORT_CROPPING_POS, saveGeometry ());
   settings.endGroup();
@@ -166,13 +169,14 @@ void DlgImportCroppingNonPdf::saveGeometryToSettings()
 
 void DlgImportCroppingNonPdf::showEvent (QShowEvent * /* event */)
 {
-  QSettings settings;
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   settings.beginGroup (SETTINGS_GROUP_IMPORT_CROPPING);
   if (settings.contains (SETTINGS_IMPORT_CROPPING_POS)) {
 
     // Restore the settings that were stored by the last call to saveGeometryToSettings
     restoreGeometry (settings.value (SETTINGS_IMPORT_CROPPING_POS).toByteArray ());
   }
+  settings.endGroup ();
 }
 
 void DlgImportCroppingNonPdf::slotCancel ()
@@ -203,7 +207,7 @@ void DlgImportCroppingNonPdf::updatePreview ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgImportCroppingNonPdf::updatePreview";
 
-  if (m_pixmap != 0) {
+  if (m_pixmap != nullptr) {
     m_scenePreview->removeItem (m_pixmap);
   }
 

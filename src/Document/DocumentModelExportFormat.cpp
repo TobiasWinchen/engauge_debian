@@ -22,34 +22,39 @@ const QString DEFAULT_X_LABEL ("x");
 const ExportPointsIntervalUnits DEFAULT_POINTS_INTERVAL_UNITS_FUNCTIONS = EXPORT_POINTS_INTERVAL_UNITS_SCREEN; // Consistent with DEFAULT_POINTS_INTERVAL_FUNCTIONS
 const ExportPointsIntervalUnits DEFAULT_POINTS_INTERVAL_UNITS_RELATIONS = EXPORT_POINTS_INTERVAL_UNITS_SCREEN; // Consistent with DEFAULT_POINTS_INTERVAL_RELATIONS
 const bool DEFAULT_EXPORT_DELIMITER_OVERRIDE = false; // Target beginner users who expect simplest behavior. Issue #169
+const bool DEFAULT_EXTRAPOLATE = true; // Traditional behavior before version 11
 
 DocumentModelExportFormat::DocumentModelExportFormat()
 {
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   settings.beginGroup (SETTINGS_GROUP_EXPORT);
 
+  // Sync these settings with DlgSettingsExportFormat::slotLoadDefault()
+  // and DlgSettingsExportFormat::slotSaveDefault()
   m_curveNamesNotExported = settings.value (SETTINGS_EXPORT_CURVE_NAMES_NOT_EXPORTED,
                                             QVariant (DEFAULT_CURVE_NAMES_NOT_EXPORTED)).toStringList();
-  m_delimiter = (ExportDelimiter) settings.value (SETTINGS_EXPORT_DELIMITER,
-                                                  QVariant (EXPORT_DELIMITER_COMMA)).toInt();
+  m_delimiter = static_cast<ExportDelimiter> (settings.value (SETTINGS_EXPORT_DELIMITER,
+                                                              QVariant (EXPORT_DELIMITER_COMMA)).toInt());  
+  m_extrapolateOutsideEndpoints = settings.value (SETTINGS_EXPORT_EXTRAPOLATE_OUTSIDE_ENDPOINTS,
+                                                  QVariant (DEFAULT_EXTRAPOLATE)).toBool();
   m_overrideCsvTsv = settings.value (SETTINGS_EXPORT_DELIMITER_OVERRIDE_CSV_TSV,
                                      QVariant (DEFAULT_EXPORT_DELIMITER_OVERRIDE)).toBool();
-  m_header = (ExportHeader) settings.value (SETTINGS_EXPORT_HEADER,
-                                            QVariant (EXPORT_HEADER_SIMPLE)).toInt();
-  m_layoutFunctions = (ExportLayoutFunctions) settings.value (SETTINGS_EXPORT_LAYOUT_FUNCTIONS,
-                                                              QVariant (EXPORT_LAYOUT_ALL_PER_LINE)).toInt();
+  m_header = static_cast<ExportHeader> (settings.value (SETTINGS_EXPORT_HEADER,
+                                                        QVariant (EXPORT_HEADER_SIMPLE)).toInt());
+  m_layoutFunctions = static_cast<ExportLayoutFunctions> (settings.value (SETTINGS_EXPORT_LAYOUT_FUNCTIONS,
+                                                                          QVariant (EXPORT_LAYOUT_ALL_PER_LINE)).toInt());
   m_pointsIntervalFunctions = settings.value (SETTINGS_EXPORT_POINTS_INTERVAL_FUNCTIONS,
                                               QVariant (DEFAULT_POINTS_INTERVAL_FUNCTIONS)).toDouble();
   m_pointsIntervalRelations = settings.value (SETTINGS_EXPORT_POINTS_INTERVAL_RELATIONS,
                                               QVariant (DEFAULT_POINTS_INTERVAL_RELATIONS)).toDouble();
-  m_pointsIntervalUnitsFunctions = (ExportPointsIntervalUnits) settings.value (SETTINGS_EXPORT_POINTS_INTERVAL_UNITS_FUNCTIONS,
-                                                                               QVariant (DEFAULT_POINTS_INTERVAL_UNITS_FUNCTIONS)).toInt();
-  m_pointsIntervalUnitsRelations = (ExportPointsIntervalUnits) settings.value (SETTINGS_EXPORT_POINTS_INTERVAL_UNITS_RELATIONS,
-                                                                               QVariant (DEFAULT_POINTS_INTERVAL_UNITS_RELATIONS)).toInt();
-  m_pointsSelectionFunctions = (ExportPointsSelectionFunctions) settings.value (SETTINGS_EXPORT_POINTS_SELECTION_FUNCTIONS,
-                                                                                QVariant (EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_ALL_CURVES)).toInt();
-  m_pointsSelectionRelations = (ExportPointsSelectionRelations) settings.value (SETTINGS_EXPORT_POINTS_SELECTION_RELATIONS,
-                                                                                QVariant (EXPORT_POINTS_SELECTION_RELATIONS_INTERPOLATE)).toInt();
+  m_pointsIntervalUnitsFunctions = static_cast<ExportPointsIntervalUnits> (settings.value (SETTINGS_EXPORT_POINTS_INTERVAL_UNITS_FUNCTIONS,
+                                                                                           QVariant (DEFAULT_POINTS_INTERVAL_UNITS_FUNCTIONS)).toInt());
+  m_pointsIntervalUnitsRelations = static_cast<ExportPointsIntervalUnits> (settings.value (SETTINGS_EXPORT_POINTS_INTERVAL_UNITS_RELATIONS,
+                                                                                           QVariant (DEFAULT_POINTS_INTERVAL_UNITS_RELATIONS)).toInt());
+  m_pointsSelectionFunctions = static_cast<ExportPointsSelectionFunctions> (settings.value (SETTINGS_EXPORT_POINTS_SELECTION_FUNCTIONS,
+                                                                                            QVariant (EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_ALL_CURVES)).toInt());
+  m_pointsSelectionRelations = static_cast<ExportPointsSelectionRelations> (settings.value (SETTINGS_EXPORT_POINTS_SELECTION_RELATIONS,
+                                                                                            QVariant (EXPORT_POINTS_SELECTION_RELATIONS_INTERPOLATE)).toInt());
   m_xLabel = settings.value (SETTINGS_EXPORT_X_LABEL,
                              QVariant (DEFAULT_X_LABEL)).toString();
 }
@@ -64,6 +69,7 @@ DocumentModelExportFormat::DocumentModelExportFormat (const Document &document) 
   m_pointsIntervalUnitsRelations (document.modelExport().pointsIntervalUnitsRelations()),
   m_layoutFunctions (document.modelExport().layoutFunctions()),
   m_delimiter (document.modelExport().delimiter()),
+  m_extrapolateOutsideEndpoints (document.modelExport().extrapolateOutsideEndpoints()),
   m_overrideCsvTsv (document.modelExport().overrideCsvTsv()),
   m_header (document.modelExport().header()),
   m_xLabel (document.modelExport().xLabel())
@@ -80,6 +86,7 @@ DocumentModelExportFormat::DocumentModelExportFormat(const DocumentModelExportFo
   m_pointsIntervalUnitsRelations (other.pointsIntervalUnitsRelations()),
   m_layoutFunctions (other.layoutFunctions()),
   m_delimiter (other.delimiter()),
+  m_extrapolateOutsideEndpoints (other.extrapolateOutsideEndpoints()),
   m_overrideCsvTsv (other.overrideCsvTsv()),
   m_header (other.header()),
   m_xLabel (other.xLabel ())
@@ -97,6 +104,7 @@ DocumentModelExportFormat &DocumentModelExportFormat::operator=(const DocumentMo
   m_pointsIntervalUnitsRelations = other.pointsIntervalUnitsRelations();
   m_layoutFunctions = other.layoutFunctions();
   m_delimiter = other.delimiter();
+  m_extrapolateOutsideEndpoints = other.extrapolateOutsideEndpoints();
   m_overrideCsvTsv = other.overrideCsvTsv();
   m_header = other.header();
   m_xLabel = other.xLabel();
@@ -112,6 +120,11 @@ QStringList DocumentModelExportFormat::curveNamesNotExported() const
 ExportDelimiter DocumentModelExportFormat::delimiter() const
 {
   return m_delimiter;
+}
+
+bool DocumentModelExportFormat::extrapolateOutsideEndpoints() const
+{
+  return m_extrapolateOutsideEndpoints;
 }
 
 ExportHeader DocumentModelExportFormat::header() const
@@ -132,6 +145,7 @@ void DocumentModelExportFormat::loadXml(QXmlStreamReader &reader)
 
   QXmlStreamAttributes attributes = reader.attributes();
 
+  // DOCUMENT_SERIALIZE_EXPORT_EXTRAPOLATE_OUTSIDE_ENDPOINTS is specific to versions 11 and newer
   if (attributes.hasAttribute(DOCUMENT_SERIALIZE_EXPORT_POINTS_SELECTION_FUNCTIONS) &&
       attributes.hasAttribute(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_FUNCTIONS) &&
       attributes.hasAttribute(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_UNITS_FUNCTIONS) &&
@@ -143,14 +157,14 @@ void DocumentModelExportFormat::loadXml(QXmlStreamReader &reader)
       attributes.hasAttribute(DOCUMENT_SERIALIZE_EXPORT_HEADER) &&
       attributes.hasAttribute(DOCUMENT_SERIALIZE_EXPORT_X_LABEL)) {
 
-    setPointsSelectionFunctions ((ExportPointsSelectionFunctions) attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_SELECTION_FUNCTIONS).toInt());
+    setPointsSelectionFunctions (static_cast<ExportPointsSelectionFunctions> (attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_SELECTION_FUNCTIONS).toInt()));
     setPointsIntervalFunctions (attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_FUNCTIONS).toDouble());
-    setPointsIntervalUnitsFunctions ((ExportPointsIntervalUnits) attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_UNITS_FUNCTIONS).toInt());
-    setPointsSelectionRelations ((ExportPointsSelectionRelations) attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_SELECTION_RELATIONS).toInt());
+    setPointsIntervalUnitsFunctions (static_cast<ExportPointsIntervalUnits> (attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_UNITS_FUNCTIONS).toInt()));
+    setPointsSelectionRelations (static_cast<ExportPointsSelectionRelations> (attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_SELECTION_RELATIONS).toInt()));
     setPointsIntervalRelations (attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_RELATIONS).toDouble());
-    setPointsIntervalUnitsRelations ((ExportPointsIntervalUnits) attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_UNITS_RELATIONS).toInt());
-    setLayoutFunctions ((ExportLayoutFunctions) attributes.value(DOCUMENT_SERIALIZE_EXPORT_LAYOUT_FUNCTIONS).toInt());
-    setDelimiter ((ExportDelimiter) attributes.value (DOCUMENT_SERIALIZE_EXPORT_DELIMITER).toInt());
+    setPointsIntervalUnitsRelations (static_cast<ExportPointsIntervalUnits> (attributes.value(DOCUMENT_SERIALIZE_EXPORT_POINTS_INTERVAL_UNITS_RELATIONS).toInt()));
+    setLayoutFunctions (static_cast<ExportLayoutFunctions> (attributes.value(DOCUMENT_SERIALIZE_EXPORT_LAYOUT_FUNCTIONS).toInt()));
+    setDelimiter (static_cast<ExportDelimiter> (attributes.value (DOCUMENT_SERIALIZE_EXPORT_DELIMITER).toInt()));
     if (attributes.hasAttribute(DOCUMENT_SERIALIZE_EXPORT_DELIMITER_OVERRIDE_CSV_TSV)) {
 
       // Boolean value
@@ -158,7 +172,15 @@ void DocumentModelExportFormat::loadXml(QXmlStreamReader &reader)
 
       setOverrideCsvTsv(stringOverrideCsvTsv == DOCUMENT_SERIALIZE_BOOL_TRUE);
     }
-    setHeader ((ExportHeader) attributes.value(DOCUMENT_SERIALIZE_EXPORT_HEADER).toInt());
+    if (attributes.hasAttribute(DOCUMENT_SERIALIZE_EXPORT_EXTRAPOLATE_OUTSIDE_ENDPOINTS)) {
+
+      // Boolean value
+      QString stringExtrapolate = attributes.value (DOCUMENT_SERIALIZE_EXPORT_EXTRAPOLATE_OUTSIDE_ENDPOINTS).toString();
+      
+      setExtrapolateOutsideEndpoints (stringExtrapolate == DOCUMENT_SERIALIZE_BOOL_TRUE);
+    }
+
+    setHeader (static_cast<ExportHeader> (attributes.value(DOCUMENT_SERIALIZE_EXPORT_HEADER).toInt()));
     setXLabel (attributes.value(DOCUMENT_SERIALIZE_EXPORT_X_LABEL).toString());
 
     // Read element containing excluded curve names
@@ -240,7 +262,7 @@ ExportPointsSelectionRelations DocumentModelExportFormat::pointsSelectionRelatio
 }
 
 void DocumentModelExportFormat::printStream(QString indentation,
-                                      QTextStream &str) const
+                                            QTextStream &str) const
 {
   str << indentation << "DocumentModelExportFormat\n";
 
@@ -266,6 +288,7 @@ void DocumentModelExportFormat::printStream(QString indentation,
       << exportPointsIntervalUnitsToString (m_pointsIntervalUnitsRelations) << "\n";
   str << indentation << "exportLayoutFunctions=" << exportLayoutFunctionsToString (m_layoutFunctions) << "\n";
   str << indentation << "exportDelimiter=" << exportDelimiterToString (m_delimiter) << "\n";
+  str << indentation << "exportExtrapolateOutsideEndpoints=" << (m_extrapolateOutsideEndpoints ? "yes" : "no") << "\n";
   str << indentation << "overrideCsvTsv=" << (m_overrideCsvTsv ? "true" : "false") << "\n";
   str << indentation << "exportHeader=" << exportHeaderToString (m_header) << "\n";
   str << indentation << "xLabel=" << m_xLabel << "\n";
@@ -288,9 +311,12 @@ void DocumentModelExportFormat::saveXml(QXmlStreamWriter &writer) const
   writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_LAYOUT_FUNCTIONS_STRING, exportLayoutFunctionsToString (m_layoutFunctions));
   writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_DELIMITER, QString::number (m_delimiter));
   writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_DELIMITER_OVERRIDE_CSV_TSV, m_overrideCsvTsv ?
-                          DOCUMENT_SERIALIZE_BOOL_TRUE :
-                          DOCUMENT_SERIALIZE_BOOL_FALSE);
+                        DOCUMENT_SERIALIZE_BOOL_TRUE :
+                        DOCUMENT_SERIALIZE_BOOL_FALSE);
   writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_DELIMITER_STRING, exportDelimiterToString (m_delimiter));
+  writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_EXTRAPOLATE_OUTSIDE_ENDPOINTS, m_extrapolateOutsideEndpoints ?
+                        DOCUMENT_SERIALIZE_BOOL_TRUE :
+                        DOCUMENT_SERIALIZE_BOOL_FALSE);
   writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_HEADER, QString::number (m_header));
   writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_HEADER_STRING, exportHeaderToString (m_header));
   writer.writeAttribute(DOCUMENT_SERIALIZE_EXPORT_X_LABEL, m_xLabel);
@@ -317,6 +343,11 @@ void DocumentModelExportFormat::setCurveNamesNotExported(const QStringList &curv
 void DocumentModelExportFormat::setDelimiter(ExportDelimiter delimiter)
 {
   m_delimiter = delimiter;
+}
+
+void DocumentModelExportFormat::setExtrapolateOutsideEndpoints(bool extrapolateOutsideEndpoints)
+{
+  m_extrapolateOutsideEndpoints = extrapolateOutsideEndpoints;
 }
 
 void DocumentModelExportFormat::setHeader(ExportHeader header)

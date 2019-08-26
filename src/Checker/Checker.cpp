@@ -36,6 +36,11 @@ Checker::Checker(QGraphicsScene &scene) :
 {
 }
 
+Checker::~Checker()
+{
+  m_gridLines.clear ();
+}
+
 void Checker::adjustPolarAngleRanges (const DocumentModelCoords &modelCoords,
                                       const Transformation &transformation,
                                       const QList<Point> &points,

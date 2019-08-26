@@ -26,6 +26,7 @@ void TestProjectedPoint::cleanupTestCase ()
 
 void TestProjectedPoint::initTestCase ()
 {
+  const bool NO_DROP_REGRESSION = false;
   const QString NO_ERROR_REPORT_LOG_FILE;
   const QString NO_REGRESSION_OPEN_FILE;
   const bool NO_GNUPLOT_LOG_FILES = false;
@@ -44,6 +45,7 @@ void TestProjectedPoint::initTestCase ()
 
   MainWindow w (NO_ERROR_REPORT_LOG_FILE,
                 NO_REGRESSION_OPEN_FILE,
+                NO_DROP_REGRESSION,
                 NO_REGRESSION_IMPORT,
                 NO_GNUPLOT_LOG_FILES,
                 NO_RESET,
@@ -69,8 +71,8 @@ void TestProjectedPoint::testProjectedPoints ()
   int angleStep = 13;
 
   // Critical angle in degrees
-  int angleCriticalRight = (int) (0.5 + qAcos (radiusCircle / radiusProjection) * RADIANS_TO_DEGREES);
-  int angleCriticalUp = (int) (0.5 + qAsin (radiusCircle / radiusProjection) * RADIANS_TO_DEGREES);
+  int angleCriticalRight = qFloor (0.5 + qAcos (radiusCircle / radiusProjection) * RADIANS_TO_DEGREES);
+  int angleCriticalUp = qFloor (0.5 + qAsin (radiusCircle / radiusProjection) * RADIANS_TO_DEGREES);
 
   for (int angle = 0; angle <= 360; angle += angleStep) {
 

@@ -32,7 +32,7 @@ class DigitizeStateContext;
 class DlgSettingsAxesChecker;
 class DlgSettingsColorFilter;
 class DlgSettingsCoords;
-class DlgSettingsCurveAddRemove;
+class DlgSettingsCurveList;
 class DlgSettingsCurveProperties;
 class DlgSettingsDigitizeCurve;
 class DlgSettingsExportFormat;
@@ -118,6 +118,7 @@ public:
   /// Single constructor.
   /// \param errorReportFile Optional error report file to be read at startup. Empty if unused. Incompatible with fileCmdScript
   /// \param fileCmdScriptFile Optional file command script file to be read at startup. Empty if unused. Incompatible with errorReportFile
+  /// \param isDropRegression True if files loaded at startup are for drag and drop testing
   /// \param isRegressionTest True if errorReportFile or fileCmdScript is for regression testing, in which case it is executed and the program exits
   /// \param isGnuplot True if diagnostic gnuplot files are generated for math-intense sections of the code. Used for development and debugging
   /// \param isReset True to reset all settings that would otherwise be restored from the previous execution of Engauge
@@ -129,6 +130,7 @@ public:
   /// \param parent Optional parent widget for this widget
   MainWindow(const QString &errorReportFile,
              const QString &fileCmdScriptFile,
+             bool isDropRegression,
              bool isRegressionTest,
              bool isGnuplot,
              bool isReset,
@@ -227,7 +229,7 @@ public:
   void updateSettingsCoords(const DocumentModelCoords &modelCoords);
 
   /// Update with new curves.
-  void updateSettingsCurveAddRemove (const CurvesGraphs &curvesGraphs);
+  void updateSettingsCurveList (const CurvesGraphs &curvesGraphs);
 
   /// Update with new curve styles.
   void updateSettingsCurveStyles(const CurveStyles &modelCurveStyles);
@@ -321,7 +323,7 @@ private slots:
   void slotSettingsAxesChecker ();
   void slotSettingsColorFilter ();
   void slotSettingsCoords ();
-  void slotSettingsCurveAddRemove ();
+  void slotSettingsCurveList ();
   void slotSettingsCurveProperties ();
   void slotSettingsDigitizeCurve ();
   void slotSettingsExportFormat ();
@@ -356,6 +358,9 @@ private slots:
   void slotViewZoomOutFromWheelEvent ();
 
 signals:
+  /// Send drag and drop regression test url
+  void signalDropRegression(QString);
+
   /// Send zoom selection, picked from menu or keystroke, to StatusBar.
   void signalZoom(int);
 
@@ -435,6 +440,7 @@ private:
                                      const QString &temporaryMessage,
                                      ImportType ImportType);
   void startRegressionTestErrorReport (const QString &regressionInputFile);
+  void startRegressionDropTest (const QStringList &loadStartupFiles);
   void startRegressionTestFileCmdScript ();
   void updateAfterCommandStatusBarCoords ();
   void updateChecklistGuide ();
@@ -555,7 +561,7 @@ private:
   QAction *m_actionSettingsAxesChecker;
   QAction *m_actionSettingsColorFilter;
   QAction *m_actionSettingsCoords;
-  QAction *m_actionSettingsCurveAddRemove;
+  QAction *m_actionSettingsCurveList;
   QAction *m_actionSettingsCurveProperties;
   QAction *m_actionSettingsDigitizeCurve;
   QAction *m_actionSettingsExport;
@@ -619,9 +625,9 @@ private:
   DlgSettingsAxesChecker *m_dlgSettingsAxesChecker;
   DlgSettingsColorFilter *m_dlgSettingsColorFilter;
   DlgSettingsCoords *m_dlgSettingsCoords;
-  DlgSettingsCurveAddRemove *m_dlgSettingsCurveAddRemove;
+  DlgSettingsCurveList *m_dlgSettingsCurveList;
   DlgSettingsCurveProperties *m_dlgSettingsCurveProperties;
-  DlgSettingsDigitizeCurve * m_dlgSettingsDigitizeCurve;
+  DlgSettingsDigitizeCurve *m_dlgSettingsDigitizeCurve;
   DlgSettingsExportFormat *m_dlgSettingsExportFormat;
   DlgSettingsGeneral *m_dlgSettingsGeneral;
   DlgSettingsGridDisplay *m_dlgSettingsGridDisplay;
