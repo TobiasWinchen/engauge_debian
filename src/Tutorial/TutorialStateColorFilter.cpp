@@ -15,8 +15,17 @@
 #include "TutorialStateContext.h"
 
 TutorialStateColorFilter::TutorialStateColorFilter (TutorialStateContext &context) : 
-  TutorialStateAbstractBase (context)
+  TutorialStateAbstractBase (context),
+  m_title (nullptr),
+  m_background (nullptr),
+  m_text0 (nullptr),
+  m_text1 (nullptr),
+  m_text2 (nullptr),
+  m_text3 (nullptr),
+  m_text4 (nullptr),
+  m_back (nullptr)
 {
+  LOG4CPP_INFO_S ((*mainCat)) << "TutorialStateColorFilter::TutorialStateColorFilter";
 }
 
 void TutorialStateColorFilter::begin ()
@@ -80,14 +89,14 @@ void TutorialStateColorFilter::end ()
   delete m_text4;
   delete m_back;
 
-  m_title = 0;
-  m_background = 0;
-  m_text0 = 0;
-  m_text1 = 0;
-  m_text2 = 0;
-  m_text3 = 0;
-  m_text4 = 0;
-  m_back = 0;
+  m_title = nullptr;
+  m_background = nullptr;
+  m_text0 = nullptr;
+  m_text1 = nullptr;
+  m_text2 = nullptr;
+  m_text3 = nullptr;
+  m_text4 = nullptr;
+  m_back = nullptr;
 }
 
 void TutorialStateColorFilter::slotBack ()

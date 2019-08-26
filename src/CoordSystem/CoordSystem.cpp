@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QImage>
+#include <qmath.h>
 #include <QtToString.h>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -57,6 +58,11 @@ CoordSystem::CoordSystem () :
 
     resetSelectedCurveNameIfNecessary ();
   }
+}
+
+CoordSystem::~CoordSystem()
+{
+  delete m_curveAxes;
 }
 
 void CoordSystem::addGraphCurveAtEnd (const QString &curveName)
@@ -321,8 +327,8 @@ void CoordSystem::initializeUnsetGridRemovalFromGridDisplay (double version)
       m_modelGridRemoval.setStepY (m_modelGridDisplay.stepY ());
       m_modelGridRemoval.setStopX (m_modelGridDisplay.stopX ());
       m_modelGridRemoval.setStopY (m_modelGridDisplay.stopY ());
-      m_modelGridRemoval.setCountX (m_modelGridDisplay.countX ());
-      m_modelGridRemoval.setCountY (m_modelGridDisplay.countY ());
+      m_modelGridRemoval.setCountX (signed (m_modelGridDisplay.countX ()));
+      m_modelGridRemoval.setCountY (signed (m_modelGridDisplay.countY ()));
     }
   }
 }
@@ -391,30 +397,30 @@ void CoordSystem::loadPreVersion6 (QDataStream &str,
   str >> st; // CurveCmbText selection
   str >> st; // MeasureCmbText selection
   str >> int32;
-  m_modelCoords.setCoordsType((CoordsType) int32);
+  m_modelCoords.setCoordsType(static_cast<CoordsType> (int32));
   if (version >= 3) {
-    str >> (double &) radius;
+    str >> static_cast<double &> (radius);
   }
   m_modelCoords.setOriginRadius(radius);
   str >> int32;
   m_modelCoords.setCoordUnitsRadius(COORD_UNITS_NON_POLAR_THETA_NUMBER);
-  m_modelCoords.setCoordUnitsTheta((CoordUnitsPolarTheta) int32);
+  m_modelCoords.setCoordUnitsTheta(static_cast<CoordUnitsPolarTheta> (int32));
   str >> int32;
-  m_modelCoords.setCoordScaleXTheta((CoordScale) int32);
+  m_modelCoords.setCoordScaleXTheta(static_cast<CoordScale> (int32));
   str >> int32;
-  m_modelCoords.setCoordScaleYRadius((CoordScale) int32);
+  m_modelCoords.setCoordScaleYRadius(static_cast<CoordScale> (int32));
 
   str >> int32;
-  m_modelExport.setDelimiter((ExportDelimiter) int32);
+  m_modelExport.setDelimiter(static_cast<ExportDelimiter> (int32));
   str >> int32;
-  m_modelExport.setLayoutFunctions((ExportLayoutFunctions) int32);
+  m_modelExport.setLayoutFunctions(static_cast<ExportLayoutFunctions> (int32));
   str >> int32;
-  m_modelExport.setPointsSelectionFunctions((ExportPointsSelectionFunctions) int32);
+  m_modelExport.setPointsSelectionFunctions(static_cast<ExportPointsSelectionFunctions> (int32));
   m_modelExport.setPointsSelectionRelations(EXPORT_POINTS_SELECTION_RELATIONS_RAW); // Best for maps
-  m_modelExport.setPointsIntervalUnitsFunctions((ExportPointsIntervalUnits) int32);
-  m_modelExport.setPointsIntervalUnitsRelations((ExportPointsIntervalUnits) int32);
+  m_modelExport.setPointsIntervalUnitsFunctions(static_cast<ExportPointsIntervalUnits> (int32));
+  m_modelExport.setPointsIntervalUnitsRelations(static_cast<ExportPointsIntervalUnits> (int32));
   str >> int32;
-  m_modelExport.setHeader((ExportHeader) int32);
+  m_modelExport.setHeader(static_cast<ExportHeader> (int32));
   if (version >= 5.1) {
     str >> st; // X label
     if (m_modelCoords.coordsType() == COORDS_TYPE_CARTESIAN) {
@@ -437,9 +443,9 @@ void CoordSystem::loadPreVersion6 (QDataStream &str,
   str >> int32;
   m_modelGridRemoval.setCountY(int32);
   str >> int32;
-  m_modelGridRemoval.setGridCoordDisableX((GridCoordDisable) int32);
+  m_modelGridRemoval.setGridCoordDisableX(static_cast<GridCoordDisable> (int32));
   str >> int32;
-  m_modelGridRemoval.setGridCoordDisableY((GridCoordDisable) int32);
+  m_modelGridRemoval.setGridCoordDisableY(static_cast<GridCoordDisable> (int32));
   str >> dbl;
   m_modelGridRemoval.setStartX(dbl);
   str >> dbl;
@@ -468,13 +474,13 @@ void CoordSystem::loadPreVersion6 (QDataStream &str,
   str >> int32;
   m_modelGridDisplay.setStable(int32);
   str >> int32;
-  m_modelGridDisplay.setCountX(int32);
+  m_modelGridDisplay.setCountX(unsigned (int32));
   str >> int32;
-  m_modelGridDisplay.setCountY(int32);
+  m_modelGridDisplay.setCountY(unsigned (int32));
   str >> int32;
-  m_modelGridDisplay.setDisableX((GridCoordDisable) int32);
+  m_modelGridDisplay.setDisableX(static_cast<GridCoordDisable> (int32));
   str >> int32;
-  m_modelGridDisplay.setDisableY((GridCoordDisable) int32);
+  m_modelGridDisplay.setDisableY(static_cast<GridCoordDisable> (int32));
   str >> dbl;
   m_modelGridDisplay.setStartX (dbl);
   str >> dbl;
@@ -497,20 +503,20 @@ void CoordSystem::loadPreVersion6 (QDataStream &str,
   str >> int32;
   m_modelSegments.setLineWidth(int32);
   str >> int32;
-  m_modelSegments.setLineColor((ColorPalette) int32);
+  m_modelSegments.setLineColor(static_cast<ColorPalette> (int32));
 
   str >> int32; // Point separation
   str >> int32;
   m_modelPointMatch.setMaxPointSize(int32);
   str >> int32;
-  m_modelPointMatch.setPaletteColorAccepted((ColorPalette) int32);
+  m_modelPointMatch.setPaletteColorAccepted(static_cast<ColorPalette> (int32));
   str >> int32;
-  m_modelPointMatch.setPaletteColorRejected((ColorPalette) int32);
+  m_modelPointMatch.setPaletteColorRejected(static_cast<ColorPalette> (int32));
   if (version < 4) {
     m_modelPointMatch.setPaletteColorCandidate(COLOR_PALETTE_BLUE);
   } else {
     str >> int32;
-    m_modelPointMatch.setPaletteColorCandidate((ColorPalette) int32);
+    m_modelPointMatch.setPaletteColorCandidate(static_cast<ColorPalette> (int32));
   }
 
   str >> int32; // Discretize method
@@ -531,12 +537,14 @@ void CoordSystem::loadPreVersion6 (QDataStream &str,
   if (curveScaleIn->numPoints() == 2) {
     // Nondefault case is map with scale bar
     documentAxesPointsRequired = DOCUMENT_AXES_POINTS_REQUIRED_2;
+    delete m_curveAxes;
     m_curveAxes = curveScaleIn;
     m_curveAxes->setCurveName (AXIS_CURVE_NAME); // Override existing "Scale" name
     delete curveAxesIn;
   } else {
     // Default case is graph with axes
     documentAxesPointsRequired = DOCUMENT_AXES_POINTS_REQUIRED_3;
+    delete m_curveAxes;    
     m_curveAxes = curveAxesIn;
     delete curveScaleIn;
   }
@@ -579,6 +587,7 @@ void CoordSystem::loadVersion6 (QXmlStreamReader &reader,
       } else if (tag == DOCUMENT_SERIALIZE_COORDS) {
         m_modelCoords.loadXml (reader);
       } else if (tag == DOCUMENT_SERIALIZE_CURVE) {
+        delete m_curveAxes;        
         m_curveAxes = new Curve (reader);
       } else if (tag == DOCUMENT_SERIALIZE_CURVES_GRAPHS) {
         m_curvesGraphs.loadXml (reader);
@@ -636,6 +645,7 @@ void CoordSystem::loadVersions7AndUp (QXmlStreamReader &reader)
       } else if (tag == DOCUMENT_SERIALIZE_COORDS) {
         m_modelCoords.loadXml (reader);
       } else if (tag == DOCUMENT_SERIALIZE_CURVE) {
+        delete m_curveAxes;                
         m_curveAxes = new Curve (reader);
       } else if (tag == DOCUMENT_SERIALIZE_CURVES_GRAPHS) {
         m_curvesGraphs.loadXml (reader);
@@ -733,7 +743,7 @@ void CoordSystem::movePoint (const QString &pointIdentifier,
   QString curveName = Point::curveNameFromPointIdentifier (pointIdentifier);
 
   Curve *curve = curveForCurveName (curveName);
-  ENGAUGE_ASSERT (curve != 0);
+  ENGAUGE_CHECK_PTR (curve);
   curve->movePoint (pointIdentifier,
                     deltaScreen);
 }
@@ -751,7 +761,7 @@ int CoordSystem::nextOrdinalForCurve (const QString &curveName) const
     m_curvesGraphs.iterateThroughCurvesPoints (ftorWithCallback);
   }
 
-  return ftor.nextOrdinal ();
+  return qFloor (ftor.nextOrdinal ());
 }
 
 QPointF CoordSystem::positionGraph (const QString &pointIdentifier) const
@@ -849,7 +859,7 @@ void CoordSystem::removePointsInCurvesGraphs (CurvesGraphs &curvesGraphs)
 void CoordSystem::resetSelectedCurveNameIfNecessary ()
 {
   if (m_selectedCurveName.isEmpty () ||
-      curveForCurveName (m_selectedCurveName) == 0) {
+      curveForCurveName (m_selectedCurveName) == nullptr) {
 
     // Selected curve name is empty, or the curve has been removed so we pick another. The first is arbitrarily picked
     m_selectedCurveName = m_curvesGraphs.curvesGraphsNames().first();

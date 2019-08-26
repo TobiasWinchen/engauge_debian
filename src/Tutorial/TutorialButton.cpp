@@ -9,6 +9,7 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
+#include <qmath.h>
 #include "TutorialButton.h"
 #include "TutorialButtonRect.h"
 #include "TutorialButtonText.h"
@@ -18,7 +19,9 @@ const int VERTICAL_PADDING = 5;
 const double Z_IN_FRONT = 1;
 
 TutorialButton::TutorialButton (const QString &text,
-                                QGraphicsScene &scene)
+                                QGraphicsScene &scene) :
+  m_rect (nullptr),
+  m_text (nullptr)
 {
   createRect (scene);
   createText (text);
@@ -26,8 +29,13 @@ TutorialButton::TutorialButton (const QString &text,
 
 TutorialButton::~TutorialButton ()
 {
-  QGraphicsScene *scene = m_rect->scene();
-  scene->removeItem (m_rect); // This also removes m_text from the scene
+  if (m_rect != nullptr) {
+    QGraphicsScene *scene = m_rect->scene();
+    scene->removeItem (m_rect); // This also removes m_text from the scene
+
+    delete m_rect;
+  }
+  delete m_text;
 }
 
 void TutorialButton::createRect (QGraphicsScene &scene)
@@ -54,8 +62,8 @@ void TutorialButton::createText (const QString &text)
 QSize TutorialButton::size () const
 {
   // The size of the rectangle is not updated until later so we use the size of the text
-  return QSize (m_text->boundingRect().size().width() + 2 * HORIZONTAL_PADDING,
-                m_text->boundingRect().size().height() + 2 * VERTICAL_PADDING);
+  return QSize (qFloor (m_text->boundingRect().size().width() + 2 * HORIZONTAL_PADDING),
+                qFloor (m_text->boundingRect().size().height() + 2 * VERTICAL_PADDING));
 }
 
 void TutorialButton::handleTriggered()

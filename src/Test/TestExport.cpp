@@ -21,13 +21,14 @@ QTEST_MAIN (TestExport)
 
 using namespace std;
 
+const bool NO_DROP_REGRESSION = false;
 const bool NOT_USING_GNUPLOT = false;
 const bool EXPORT_ONLY= true;
 const QString NO_ERROR_REPORT_LOG_FILE;
 const QString NO_REGRESSION_OPEN_FILE;
 const bool NO_GNUPLOT_LOG_FILES = false;
 const bool NO_REGRESSION_IMPORT = false;
-const bool NO_RESET = false;
+const bool IS_RESET = true; // Eliminate issues due to unexpected config file settings
 const bool NO_EXPORT_ONLY = false;
 const bool NO_EXTRACT_IMAGE_ONLY = false;
 const QString NO_EXTRACT_IMAGE_EXTENSION;
@@ -64,7 +65,8 @@ bool TestExport::checkCommasInFunctionsForDelimiter (ExportDelimiter delimiter,
     bool isLogYRadius = (m_modelCoords.coordScaleYRadius() == COORD_SCALE_LOG);
     unsigned int numWritesSoFar = 0;
 
-    ExportFileFunctions exportFile;    
+    ExportFileFunctions exportFile;
+    CurveLimits curveLimitsMin, curveLimitsMax; // Empty containers mean no limits are in effect
     exportFile.exportAllPerLineXThetaValuesMerged (m_modelExportOverride,
                                                    *m_document,
                                                    m_modelMainWindow,
@@ -74,6 +76,8 @@ bool TestExport::checkCommasInFunctionsForDelimiter (ExportDelimiter delimiter,
                                                    m_transformation,
                                                    isLogXTheta,
                                                    isLogYRadius,
+                                                   curveLimitsMin,
+                                                   curveLimitsMax,
                                                    str,
                                                    numWritesSoFar);
   }
@@ -213,14 +217,20 @@ void TestExport::initTestCase ()
 
   m_mainWindow = new MainWindow (NO_ERROR_REPORT_LOG_FILE,
                                  NO_REGRESSION_OPEN_FILE,
+                                 NO_DROP_REGRESSION,
                                  NO_REGRESSION_IMPORT,                
                                  NO_GNUPLOT_LOG_FILES,
-                                 NO_RESET,
+                                 IS_RESET,
                                  NO_EXPORT_ONLY,
                                  NO_EXTRACT_IMAGE_ONLY,
                                  NO_EXTRACT_IMAGE_EXTENSION,                                 
                                  NO_LOAD_STARTUP_FILES,
                                  NO_COMMAND_LINE);
+
+  // Values loaded in the constructor of this class are overwritten so the settings reset just
+  // performed by MainWindow will give us predictable settings (which ultimately affect the test results)
+  DocumentModelExportFormat exportDefault;
+  m_modelExportOverride = exportDefault;
 
   m_mainWindow->show ();
 }
@@ -608,7 +618,8 @@ void TestExport::testLogExtrapolationFunctionsAll ()
     bool isLogYRadius = (m_modelCoords.coordScaleYRadius() == COORD_SCALE_LOG);
     unsigned int numWritesSoFar = 0;
     
-    ExportFileFunctions exportFile;    
+    ExportFileFunctions exportFile;
+    CurveLimits curveLimitsMin, curveLimitsMax; // Empty containers mean no limits are in effect    
     exportFile.exportAllPerLineXThetaValuesMerged (m_modelExportOverride,
                                                    *m_document,
                                                    m_modelMainWindow,
@@ -618,6 +629,8 @@ void TestExport::testLogExtrapolationFunctionsAll ()
                                                    m_transformation,
                                                    isLogXTheta,
                                                    isLogYRadius,
+                                                   curveLimitsMin,
+                                                   curveLimitsMax,
                                                    str,
                                                    numWritesSoFar);
   }

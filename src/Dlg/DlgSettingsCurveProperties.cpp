@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
+#include <qmath.h>
 #include <QPen>
 #include <QPushButton>
 #include <QSettings>
@@ -62,10 +63,10 @@ DlgSettingsCurveProperties::DlgSettingsCurveProperties(MainWindow &mainWindow) :
                            "DlgSettingsCurveProperties",
                            mainWindow),
   m_modelMainWindow (mainWindow.modelMainWindow()),
-  m_scenePreview (0),
-  m_viewPreview (0),
-  m_modelCurveStylesBefore (0),
-  m_modelCurveStylesAfter (0)
+  m_scenePreview (nullptr),
+  m_viewPreview (nullptr),
+  m_modelCurveStylesBefore (nullptr),
+  m_modelCurveStylesAfter (nullptr)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsCurveProperties::DlgSettingsCurveProperties";
 
@@ -142,7 +143,8 @@ void DlgSettingsCurveProperties::createLine (QGridLayout *layout,
                                    "endpoints.\n\n"
                                    "Lines are drawn between successively ordered points.\n\n"
                                    "Straight curves are drawn with straight lines between successive points. Smooth curves are drawn "
-                                   "with smooth lines between successive points.\n\n"
+                                   "with smooth lines between successive points, using natural cubic splines of (x,y) pairs versus "
+                                   "scalar ordinal (t) values.\n\n"
                                     "This applies only to graph curves. No lines are ever drawn between axis points."));
   connect (m_cmbLineType, SIGNAL (activated (const QString &)), this, SLOT (slotLineType (const QString &))); // activated() ignores code changes
   layoutGroup->addWidget (m_cmbLineType, 2, 1);
@@ -170,10 +172,14 @@ void DlgSettingsCurveProperties::createPoint (QGridLayout *layout,
                             POINT_SHAPE_CROSS);
   m_cmbPointShape->addItem (pointShapeToString (POINT_SHAPE_DIAMOND),
                             POINT_SHAPE_DIAMOND);
+  m_cmbPointShape->addItem (pointShapeToString (POINT_SHAPE_HOURGLASS),
+                            POINT_SHAPE_HOURGLASS);  
   m_cmbPointShape->addItem (pointShapeToString (POINT_SHAPE_SQUARE),
                             POINT_SHAPE_SQUARE);
   m_cmbPointShape->addItem (pointShapeToString (POINT_SHAPE_TRIANGLE),
                             POINT_SHAPE_TRIANGLE);
+  m_cmbPointShape->addItem (pointShapeToString (POINT_SHAPE_TRIANGLE2),
+                            POINT_SHAPE_TRIANGLE2);
   m_cmbPointShape->addItem (pointShapeToString (POINT_SHAPE_X),
                             POINT_SHAPE_X);
   connect (m_cmbPointShape, SIGNAL (activated (const QString &)), this, SLOT (slotPointShape (const QString &))); // activated() ignores code changes
@@ -329,7 +335,7 @@ void DlgSettingsCurveProperties::drawLine (bool isRelation,
 void DlgSettingsCurveProperties::drawPoints (const PointStyle &pointStyle)
 {
   const QString NULL_IDENTIFIER;
-  GeometryWindow *NULL_GEOMETRY_WINDOW = 0;
+  GeometryWindow *NULL_GEOMETRY_WINDOW = nullptr;
 
   GraphicsPointFactory pointFactory;
 
@@ -446,10 +452,10 @@ void DlgSettingsCurveProperties::loadForCurveName (const QString &curveName)
 void DlgSettingsCurveProperties::resetSceneRectangle ()
 {
 
-  QRect rect (0.0,
-              0.0,
-              PREVIEW_WIDTH,
-              PREVIEW_HEIGHT);
+  QRect rect (0,
+              0,
+              qFloor (PREVIEW_WIDTH),
+              qFloor (PREVIEW_HEIGHT));
 
   QGraphicsRectItem *itemPerimeter = new QGraphicsRectItem(rect);
   itemPerimeter->setVisible(false);
@@ -477,7 +483,7 @@ void DlgSettingsCurveProperties::slotCurveName(const QString &curveName)
   // Dirty flag is not set when simply changing to new curve
 
   // Do nothing if combobox is getting cleared, or load has not been called yet
-  if (!curveName.isEmpty () && (m_modelCurveStylesAfter != 0)) {
+  if (!curveName.isEmpty () && (m_modelCurveStylesAfter != nullptr)) {
 
     loadForCurveName (curveName);
   }
@@ -490,7 +496,7 @@ void DlgSettingsCurveProperties::slotLineColor(const QString &lineColor)
   m_isDirty = true;
 
   m_modelCurveStylesAfter->setLineColor(m_cmbCurveName->currentText(),
-                                        (ColorPalette) m_cmbLineColor->currentData().toInt());
+                                        static_cast<ColorPalette> (m_cmbLineColor->currentData().toInt()));
   updateControls();
   updatePreview();
 }
@@ -514,7 +520,7 @@ void DlgSettingsCurveProperties::slotLineType(const QString &lineType)
   m_isDirty = true;
 
   m_modelCurveStylesAfter->setLineConnectAs(m_cmbCurveName->currentText(),
-                                            (CurveConnectAs) m_cmbLineType->currentData().toInt ());
+                                            static_cast<CurveConnectAs> (m_cmbLineType->currentData().toInt ()));
   updateControls();
   updatePreview();
 }
@@ -526,7 +532,7 @@ void DlgSettingsCurveProperties::slotPointColor(const QString &pointColor)
   m_isDirty = true;
 
   m_modelCurveStylesAfter->setPointColor(m_cmbCurveName->currentText(),
-                                         (ColorPalette) m_cmbPointColor->currentData().toInt ());
+                                         static_cast<ColorPalette> (m_cmbPointColor->currentData().toInt ()));
   updateControls();
   updatePreview();
 }
@@ -562,7 +568,7 @@ void DlgSettingsCurveProperties::slotPointShape(const QString &)
   m_isDirty = true;
 
   m_modelCurveStylesAfter->setPointShape(m_cmbCurveName->currentText(),
-                                         (PointShape) m_cmbPointShape->currentData().toInt ());
+                                         static_cast<PointShape> (m_cmbPointShape->currentData().toInt ()));
   updateControls();
   updatePreview();
 }

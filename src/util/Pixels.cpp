@@ -76,18 +76,18 @@ void Pixels::fillHole (QImage &image,
   //           2-4 pixels               4x4                  -2 to +2
   //           5-9                      5x5                  -2 to +3
   //           10-16                    6x6                  -3 to +3
-  int rowStart = row - (1 + qSqrt (thresholdCount - 1)); // Inclusive
-  int colStart = col - (1 + qSqrt (thresholdCount - 1)); // Inclusive
-  int rowStop = row + (1 + qSqrt (thresholdCount)); // Exclusive
-  int colStop = col + (1 + qSqrt (thresholdCount)); // Exclusive
+  int rowStart = qFloor (row - (1 + qSqrt (thresholdCount - 1))); // Inclusive
+  int colStart = qFloor (col - (1 + qSqrt (thresholdCount - 1))); // Inclusive
+  int rowStop = qFloor (row + (1 + qSqrt (thresholdCount))); // Exclusive
+  int colStop = qFloor (col + (1 + qSqrt (thresholdCount))); // Exclusive
 
   // First pass is for counting
   int countWhite = 0;
-  for (int row = rowStart; row < rowStop; row++) {
-    for (int col = colStart; col < colStop; col++) {
+  for (int rowIter = rowStart; rowIter < rowStop; rowIter++) {
+    for (int colIter = colStart; colIter < colStop; colIter++) {
       if (!pixelIsBlack (image,
-                         col,
-                         row)) {
+                         colIter,
+                         rowIter)) {
         ++countWhite;
       }
     }
@@ -95,10 +95,10 @@ void Pixels::fillHole (QImage &image,
 
   // Second pass fills in the hole
   if (countWhite < thresholdCount) {
-    for (int row = rowStart; row < rowStop; row++) {
-      for (int col = colStart; col < colStop; col++) {
-        image.setPixel (col,
-                        row,
+    for (int rowIter = rowStart; rowIter < rowStop; rowIter++) {
+      for (int colIter = colStart; colIter < colStop; colIter++) {
+        image.setPixel (colIter,
+                        rowIter,
                         Qt::black);
       }
     }

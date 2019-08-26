@@ -21,7 +21,7 @@ CurvesGraphs::CurvesGraphs()
 {
 }
 
-void CurvesGraphs::addGraphCurveAtEnd (Curve curve)
+void CurvesGraphs::addGraphCurveAtEnd (const Curve &curve)
 {
   m_curvesGraphs.push_back (curve);
 }
@@ -46,7 +46,7 @@ Curve *CurvesGraphs::curveForCurveName (const QString &curveName)
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 const Curve *CurvesGraphs::curveForCurveName (const QString &curveName) const
@@ -61,7 +61,7 @@ const Curve *CurvesGraphs::curveForCurveName (const QString &curveName) const
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 QStringList CurvesGraphs::curvesGraphsNames () const

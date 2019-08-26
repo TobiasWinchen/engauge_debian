@@ -17,8 +17,6 @@ void CreateLoadImage::create(MainWindow &mw)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "CreateLoadImage::create";
   
-#ifdef NETWORKING
   mw.m_loadImageFromUrl = new LoadImageFromUrl (mw);
-#endif
 }
 

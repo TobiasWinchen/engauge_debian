@@ -4,7 +4,6 @@
  * LICENSE or go to gnu.org/licenses for details. Distribution requires prior written permission.     *
  ******************************************************************************************************/
 
-#include "CallbackGatherXThetaValuesFunctions.h"
 #include "CmdMediator.h"
 #include "Curve.h"
 #include "CurveConnectAs.h"
@@ -48,6 +47,7 @@ GeometryWindow::GeometryWindow (MainWindow *mainWindow) :
 
 GeometryWindow::~GeometryWindow()
 {
+  delete m_model;
 }
 
 void GeometryWindow::clear ()
@@ -196,6 +196,8 @@ void GeometryWindow::update (const CmdMediator &cmdMediator,
 {
   LOG4CPP_INFO_S ((*mainCat)) << "GeometryWindow::update";
 
+  const int NUM_LEGEND_ROWS_UNSPANNED = 2; // Match with GeometryModel::NUM_LEGEND_ROWS_UNSPANNED
+
   // Save inputs
   m_modelExport = cmdMediator.document().modelExport();
   m_model->setDelimiter (m_modelExport.delimiter());
@@ -210,6 +212,7 @@ void GeometryWindow::update (const CmdMediator &cmdMediator,
 
   QString funcArea, polyArea;
   QVector<QString> x, y, distanceGraphForward, distancePercentForward, distanceGraphBackward, distancePercentBackward;
+  QVector<bool> isPotentialExportAmbiguity;
 
   CurveStyle curveStyle = cmdMediator.document().modelCurveStyles().curveStyle (curveSelected);
   m_geometryStrategyContext.calculateGeometry (points,
@@ -222,13 +225,20 @@ void GeometryWindow::update (const CmdMediator &cmdMediator,
                                                polyArea,
                                                x,
                                                y,
+                                               isPotentialExportAmbiguity,
                                                distanceGraphForward,
                                                distancePercentForward,
                                                distanceGraphBackward,
                                                distancePercentBackward);
 
+  // Was there a potential export ambiguity
+  bool wasAmbiguity = isPotentialExportAmbiguity.contains (true);
+
+  // Unmerge any merged cells from the previous update
+  m_view->clearSpans();
+
   // Output to table
-  resizeTable (NUM_HEADER_ROWS + points.count());
+  resizeTable (NUM_HEADER_ROWS + points.count() + (wasAmbiguity ? NUM_LEGEND_ROWS_UNSPANNED : 0));
 
   m_model->setItem (HEADER_ROW_NAME, COLUMN_HEADER_VALUE, new QStandardItem (curveSelected));
   m_model->setItem (HEADER_ROW_FUNC_AREA, COLUMN_HEADER_VALUE, new QStandardItem (funcArea));
@@ -236,9 +246,10 @@ void GeometryWindow::update (const CmdMediator &cmdMediator,
 
   if (transformation.transformIsDefined()) {
 
+    m_model->setPotentialExportAmbiguity (isPotentialExportAmbiguity);
+
     int row = NUM_HEADER_ROWS;
-    int index = 0;
-    for (; index < points.count(); row++, index++) {
+    for (int index = 0; index < points.count(); row++, index++) {
 
       const Point &point = points.at (index);
 
@@ -254,6 +265,15 @@ void GeometryWindow::update (const CmdMediator &cmdMediator,
       m_model->setItem (row, COLUMN_BODY_DISTANCE_GRAPH_BACKWARD, new QStandardItem (distanceGraphBackward [index]));
       m_model->setItem (row, COLUMN_BODY_DISTANCE_PERCENT_BACKWARD, new QStandardItem (distancePercentBackward [index]));
       m_model->setItem (row, COLUMN_BODY_POINT_IDENTIFIERS, new QStandardItem (point.identifier()));
+    }
+
+    if (wasAmbiguity) {
+      // Merge row into one big cell so text fits. Requires unmerge at start of next update
+      m_view->setSpan (row, 0, NUM_LEGEND_ROWS_UNSPANNED, NUM_BODY_COLUMNS);
+      m_model->setItem (row, COLUMN_BODY_X,
+                        new QStandardItem (tr ("Highlighted segments may have unexpected values when exported due to overlaps. "
+                                               "Adjust points or change Settings / Curve Properties / Connect As.")));
+      row++;
     }
   }
 

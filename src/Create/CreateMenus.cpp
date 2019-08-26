@@ -25,7 +25,7 @@ void CreateMenus::create(MainWindow &mw)
   mw.m_menuFile->addAction (mw.m_actionOpen);
 #if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   mw.m_menuFileOpenRecent = new QMenu (tr ("Open &Recent"));
-  for (unsigned int i = 0; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
+  for (int i = 0; i < signed (MAX_RECENT_FILE_LIST_SIZE); i++) {
     mw.m_menuFileOpenRecent->addAction (mw.m_actionRecentFiles.at (i));
   }
   mw.m_menuFile->addMenu (mw.m_menuFileOpenRecent);
@@ -123,7 +123,7 @@ void CreateMenus::create(MainWindow &mw)
 
   mw.m_menuSettings = mw.menuBar()->addMenu(tr ("Settings"));
   mw.m_menuSettings->addAction (mw.m_actionSettingsCoords);
-  mw.m_menuSettings->addAction (mw.m_actionSettingsCurveAddRemove);
+  mw.m_menuSettings->addAction (mw.m_actionSettingsCurveList);
   mw.m_menuSettings->addAction (mw.m_actionSettingsCurveProperties);
   mw.m_menuSettings->addAction (mw.m_actionSettingsDigitizeCurve);
   mw.m_menuSettings->addAction (mw.m_actionSettingsExport);

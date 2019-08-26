@@ -9,6 +9,8 @@
 
 #include "DlgSettingsAbstractBase.h"
 #include <QLocale>
+#include <QString>
+#include <QStringList>
 
 class QCheckBox;
 class QComboBox;
@@ -40,6 +42,7 @@ public:
 private slots:
   void slotDragDropExport (bool);
   void slotHighlightOpacity (double);
+  void slotImageReplaceRenamesDocument (bool);
   void slotImportCropping (int index);
   void slotLocale (int index);
   void slotMaximumGridLines (int limit);
@@ -58,6 +61,7 @@ private:
 
   void createControls (QGridLayout *layout,
                        int &row);
+  QStringList gatherQmFilenames () const;
   void updateControls();
 
   QComboBox *m_cmbZoomFactor;
@@ -72,6 +76,7 @@ private:
   QCheckBox *m_chkSmallDialogs;
   QCheckBox *m_chkDragDropExport;
   QSpinBox *m_spinSignificantDigits;
+  QCheckBox *m_chkImageReplaceRenamesDocument;
 
   MainWindowModel *m_modelMainWindowBefore;
   MainWindowModel *m_modelMainWindowAfter;

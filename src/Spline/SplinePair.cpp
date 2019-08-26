@@ -6,6 +6,8 @@
 
 #include "SplinePair.h"
 
+using namespace std;
+
 SplinePair::SplinePair () :
   m_x (0.0),
   m_y (0.0)
@@ -25,7 +27,15 @@ SplinePair::SplinePair(double x,
 {
 }
 
-SplinePair::SplinePair(const SplinePair&other) :
+SplinePair &SplinePair::operator=(const SplinePair &other)
+{
+  m_x = other.x();
+  m_y = other.y();
+
+  return *this;
+}
+
+SplinePair::SplinePair(const SplinePair &other) :
   m_x (other.x()),
   m_y (other.y())
 {
@@ -61,6 +71,13 @@ SplinePair SplinePair::operator/(const SplinePair &other) const
                      m_y / other.y());
 
   return result;
+}
+
+ostream &operator<< (ostream &str, const SplinePair &pair)
+{
+  str << "(" << pair.x() << "," << pair.y() << ")";
+
+  return str;
 }
 
 double SplinePair::x() const

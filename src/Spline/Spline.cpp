@@ -4,17 +4,23 @@
 
 #include "EngaugeAssert.h"
 #include <iostream>
+#include "Logger.h"
+#include <qmath.h>
 #include "Spline.h"
 
 using namespace std;
 
 Spline::Spline(const std::vector<double> &t,
-               const std::vector<SplinePair> &xy)
+               const std::vector<SplinePair> &xy,
+               SplineTCheck splineTCheck)
 {
   ENGAUGE_ASSERT (t.size() == xy.size());
   ENGAUGE_ASSERT (xy.size() > 0); // Need at least one point for this class to not fail with a crash
 
-  checkTIncrements (t);
+  if (splineTCheck == SPLINE_ENABLE_T_CHECK) {
+    // In normal production this check should be performed
+    checkTIncrements (t);
+  }
   computeCoefficientsForIntervals (t, xy);
   computeControlPointsForIntervals ();
 }
@@ -40,8 +46,9 @@ void Spline::computeCoefficientsForIntervals (const std::vector<double> &t,
   if (xy.size() > 1) {
 
     // There are enough points to compute the coefficients
-    int i, j;
-    int n = (int) xy.size() - 1;
+    unsigned int i;
+    int jneg; // Can go negative
+    unsigned int n = unsigned (qFloor (xy.size()) - 1);
 
     m_t = t;
     m_xy = xy;
@@ -66,7 +73,8 @@ void Spline::computeCoefficientsForIntervals (const std::vector<double> &t,
     z[n] = SplinePair (0.0);
     c[n] = SplinePair (0.0);
 
-    for (j = n - 1; j >= 0; j--) {
+    for (jneg = signed (n - 1); jneg >= 0; jneg--) {
+      unsigned int j = unsigned (jneg);
       c[j] = z[j] - u[j] * c[j+1];
       b[j] = (xy[j+1] - xy[j]) / (h[j]) - (h[j] * (c[j+1] + SplinePair (2.0) * c[j])) / SplinePair (3.0);
       d[j] = (c[j+1] - c[j]) / (SplinePair (3.0) * h[j]);
@@ -92,25 +100,73 @@ void Spline::computeCoefficientsForIntervals (const std::vector<double> &t,
 
 void Spline::computeControlPointsForIntervals ()
 {
-  int n = (int) m_xy.size() - 1;
+  int i, n = qFloor (m_xy.size()) - 1; // Must be signed to handle zero length array
 
-  for (int i = 0; i < n; i++) {
-    const SplineCoeff &element = m_elements[i];
+  for (i = 0; i < n; i++) {
+    unsigned int iU = unsigned (i);
+    const SplineCoeff &element = m_elements[iU];
 
     // Derivative at P0 from (1-s)^3*P0+(1-s)^2*s*P1+(1-s)*s^2*P2+s^3*P3 with s=0 evaluates to 3(P1-P0). That
     // derivative must match the derivative of y=a+b*(t-ti)+c*(t-ti)^2+d*(t-ti)^3 with t=ti which evaluates to b.
     // So 3(P1-P0)=b
-    SplinePair p1 = m_xy [i] + element.b() /
+    SplinePair p1 = m_xy [iU] + element.b() /
                     SplinePair (3.0);
 
     // Derivative at P2 from (1-s)^3*P0+(1-s)^2*s*P1+(1-s)*s^2*P2+s^3*P3 with s=1 evaluates to 3(P3-P2). That
     // derivative must match the derivative of y=a+b*(t-ti)+c*(t-ti)^2+d*(t-ti)^3 with t=ti+1 which evaluates to b+2*c+3*d
-    SplinePair p2 = m_xy [i + 1] - (element.b() + SplinePair (2.0) * element.c() + SplinePair (3.0) * element.d()) /
+    SplinePair p2 = m_xy [iU + 1] - (element.b() + SplinePair (2.0) * element.c() + SplinePair (3.0) * element.d()) /
                     SplinePair (3.0);
 
     m_p1.push_back (p1);
     m_p2.push_back (p2);
   }
+
+  // Debug logging
+  for (i = 0; i < qFloor (m_xy.size ()) - 1; i++) {
+    unsigned int iU = unsigned (i);
+    LOG4CPP_DEBUG_S ((*mainCat)) << "Spline::computeControlPointsForIntervals" << " i=" << i
+             << " xy=" << m_xy [iU]
+             << " elementt=" << m_elements[iU].t()
+             << " elementa=" << m_elements[iU].a()
+             << " elementb=" << m_elements[iU].b()
+             << " elementc=" << m_elements[iU].c()
+             << " elementd=" << m_elements[iU].d()
+             << " p1=" << m_p1[iU]
+             << " p2=" << m_p2[iU];
+  }
+
+  if (m_xy.size() > 1) {
+    unsigned int iU = unsigned (m_xy.size() - 1);
+    LOG4CPP_DEBUG_S ((*mainCat)) << "Spline::computeControlPointsForIntervals" << " i=" << iU
+                  << " xy=" << m_xy [iU];
+  }
+}
+
+void Spline::computeUntranslatedCoefficients (double aTranslated,
+                                              double bTranslated,
+                                              double cTranslated,
+                                              double dTranslated,
+                                              double tI,
+                                              double &aUntranslated,
+                                              double &bUntranslated,
+                                              double &cUntranslated,
+                                              double &dUntranslated) const
+{
+  // Expanding the equation using t translated as (t-ti) we get the equation using untranslated (t) as follows
+  //   xy=d*t^3+
+  //      (c-3*d*ti)*t^2+
+  //      (b-2*c*ti+3*d*ti^2)*t+
+  //      (a-b*ti+c*ti^2-d*ti^3)
+  // which matches up with
+  //   xy=d*t^3+
+  //      c*t^2+
+  //      b*t+
+  //      a
+  // Both equations are given in the header file documentation for this method
+  aUntranslated = aTranslated - bTranslated * tI + cTranslated * tI * tI - dTranslated * tI * tI * tI;
+  bUntranslated = bTranslated - 2.0 * cTranslated * tI + 3.0 * dTranslated * tI * tI;
+  cUntranslated = cTranslated - 3.0 * dTranslated * tI;
+  dUntranslated = dTranslated;
 }
 
 SplinePair Spline::findSplinePairForFunctionX (double x,
@@ -121,7 +177,18 @@ SplinePair Spline::findSplinePairForFunctionX (double x,
   double tLow = m_t[0];
   double tHigh = m_t[m_xy.size() - 1];
 
-  // This method implicitly assumes that the x values are monotonically increasing
+  // This method implicitly assumes that the x values are monotonically increasing - except for the
+  // "export raw points" exception right here
+
+  // Subtle stuff here - we first look for exact matches in m_elements. If a match is found, we exit
+  // immediately. This strategy works for "export raw points" option with functions having overlaps,
+  // in which case users expect interpolation to be used (issue #303)
+  for (unsigned int i = 0; i < m_xy.size(); i++) {
+    const SplinePair &sp = m_xy.at (i);
+    if (sp.x() == x) {
+      return sp;
+    }
+  }
 
   // Extrapolation that is performed if x is out of bounds. As a starting point, we assume that the t
   // values and x values behave the same, which is linearly. This assumption works best when user
@@ -180,7 +247,7 @@ SplinePair Spline::interpolateControlPoints (double t) const
 {
   ENGAUGE_ASSERT (m_xy.size() != 0);
 
-  for (int i = 0; i < (signed) m_xy.size() - 1; i++) {
+  for (unsigned int i = 0; i < unsigned (m_xy.size() - 1); i++) {
 
     if (m_t[i] <= t && t <= m_t[i+1]) {
 
@@ -201,14 +268,14 @@ SplinePair Spline::interpolateControlPoints (double t) const
 
 SplinePair Spline::p1 (unsigned int i) const
 {
-  ENGAUGE_ASSERT (i < (unsigned int) m_p1.size ());
+  ENGAUGE_ASSERT (i < m_p1.size ());
 
   return m_p1 [i];
 }
 
 SplinePair Spline::p2 (unsigned int i) const
 {
-  ENGAUGE_ASSERT (i < (unsigned int) m_p2.size ());
+  ENGAUGE_ASSERT (i < m_p2.size ());
 
   return m_p2 [i];
 }

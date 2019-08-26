@@ -71,19 +71,25 @@ void CreateActions::createDigitize (MainWindow &mw)
   mw.m_actionDigitizeAxis->setWhatsThis (tr ("Digitize Axis Point\n\n"
                                              "Digitizes an axis point for a graph by placing a new point at the cursor "
                                              "after a mouse click. The coordinates of the axis point are then "
-                                             "entered. In a graph, three axis points are required to define "
-                                             "the graph coordinates."));
+                                             "entered. After Import and Import (Advanced), three axis points with "
+                                             "(X1,Y1) (X2,Y2) (X3,Y3) coordinates can be digitized to define the graph coordinates. "
+                                             "Optionally, after Import (Advanced) four axis points with "
+                                             "(X1) (X2) (Y3) (Y4) coordinates can be digitized to define the graph coordinates.\n\n"
+                                             "This tool is disabled when a complete set of axis points has been defined, or "
+                                             "after Import (Advanced) if Scale Bar is selected."));
   connect (mw.m_actionDigitizeAxis, SIGNAL (triggered ()), &mw, SLOT (slotDigitizeAxis ()));
 
   mw.m_actionDigitizeScale = new QAction (iconScale, tr ("Scale Bar Tool"), &mw);
   mw.m_actionDigitizeScale->setShortcut (QKeySequence (tr ("Shift+F8")));
   mw.m_actionDigitizeScale->setCheckable (true);
-  mw.m_actionDigitizeScale->setStatusTip (tr ("Digitize scale bar for a map."));
+  mw.m_actionDigitizeScale->setStatusTip (tr ("Digitize scale bar for a map. Requires Import (Advanced)."));
   mw.m_actionDigitizeScale->setWhatsThis (tr ("Digitize Scale Bar\n\n"
                                               "Digitize a scale bar for a map by clicking and dragging. The length of the "
                                               "scale bar is then entered. In a map, the two endpoints of the scale "
                                               "bar define the distances in graph coordinates.\n\n"
-                                              "Maps must be imported using Import (Advanced)."));
+                                              "This tool is enabled by selecting Scale Bar in Import (Advanced).\n\n"
+                                              "This tool is disabled when a scale bar has been defined, or "
+                                              "if axis points were selected during import."));
   connect (mw.m_actionDigitizeScale, SIGNAL (triggered ()), &mw, SLOT (slotDigitizeScale ()));
 
   mw.m_actionDigitizeCurve = new QAction (iconCurve, tr ("Curve Point Tool"), &mw);
@@ -331,11 +337,11 @@ void CreateActions::createSettings (MainWindow &mw)
                                                "Coordinate settings determine how the graph coordinates are mapped to the pixels in the image"));
   connect (mw.m_actionSettingsCoords, SIGNAL (triggered ()), &mw, SLOT (slotSettingsCoords ()));
 
-  mw.m_actionSettingsCurveAddRemove = new QAction (tr ("Curve List..."), &mw);
-  mw.m_actionSettingsCurveAddRemove->setStatusTip (tr ("Edit Curve List settings."));
-  mw.m_actionSettingsCurveAddRemove->setWhatsThis (tr ("Curve List\n\n"
-                                                       "Curve list settings add, rename and/or remove curves in the current document"));
-  connect (mw.m_actionSettingsCurveAddRemove, SIGNAL (triggered ()), &mw, SLOT (slotSettingsCurveAddRemove ()));
+  mw.m_actionSettingsCurveList = new QAction (tr ("Curve List..."), &mw);
+  mw.m_actionSettingsCurveList->setStatusTip (tr ("Edit Curve List settings."));
+  mw.m_actionSettingsCurveList->setWhatsThis (tr ("Curve List\n\n"
+                                                  "Curve list settings add, rename and/or remove curves in the current document"));
+  connect (mw.m_actionSettingsCurveList, SIGNAL (triggered ()), &mw, SLOT (slotSettingsCurveList ()));
 
   mw.m_actionSettingsCurveProperties = new QAction (tr ("Curve Properties..."), &mw);
   mw.m_actionSettingsCurveProperties->setStatusTip (tr ("Edit Curve Properties settings."));

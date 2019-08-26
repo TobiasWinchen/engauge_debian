@@ -34,10 +34,16 @@
 # 9) To include log4cpp_null as part of the build, add the 'log4cpp_null' config argument. This is meant only for
 #    building the snap package.
 #        qmake CONFIG+=log4cpp_null
+# 10) To add address sanitizer (sometimes trigggering race condition segfault in ubuntu), with line numbers for later gdb debugging
+#        qmake "QMAKE_CXXFLAGS+=-fsanitize=address,undefined" "QMAKE_CXXFLAGS+=-Werror=format" "QMAKE_CXXFLAGS+=-g1"
+#        "QMAKE_CXXFLAGS+=-fno-stack-protector" "LIBS=-fsanitize=address,undefined" engauge.pro
+# 11) To add thread sanitizer (sometimes trigggering race condition segfault in ubuntu), with line numbers for later gdb debugging
+#        qmake "QMAKE_CXXFLAGS+=-fsanitize=thread" "QMAKE_CXXFLAGS+=-g1" "LIBS=-fsanitize=thread" engauge.pro
 #
 # More comments are in the INSTALL file, and below
 
 QT += core gui printsupport widgets xml
+CONFIG += c++11 # For nullptr
 
 !mac {
 QT += help
@@ -80,7 +86,9 @@ HEADERS  += \
     src/Callback/CallbackCheckEditPointAxis.h \
     src/Callback/CallbackDocumentHash.h \
     src/Callback/CallbackDocumentScrub.h \
-    src/Callback/CallbackGatherXThetaValuesFunctions.h \
+    src/Callback/CallbackGatherXThetasAbstractBase.h \
+    src/Callback/CallbackGatherXThetasInCurves.h \
+    src/Callback/CallbackGatherXThetasInGridLines.h \
     src/Callback/CallbackNextOrdinal.h \
     src/Callback/CallbackPointOrdinal.h \
     src/Callback/CallbackRemovePointsInCurvesGraphs.h \
@@ -118,7 +126,7 @@ HEADERS  += \
     src/Cmd/CmdSettingsAxesChecker.h \
     src/Cmd/CmdSettingsColorFilter.h \
     src/Cmd/CmdSettingsCoords.h \
-    src/Cmd/CmdSettingsCurveAddRemove.h \
+    src/Cmd/CmdSettingsCurveList.h \
     src/Cmd/CmdSettingsCurveProperties.h \
     src/Cmd/CmdSettingsDigitizeCurve.h \
     src/Cmd/CmdSettingsExportFormat.h \
@@ -181,7 +189,9 @@ HEADERS  += \
     src/Cursor/CursorSize.h \
     src/Curve/Curve.h \
     src/Curve/CurveConnectAs.h \
+    src/include/CurveLimits.h \
     src/Curve/CurveNameList.h \
+    src/include/CurvesIncludedHash.h \
     src/Curve/CurveSettingsInt.h \
     src/Curve/CurvesGraphs.h \
     src/Curve/CurveStyle.h \
@@ -214,7 +224,7 @@ HEADERS  += \
     src/Dlg/DlgSettingsAxesChecker.h \
     src/Dlg/DlgSettingsColorFilter.h \
     src/Dlg/DlgSettingsCoords.h \
-    src/Dlg/DlgSettingsCurveAddRemove.h \
+    src/Dlg/DlgSettingsCurveList.h \
     src/Dlg/DlgSettingsCurveProperties.h \
     src/Dlg/DlgSettingsDigitizeCurve.h \
     src/Dlg/DlgSettingsExportFormat.h \
@@ -340,13 +350,14 @@ HEADERS  += \
     src/util/LinearToLog.h \
     src/Line/LineStyle.h \
     src/Load/LoadFileInfo.h \
+    src/Load/LoadImageFromUrl.h \
     src/Logger/Logger.h \
     src/Logger/LoggerUpload.h \
-    src/Matrix/Matrix.h \
     src/main/MainDirectoryPersist.h \
     src/main/MainTitleBarFormat.h \
     src/main/MainWindow.h \
     src/main/MainWindowModel.h \
+    src/Matrix/Matrix.h \
     src/util/MigrateToVersion6.h \
     src/Mime/MimePointsDetector.h \
     src/Mime/MimePointsExport.h \
@@ -377,6 +388,7 @@ HEADERS  += \
     src/Settings/SettingsForGraph.h \
     src/Spline/Spline.h \
     src/Spline/SplineCoeff.h \
+    src/Spline/SplineDrawer.h \
     src/Spline/SplinePair.h \
     src/StatusBar/StatusBar.h \
     src/StatusBar/StatusBarMode.h \
@@ -438,7 +450,9 @@ SOURCES += \
     src/Callback/CallbackCheckEditPointAxis.cpp \
     src/Callback/CallbackDocumentHash.cpp \
     src/Callback/CallbackDocumentScrub.cpp \
-    src/Callback/CallbackGatherXThetaValuesFunctions.cpp \
+    src/Callback/CallbackGatherXThetasAbstractBase.cpp \
+    src/Callback/CallbackGatherXThetasInCurves.cpp \
+    src/Callback/CallbackGatherXThetasInGridLines.cpp \
     src/Callback/CallbackNextOrdinal.cpp \
     src/Callback/CallbackPointOrdinal.cpp \
     src/Callback/CallbackRemovePointsInCurvesGraphs.cpp \
@@ -475,7 +489,7 @@ SOURCES += \
     src/Cmd/CmdSettingsAxesChecker.cpp \
     src/Cmd/CmdSettingsColorFilter.cpp \
     src/Cmd/CmdSettingsCoords.cpp \
-    src/Cmd/CmdSettingsCurveAddRemove.cpp \
+    src/Cmd/CmdSettingsCurveList.cpp \
     src/Cmd/CmdSettingsCurveProperties.cpp \
     src/Cmd/CmdSettingsDigitizeCurve.cpp \
     src/Cmd/CmdSettingsExportFormat.cpp \
@@ -514,8 +528,6 @@ SOURCES += \
     src/Coord/CoordUnitsPolarTheta.cpp \
     src/Coord/CoordUnitsTime.cpp \
     src/Correlation/Correlation.cpp \
-    src/Cursor/CursorFactory.cpp \
-    src/Cursor/CursorSize.cpp \
     src/Create/CreateActions.cpp \
     src/Create/CreateCentralWidget.cpp \
     src/Create/CreateCommandStackShadow.cpp \
@@ -533,6 +545,8 @@ SOURCES += \
     src/Create/CreateToolBars.cpp \
     src/Create/CreateTutorial.cpp \
     src/Create/CreateZoomMaps.cpp \
+    src/Cursor/CursorFactory.cpp \
+    src/Cursor/CursorSize.cpp \
     src/Curve/Curve.cpp \
     src/Curve/CurveConnectAs.cpp \
     src/Curve/CurveNameList.cpp \
@@ -568,7 +582,7 @@ SOURCES += \
     src/Dlg/DlgSettingsAxesChecker.cpp \
     src/Dlg/DlgSettingsColorFilter.cpp \
     src/Dlg/DlgSettingsCoords.cpp \
-    src/Dlg/DlgSettingsCurveAddRemove.cpp \
+    src/Dlg/DlgSettingsCurveList.cpp \
     src/Dlg/DlgSettingsCurveProperties.cpp \
     src/Dlg/DlgSettingsDigitizeCurve.cpp \
     src/Dlg/DlgSettingsExportFormat.cpp \
@@ -681,13 +695,14 @@ SOURCES += \
     src/util/LinearToLog.cpp \
     src/Line/LineStyle.cpp \
     src/Load/LoadFileInfo.cpp \
+    src/Load/LoadImageFromUrl.cpp \
     src/Logger/Logger.cpp \
     src/Logger/LoggerUpload.cpp \
-    src/Matrix/Matrix.cpp \
     src/main/main.cpp \
     src/main/MainDirectoryPersist.cpp \
     src/main/MainWindow.cpp \
     src/main/MainWindowModel.cpp \
+    src/Matrix/Matrix.cpp \
     src/util/MigrateToVersion6.cpp \
     src/Mime/MimePointsDetector.cpp \
     src/Mime/MimePointsExport.cpp \
@@ -715,8 +730,10 @@ SOURCES += \
     src/Settings/SettingsForGraph.cpp \
     src/Spline/Spline.cpp \
     src/Spline/SplineCoeff.cpp \
+    src/Spline/SplineDrawer.cpp \
     src/Spline/SplinePair.cpp \
     src/StatusBar/StatusBar.cpp \
+    src/StatusBar/StatusBarMode.cpp \
     src/Transformation/Transformation.cpp \
     src/Transformation/TransformationStateAbstractBase.cpp \
     src/Transformation/TransformationStateContext.cpp \
@@ -784,12 +801,11 @@ macx-* {
 }
 
 linux-* {
+  QMAKE_CXXFLAGS += -Wunused-parameter
   QT += network
   DEFINES += "NETWORKING"
-  HEADERS += src/Load/LoadImageFromUrl.h \
-             src/Network/NetworkClient.h
-  SOURCES += src/Load/LoadImageFromUrl.cpp \
-             src/Network/NetworkClient.cpp
+  HEADERS += src/Network/NetworkClient.h
+  SOURCES += src/Network/NetworkClient.cpp
   INCLUDEPATH += $$(FFTW_HOME)/include
   LIBS += -L/$$(FFTW_HOME)/lib
   !log4cpp_null {
@@ -990,23 +1006,35 @@ log4cpp_null {
     message("log4cpp_null build: no")
 }
 
+contains(DEFINES, NETWORKING) {
+    message("networking build:   yes")
+} else {
+    message("networking build:   no")
+}
+
 # People interested in translating a language can contact the developers for help. 
 # 
 # Translation file names are 'engauge_XX_YY' or 'engauge_XX' where:
 #   XX = two letter language codes in column '639-1' at https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 #   YY = two letter country codes in column 'ISO 3166-2' at https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 # where XX and YY are:
+#
+#    ************************************************************
+#    THIS LIST MUST BE UPDATED BELOW AND IN translations/step_*
+#    ************************************************************
 #   ar = Arabic     Egypt=_eg
 #   cs = Czech      Czech Republic=_cs
 #   de = German     Germany=_de
 #   en = English    USA=us
 #   es = Spanish    Spain=_es
+#   fa = Farsi      Iraq=_ir
 #   fr = French     France=_fr
 #   hi = Hindi      India=_in
 #   it = Italian    Italy=_it
 #   ja = Japanese   Japan=_jp
 #   kk = Kazakh     Kazakhstan=_kz
 #   ko = Korean     SouthKorea=_kr
+#   nb = Norwegian  
 #   pt = Portuguese Brazil=_br
 #   ru = Russian    Federation=_ru
 #   zh = Chinese    China=_cn
@@ -1021,12 +1049,14 @@ TRANSLATIONS = translations/engauge_ar.ts \
                translations/engauge_de.ts \
                translations/engauge_en.ts \
                translations/engauge_es.ts \
+               translations/engauge_fa_IR.ts \               
                translations/engauge_fr.ts \               
                translations/engauge_hi.ts \               
                translations/engauge_it.ts \               
                translations/engauge_ja.ts \               
                translations/engauge_kk.ts \
                translations/engauge_ko.ts \
+               translations/engauge_nb.ts \               
                translations/engauge_pt.ts \
                translations/engauge_ru.ts \
                translations/engauge_zh.ts

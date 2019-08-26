@@ -47,6 +47,8 @@ const int VERSION_7 = 7;
 const int VERSION_8 = 8;
 const int VERSION_9 = 9;
 const int VERSION_10 = 10;
+const int VERSION_11 = 11;
+const int VERSION_12 = 12;
 
 Document::Document (const QImage &image) :
   m_name ("untitled"),
@@ -72,11 +74,11 @@ Document::Document (const QString &fileName) :
   m_successfulRead = true;
 
   // Grab first few bytes to determine the version number
-  QFile *file = new QFile (fileName);
-  if (file->open(QIODevice::ReadOnly)) {
+  QFile fileVersion (fileName);
+  if (fileVersion.open(QIODevice::ReadOnly)) {
 
-    QByteArray bytesStart = file->read (FOUR_BYTES);
-    file->close ();
+    QByteArray bytesStart = fileVersion.read (FOUR_BYTES);
+    fileVersion.close ();
 
     if (bytesIndicatePreVersion6 (bytesStart)) {
 
@@ -109,6 +111,8 @@ Document::Document (const QString &fileName) :
           case VERSION_8:
           case VERSION_9:
           case VERSION_10:
+          case VERSION_11:
+          case VERSION_12:
             loadVersions7AndUp (file);
             break;
 
@@ -125,7 +129,7 @@ Document::Document (const QString &fileName) :
         // Close and deactivate
         file->close ();
         delete file;
-        file = 0;
+        file = nullptr;
 
       } else {
 
@@ -134,7 +138,7 @@ Document::Document (const QString &fileName) :
       }
     }
   } else {
-    file->close ();
+    fileVersion.close ();
     m_successfulRead = false;
     m_reasonForUnsuccessfulRead = QString ("%1 '%2' %3")
                                   .arg (QObject::tr ("File"))
@@ -411,7 +415,8 @@ void Document::initializeGridDisplay (const Transformation &transformation)
   ENGAUGE_ASSERT (!m_coordSystemContext.modelGridDisplay().stable());
 
   // Get graph coordinate bounds
-  CallbackBoundingRects ftor (transformation);
+  CallbackBoundingRects ftor (m_documentAxesPointsRequired,
+                              transformation);
 
   Functor2wRet<const QString &, const Point &, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
                                                                                                      &CallbackBoundingRects::callback);
@@ -420,12 +425,14 @@ void Document::initializeGridDisplay (const Transformation &transformation)
 
   // Initialize. Note that if there are no graph points then these next steps have no effect
   bool isEmpty;
-  QRectF boundingRectGraph =  ftor.boundingRectGraph(isEmpty);
+  QPointF boundingRectGraphMin = ftor.boundingRectGraphMin (isEmpty);
+  QPointF boundingRectGraphMax = ftor.boundingRectGraphMax (isEmpty);
   if (!isEmpty) {
 
     GridInitializer gridInitializer;
 
-    DocumentModelGridDisplay modelGridDisplay = gridInitializer.initializeWithWidePolarCoverage (boundingRectGraph,
+    DocumentModelGridDisplay modelGridDisplay = gridInitializer.initializeWithWidePolarCoverage (boundingRectGraphMin,
+                                                                                                 boundingRectGraphMax,
                                                                                                  modelCoords(),
                                                                                                  transformation,
                                                                                                  m_pixmap.size ());
@@ -633,7 +640,7 @@ void Document::loadVersions7AndUp (QFile *file)
 
       QXmlStreamAttributes attributes = reader.attributes();
       if (attributes.hasAttribute (DOCUMENT_SERIALIZE_AXES_POINTS_REQUIRED)) {
-        m_documentAxesPointsRequired = (DocumentAxesPointsRequired) attributes.value (DOCUMENT_SERIALIZE_AXES_POINTS_REQUIRED).toInt();
+        m_documentAxesPointsRequired = static_cast<DocumentAxesPointsRequired> (attributes.value (DOCUMENT_SERIALIZE_AXES_POINTS_REQUIRED).toInt());
       } else {
         m_documentAxesPointsRequired = DOCUMENT_AXES_POINTS_REQUIRED_3;
       }
@@ -1081,7 +1088,7 @@ int Document::versionFromFile (QFile *file) const
       if (attributes.contains (DOCUMENT_SERIALIZE_APPLICATION_VERSION_NUMBER)) {
 
         QDomElement elem = node.toElement();
-        version = (int) elem.attribute (DOCUMENT_SERIALIZE_APPLICATION_VERSION_NUMBER).toDouble();
+        version = qFloor (elem.attribute (DOCUMENT_SERIALIZE_APPLICATION_VERSION_NUMBER).toDouble());
       }
     }
   }

@@ -68,12 +68,11 @@
 		<content_attribute id="money-gambling">none</content_attribute>
 	</content_rating>
 	<releases>
-		<release date="2018-07-22" version="10.10">
+		<release date="2019-08-02" version="12.0">
 			<description>
 			  <ul>
-			    <li>Handle non-function points in functions</li>
-			    <li>Load version 4 files with unset settings</li>
-			    <li>Improved grid line setup</li>
+			    <li>More points styles </li>
+			    <li>Fix data export for log scale with small step factor</li>
 			  </ul>
 			</description>
 		</release>

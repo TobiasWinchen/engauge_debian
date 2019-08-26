@@ -8,6 +8,10 @@
 #  3) desktop-qt5 only snaps a minimal qt application, so other packages must be added by us
 #  4) sql plugins must be added so sqlite is available, which prevents a runtime error message about missing qsqlite
 #     that disappeared when the help feature started working
+#
+# Error like 'Authorization header missing' is fixed with 'snapcraft login'
+
+echo "Run in Kubuntu 16.04 virtual machine"
 
 echo "Removing existing snap, if any, so it will not be confused with new snap if this script is interrupted"
 sudo snap remove engauge-digitizer
@@ -18,6 +22,7 @@ rm -rf build
 rm -rf documentation
 
 mkdir -p build/desktop-file
+mkdir -p build/meta/gui
 cd build
 BUILD=`pwd`
 
@@ -29,6 +34,7 @@ sed 's/DESTDIR = bin/DESTDIR = ./g' ../../../engauge.pro >engauge.pro
 
 cp ../snapcraft.yaml .
 cp ../../engauge-digitizer.desktop desktop-file
+cp ../../../src/img/digitizer-32.png meta/gui/icon.png
 cp -r ../../../help .
 cp -r ../../../src .
 

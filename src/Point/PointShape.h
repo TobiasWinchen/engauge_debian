@@ -15,7 +15,9 @@ enum PointShape {
   POINT_SHAPE_DIAMOND,
   POINT_SHAPE_SQUARE,
   POINT_SHAPE_TRIANGLE,
-  POINT_SHAPE_X
+  POINT_SHAPE_X,
+  POINT_SHAPE_HOURGLASS,
+  POINT_SHAPE_TRIANGLE2
 };
 
 extern QString pointShapeToString (PointShape pointShape);

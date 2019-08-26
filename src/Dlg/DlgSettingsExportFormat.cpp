@@ -48,15 +48,17 @@ const int TAB_WIDGET_INDEX_RELATIONS = 1;
 
 const QString EMPTY_PREVIEW;
 
-const int MINIMUM_DIALOG_WIDTH_EXPORT_FORMAT = 650;
+const int MINIMUM_DIALOG_WIDTH_EXPORT_FORMAT = 600;
 const int MINIMUM_HEIGHT = 780;
 
 DlgSettingsExportFormat::DlgSettingsExportFormat(MainWindow &mainWindow) :
   DlgSettingsAbstractBase (tr ("Export Format"),
                            "DlgSettingsExportFormat",
                            mainWindow),
-  m_modelExportBefore (0),
-  m_modelExportAfter (0),
+  m_validatorFunctionsPointsEvenlySpacing (nullptr),
+  m_validatorRelationsPointsEvenlySpacing (nullptr),
+  m_modelExportBefore (nullptr),
+  m_modelExportAfter (nullptr),
   m_haveFunction (false),
   m_haveRelation (false)
 {
@@ -70,6 +72,9 @@ DlgSettingsExportFormat::DlgSettingsExportFormat(MainWindow &mainWindow) :
 DlgSettingsExportFormat::~DlgSettingsExportFormat()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::~DlgSettingsExportFormat";
+
+  delete m_validatorFunctionsPointsEvenlySpacing;
+  delete m_validatorRelationsPointsEvenlySpacing;  
 }
 
 void DlgSettingsExportFormat::createCurveSelection (QGridLayout *layout, int &row)
@@ -196,8 +201,15 @@ void DlgSettingsExportFormat::createFunctionsPointsSelection (QHBoxLayout *layou
   m_btnFunctionsPointsAllCurves = new QRadioButton (tr ("Interpolate Ys at Xs from all curves"));
   m_btnFunctionsPointsAllCurves->setWhatsThis (tr ("Exported file will have values at every unique X "
                                                    "value from every curve. Y values will be linearly interpolated if necessary"));
-  layoutPointsSelections->addWidget (m_btnFunctionsPointsAllCurves, row++, 0, 1, 4);
+  layoutPointsSelections->addWidget (m_btnFunctionsPointsAllCurves, row, 0, 1, 2);
   connect (m_btnFunctionsPointsAllCurves, SIGNAL (released()), this, SLOT (slotFunctionsPointsAllCurves()));
+  
+  // Put extrapolation control up near interpolation controls and away from raw control which never uses extrapolation
+  m_chkExtrapolateOutsideEndpoints = new QCheckBox (tr ("Extrapolate outside endpoints"));
+  m_chkExtrapolateOutsideEndpoints->setWhatsThis (tr ("Enable or disable extrapolation outside of endpoints of each curve. If disabled, "
+                                                      "only points between the endpoints of each curve are exported"));
+  layoutPointsSelections->addWidget (m_chkExtrapolateOutsideEndpoints, row++, 3, 1, 1, Qt::AlignRight);
+  connect (m_chkExtrapolateOutsideEndpoints, SIGNAL (stateChanged (int)), this, SLOT (slotFunctionsExtrapolateOutsideEndpoints(int)));
 
   m_btnFunctionsPointsFirstCurve = new QRadioButton (tr ("Interpolate Ys at Xs from first curve"));
   m_btnFunctionsPointsFirstCurve->setWhatsThis (tr ("Exported file will have values at every unique X "
@@ -205,7 +217,7 @@ void DlgSettingsExportFormat::createFunctionsPointsSelection (QHBoxLayout *layou
   layoutPointsSelections->addWidget (m_btnFunctionsPointsFirstCurve, row++, 0, 1, 4);
   connect (m_btnFunctionsPointsFirstCurve, SIGNAL (released()), this, SLOT (slotFunctionsPointsFirstCurve()));
 
-  m_btnFunctionsPointsEvenlySpaced = new QRadioButton (tr ("Interpolate Ys at evenly spaced X values."));
+  m_btnFunctionsPointsEvenlySpaced = new QRadioButton (tr ("Interpolate Ys at evenly spaced X values that are automatically selected"));
   m_btnFunctionsPointsEvenlySpaced->setWhatsThis (tr ("Exported file will have values at evenly spaced X values, separated by the interval selected below."));
   layoutPointsSelections->addWidget (m_btnFunctionsPointsEvenlySpaced, row++, 0, 1, 4);
   connect (m_btnFunctionsPointsEvenlySpaced, SIGNAL (released()), this, SLOT (slotFunctionsPointsEvenlySpaced()));
@@ -233,12 +245,17 @@ void DlgSettingsExportFormat::createFunctionsPointsSelection (QHBoxLayout *layou
                                                             "consistent across the graph, even if the X scale is logarithmic.\n\n"
                                                             "Graph units are preferred when the spacing is to depend on the X scale."));
   m_cmbFunctionsPointsEvenlySpacingUnits->addItem(exportPointsIntervalUnitsToString (EXPORT_POINTS_INTERVAL_UNITS_GRAPH),
-                                                                                     QVariant (EXPORT_POINTS_INTERVAL_UNITS_GRAPH));
+                                                  QVariant (EXPORT_POINTS_INTERVAL_UNITS_GRAPH));
   m_cmbFunctionsPointsEvenlySpacingUnits->addItem(exportPointsIntervalUnitsToString (EXPORT_POINTS_INTERVAL_UNITS_SCREEN),
-                                                                                     QVariant (EXPORT_POINTS_INTERVAL_UNITS_SCREEN));
+                                                  QVariant (EXPORT_POINTS_INTERVAL_UNITS_SCREEN));
   connect (m_cmbFunctionsPointsEvenlySpacingUnits, SIGNAL (activated (const QString &)),
            this, SLOT (slotFunctionsPointsEvenlySpacedIntervalUnits (const QString &))); // activated() ignores code changes
   layoutPointsSelections->addWidget (m_cmbFunctionsPointsEvenlySpacingUnits, row++, 3, 1, 1, Qt::AlignLeft);
+
+  m_btnFunctionsPointsGridLines = new QRadioButton (tr ("Interpolate Ys at evenly spaced X values on grid lines"));
+  m_btnFunctionsPointsGridLines->setWhatsThis (tr ("Exported file will have values at evenly spaced X values at the vertical grid lines."));
+  layoutPointsSelections->addWidget (m_btnFunctionsPointsGridLines, row++, 0, 1, 4);
+  connect (m_btnFunctionsPointsGridLines, SIGNAL (released()), this, SLOT (slotFunctionsPointsGridLines()));
 
   m_btnFunctionsPointsRaw = new QRadioButton (tr ("Raw Xs and Ys"));
   m_btnFunctionsPointsRaw->setWhatsThis (tr ("Exported file will have only original X and Y values"));
@@ -288,6 +305,11 @@ void DlgSettingsExportFormat::createOptionalSaveDefault (QHBoxLayout *layout)
   m_btnSaveDefault->setWhatsThis (tr ("Save the settings for use as future defaults."));
   connect (m_btnSaveDefault, SIGNAL (released ()), this, SLOT (slotSaveDefault ()));
   layout->addWidget (m_btnSaveDefault, 0, Qt::AlignLeft);
+
+  m_btnLoadDefault = new QPushButton (tr ("Load Default"));
+  m_btnLoadDefault->setWhatsThis (tr ("Load the default settings."));
+  connect (m_btnLoadDefault, SIGNAL (released ()), this, SLOT (slotLoadDefault ()));
+  layout->addWidget (m_btnLoadDefault, 0, Qt::AlignLeft);
 }
 
 void DlgSettingsExportFormat::createPreview(QGridLayout *layout, int &row)
@@ -408,7 +430,7 @@ QWidget *DlgSettingsExportFormat::createSubPanel ()
 }
 
 void DlgSettingsExportFormat::createTabWidget (QGridLayout *layout,
-                                         int &row)
+                                               int &row)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createTabWidget";
 
@@ -440,26 +462,17 @@ void DlgSettingsExportFormat::createTabWidget (QGridLayout *layout,
 }
 
 void DlgSettingsExportFormat::createXLabel (QGridLayout *layoutHeader,
-                                      int colLabel)
+                                            int colLabel)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::createXLabel";
 
   int row = 1; // Skip first row
 
-  QLabel *title;
-  if (true) {
-    title = new QLabel (QString ("%1:").arg (tr ("X Label")));
-  } else {
-    title = new QLabel (QString ("%1:").arg (tr ("Theta Label")));
-  }
+  QLabel *title = new QLabel (QString ("%1:").arg (tr ("X Label")));
   layoutHeader->addWidget (title, row++, colLabel, 1, 1);
 
   m_editXLabel = new QLineEdit;
-  if (true) {
-    m_editXLabel->setWhatsThis (tr ("Label in the header for x values"));
-  } else {
-    m_editXLabel->setWhatsThis (tr ("Label in the header for theta values"));
-  }
+  m_editXLabel->setWhatsThis (tr ("Label in the header for x values"));
   layoutHeader->addWidget (m_editXLabel, row++, colLabel, 1, 1);
   connect (m_editXLabel, SIGNAL (textChanged (const QString &)), this, SLOT (slotXLabel(const QString &)));
 }
@@ -539,7 +552,8 @@ void DlgSettingsExportFormat::initializeIntervalConstraints ()
   const int MAX_POINTS_ACROSS_RANGE = 5000;
 
   // Get min and max of graph and screen coordinates
-  CallbackBoundingRects ftor (mainWindow().transformation());
+  CallbackBoundingRects ftor (cmdMediator().document().documentAxesPointsRequired(),
+                              mainWindow().transformation());
 
   Functor2wRet<const QString &, const Point &, CallbackSearchReturn> ftorWithCallback = functor_ret (ftor,
                                                                                                      &CallbackBoundingRects::callback);
@@ -547,12 +561,12 @@ void DlgSettingsExportFormat::initializeIntervalConstraints ()
 
   // If there are no points, then interval will be zero. That special case must be handled downstream to prevent infinite loops
   bool isEmpty;
-  double maxSizeGraph = qMax (ftor.boundingRectGraph(isEmpty).width(),
-                              ftor.boundingRectGraph(isEmpty).height());
-  double maxSizeScreen = qMax (ftor.boundingRectScreen(isEmpty).width(),
-                               ftor.boundingRectScreen(isEmpty).height());
-  m_minIntervalGraph = maxSizeGraph / MAX_POINTS_ACROSS_RANGE;
-  m_minIntervalScreen = maxSizeScreen / MAX_POINTS_ACROSS_RANGE;
+  QPointF boundingRectGraphMin = ftor.boundingRectGraphMin (isEmpty);
+  QPointF boundingRectGraphMax = ftor.boundingRectGraphMax (isEmpty);
+  double maxSizeGraph = boundingRectGraphMax.x() - boundingRectGraphMin.x();
+  double maxSizeScreen = ftor.boundingRectScreen(isEmpty).width();
+  m_minIntervalGraph = maxSizeGraph / MAX_POINTS_ACROSS_RANGE; // Should be unaffected by y range
+  m_minIntervalScreen = maxSizeScreen / MAX_POINTS_ACROSS_RANGE; // Should be unaffected by y range
 }
 
 void DlgSettingsExportFormat::load (CmdMediator &cmdMediator)
@@ -592,6 +606,7 @@ void DlgSettingsExportFormat::load (CmdMediator &cmdMediator)
   m_btnFunctionsPointsAllCurves->setChecked (pointsSelectionFunctions == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_ALL_CURVES);
   m_btnFunctionsPointsFirstCurve->setChecked (pointsSelectionFunctions == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_FIRST_CURVE);
   m_btnFunctionsPointsEvenlySpaced->setChecked (pointsSelectionFunctions == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_PERIODIC);
+  m_btnFunctionsPointsGridLines->setChecked (pointsSelectionFunctions == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_GRID_LINES);
   m_btnFunctionsPointsRaw->setChecked (pointsSelectionFunctions == EXPORT_POINTS_SELECTION_FUNCTIONS_RAW);
 
   ExportLayoutFunctions layoutFunctions = m_modelExportAfter->layoutFunctions ();
@@ -607,6 +622,8 @@ void DlgSettingsExportFormat::load (CmdMediator &cmdMediator)
   m_btnDelimitersSpaces->setChecked (delimiter == EXPORT_DELIMITER_SPACE);
   m_btnDelimitersTabs->setChecked (delimiter == EXPORT_DELIMITER_TAB);
   m_btnDelimitersSemicolons->setChecked (delimiter == EXPORT_DELIMITER_SEMICOLON);
+
+  m_chkExtrapolateOutsideEndpoints->setChecked (m_modelExportAfter->extrapolateOutsideEndpoints ());
 
   m_chkOverrideCsvTsv->setChecked (m_modelExportAfter->overrideCsvTsv());
 
@@ -713,6 +730,15 @@ void DlgSettingsExportFormat::slotExclude ()
   updatePreview();
 }
 
+void DlgSettingsExportFormat::slotFunctionsExtrapolateOutsideEndpoints(int)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotFunctionsExtrapolateOutsideEndpoints";
+
+  m_modelExportAfter->setExtrapolateOutsideEndpoints (m_chkExtrapolateOutsideEndpoints->isChecked());  
+  updateControls();
+  updatePreview();
+}
+
 void DlgSettingsExportFormat::slotFunctionsLayoutAllCurves()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotFunctionsLayoutAllCurves";
@@ -755,7 +781,7 @@ void DlgSettingsExportFormat::slotFunctionsPointsEvenlySpacedInterval(const QStr
 
   // Prevent infinite loop on empty and "-" values which get treated as zero interval
   if (goodIntervalFunctions()) {
-   m_modelExportAfter->setPointsIntervalFunctions(m_editFunctionsPointsEvenlySpacing->text().toDouble());
+    m_modelExportAfter->setPointsIntervalFunctions(m_editFunctionsPointsEvenlySpacing->text().toDouble());
     updateControls();
     updatePreview();
   } else {
@@ -768,7 +794,7 @@ void DlgSettingsExportFormat::slotFunctionsPointsEvenlySpacedIntervalUnits(const
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotFunctionsPointsEvenlySpacedIntervalUnits";
 
   int index = m_cmbFunctionsPointsEvenlySpacingUnits->currentIndex();
-  ExportPointsIntervalUnits units = (ExportPointsIntervalUnits) m_cmbFunctionsPointsEvenlySpacingUnits->itemData (index).toInt();
+  ExportPointsIntervalUnits units = static_cast<ExportPointsIntervalUnits> (m_cmbFunctionsPointsEvenlySpacingUnits->itemData (index).toInt());
 
   m_modelExportAfter->setPointsIntervalUnitsFunctions(units);
   updateIntervalConstraints(); // Call this before updateControls so constraint checking is updated for ok button
@@ -783,6 +809,15 @@ void DlgSettingsExportFormat::slotFunctionsPointsFirstCurve()
   m_modelExportAfter->setPointsSelectionFunctions(EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_FIRST_CURVE);
   updateControls();
   updatePreview();
+}
+
+void DlgSettingsExportFormat::slotFunctionsPointsGridLines()
+{
+    LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotFunctionsPointsGridLines";
+
+    m_modelExportAfter->setPointsSelectionFunctions(EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_GRID_LINES);
+    updateControls();
+    updatePreview();
 }
 
 void DlgSettingsExportFormat::slotFunctionsPointsRaw()
@@ -874,6 +909,57 @@ void DlgSettingsExportFormat::slotListIncluded()
   // Do not call updatePreview since this method changes nothing
 }
 
+void DlgSettingsExportFormat::slotLoadDefault()
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotLoadDefault";
+
+  // Get defaults from constructor
+  DocumentModelExportFormat modelExportDefaults;
+
+  // Apply defaults to controls. That will trigger updates to m_modelExportAfter
+
+  m_btnHeaderGnuplot->setChecked (modelExportDefaults.header() == EXPORT_HEADER_GNUPLOT);
+  m_btnHeaderNone->setChecked (modelExportDefaults.header() == EXPORT_HEADER_NONE);
+  m_btnHeaderSimple->setChecked (modelExportDefaults.header() == EXPORT_HEADER_SIMPLE);
+
+  m_editXLabel->setText (modelExportDefaults.xLabel());
+
+  m_btnDelimitersCommas->setChecked (modelExportDefaults.delimiter() == EXPORT_DELIMITER_COMMA);
+  m_btnDelimitersSemicolons->setChecked (modelExportDefaults.delimiter() == EXPORT_DELIMITER_SEMICOLON);
+  m_btnDelimitersSpaces->setChecked (modelExportDefaults.delimiter() == EXPORT_DELIMITER_SPACE);
+  m_btnDelimitersTabs->setChecked (modelExportDefaults.delimiter() == EXPORT_DELIMITER_TAB);
+
+  m_chkOverrideCsvTsv->setChecked (modelExportDefaults.overrideCsvTsv());
+
+  m_btnCurvesLayoutAllCurves->setChecked (modelExportDefaults.layoutFunctions() == EXPORT_LAYOUT_ALL_PER_LINE);
+  m_btnCurvesLayoutOneCurve->setChecked (modelExportDefaults.layoutFunctions() == EXPORT_LAYOUT_ONE_PER_LINE);
+
+  m_editFunctionsPointsEvenlySpacing->setText (QString::number (modelExportDefaults.pointsIntervalFunctions ()));
+  m_editRelationsPointsEvenlySpacing->setText (QString::number (modelExportDefaults.pointsIntervalRelations ()));
+
+  m_btnFunctionsPointsAllCurves->setChecked (modelExportDefaults.pointsSelectionFunctions() == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_ALL_CURVES);
+  m_btnFunctionsPointsFirstCurve->setChecked (modelExportDefaults.pointsSelectionFunctions() == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_FIRST_CURVE);
+  m_btnFunctionsPointsEvenlySpaced->setChecked (modelExportDefaults.pointsSelectionFunctions() == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_PERIODIC);
+  m_btnFunctionsPointsGridLines->setChecked (modelExportDefaults.pointsSelectionFunctions() == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_GRID_LINES);
+  m_btnFunctionsPointsRaw->setChecked (modelExportDefaults.pointsSelectionFunctions() == EXPORT_POINTS_SELECTION_FUNCTIONS_RAW);
+
+  m_btnRelationsPointsEvenlySpaced->setChecked (modelExportDefaults.pointsSelectionRelations() == EXPORT_POINTS_SELECTION_RELATIONS_INTERPOLATE);
+  m_btnRelationsPointsRaw->setChecked (modelExportDefaults.pointsSelectionRelations() == EXPORT_POINTS_SELECTION_RELATIONS_RAW);
+
+  m_chkExtrapolateOutsideEndpoints->setChecked (modelExportDefaults.extrapolateOutsideEndpoints());
+
+  int indexFunctions = m_cmbFunctionsPointsEvenlySpacingUnits->findData (QVariant (modelExportDefaults.pointsIntervalUnitsFunctions ()));
+  int indexRelations = m_cmbRelationsPointsEvenlySpacingUnits->findData (QVariant (modelExportDefaults.pointsIntervalUnitsRelations ()));
+  m_cmbFunctionsPointsEvenlySpacingUnits->setCurrentIndex (indexFunctions);
+  m_cmbRelationsPointsEvenlySpacingUnits->setCurrentIndex (indexRelations);
+
+  // Apply defaults to 'after' settings
+  *m_modelExportAfter = modelExportDefaults;
+
+  updateControls();
+  updatePreview();
+}
+
 void DlgSettingsExportFormat::slotOverrideCsvTsv(int)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotOverrideCsvTsv";
@@ -906,7 +992,7 @@ void DlgSettingsExportFormat::slotRelationsPointsEvenlySpacedIntervalUnits(const
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsExportFormat::slotRelationsPointsEvenlySpacedIntervalUnits";
 
   int index = m_cmbRelationsPointsEvenlySpacingUnits->currentIndex();
-  ExportPointsIntervalUnits units = (ExportPointsIntervalUnits) m_cmbRelationsPointsEvenlySpacingUnits->itemData (index).toInt();
+  ExportPointsIntervalUnits units = static_cast<ExportPointsIntervalUnits> (m_cmbRelationsPointsEvenlySpacingUnits->itemData (index).toInt());
 
   m_modelExportAfter->setPointsIntervalUnitsRelations(units);
   updateIntervalConstraints(); // Call this before updateControls so constraint checking is updated for ok button
@@ -930,8 +1016,14 @@ void DlgSettingsExportFormat::slotSaveDefault()
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   settings.beginGroup (SETTINGS_GROUP_EXPORT);
 
+  // Sync these settings with DocumentModelExportFormat::DocumentModelExportFormat()
+  // and DlgSettingsExportFormat::slotLoadDefault()
   settings.setValue (SETTINGS_EXPORT_DELIMITER,
                      QVariant (m_modelExportAfter->delimiter()));
+  settings.setValue (SETTINGS_EXPORT_DELIMITER_OVERRIDE_CSV_TSV,
+                     QVariant (m_modelExportAfter->overrideCsvTsv()));
+  settings.setValue (SETTINGS_EXPORT_EXTRAPOLATE_OUTSIDE_ENDPOINTS,
+                     QVariant (m_modelExportAfter->extrapolateOutsideEndpoints()));
   settings.setValue (SETTINGS_EXPORT_HEADER,
                      QVariant (m_modelExportAfter->header()));
   settings.setValue (SETTINGS_EXPORT_LAYOUT_FUNCTIONS,
@@ -975,6 +1067,9 @@ void DlgSettingsExportFormat::updateControls ()
   bool isGoodState = goodIntervalFunctions() &&
                      goodIntervalRelations();
   enableOk (isGoodState);
+
+  // Function extrapolation never applies when using raw points
+  m_chkExtrapolateOutsideEndpoints->setEnabled (!m_btnFunctionsPointsRaw->isChecked ());
 
   int selectedForInclude = m_listExcluded->selectedItems().count();
   int selectedForExclude = m_listIncluded->selectedItems().count();
@@ -1040,6 +1135,12 @@ void DlgSettingsExportFormat::updateIntervalConstraints ()
   double relationsMin = (m_modelExportAfter->pointsIntervalUnitsRelations() == EXPORT_POINTS_INTERVAL_UNITS_GRAPH ?
                            m_minIntervalGraph :
                            m_minIntervalScreen);
+
+  if (cmdMediator().document().modelCoords().coordScaleYRadius() == COORD_SCALE_LOG) {
+    // Override scale factor with log scale so Export classes are assured that multiplying by the scale factor will
+    // cause an increase
+    functionsMin = qMax (1.00000001, functionsMin);
+  }
 
   if (m_tabWidget->currentIndex() == TAB_WIDGET_INDEX_FUNCTIONS) {
 

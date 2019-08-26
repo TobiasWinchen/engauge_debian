@@ -27,7 +27,7 @@
 #include "DlgSettingsAxesChecker.h"
 #include "DlgSettingsColorFilter.h"
 #include "DlgSettingsCoords.h"
-#include "DlgSettingsCurveAddRemove.h"
+#include "DlgSettingsCurveList.h"
 #include "DlgSettingsCurveProperties.h"
 #include "DlgSettingsDigitizeCurve.h"
 #include "DlgSettingsExportFormat.h"
@@ -62,9 +62,7 @@
 #include "Jpeg2000.h"
 #endif // ENGAUGE_JPEG2000
 #include "LoadFileInfo.h"
-#ifdef NETWORKING
 #include "LoadImageFromUrl.h"
-#endif
 #include "Logger.h"
 #include "MainDirectoryPersist.h"
 #include "MainTitleBarFormat.h"
@@ -126,13 +124,14 @@
 #include "ZoomTransition.h"
 
 const QString EMPTY_FILENAME ("");
-const char *ENGAUGE_FILENAME_DESCRIPTION = "Engauge Document";
+static const char *ENGAUGE_FILENAME_DESCRIPTION = "Engauge Document";
 const QString ENGAUGE_FILENAME_EXTENSION ("dig");
 const int REGRESSION_INTERVAL = 400; // Milliseconds
 const unsigned int MAX_RECENT_FILE_LIST_SIZE = 8;
 
 MainWindow::MainWindow(const QString &errorReportFile,
                        const QString &fileCmdScriptFile,
+                       bool isDropRegression,
                        bool isRegressionTest,
                        bool isGnuplot,
                        bool isReset,
@@ -143,26 +142,27 @@ MainWindow::MainWindow(const QString &errorReportFile,
                        const QStringList &commandLineWithoutLoadStartupFiles,
                        QWidget *parent) :
   QMainWindow(parent),
+  m_originalFileWasImported (false),
   m_isDocumentExported (false),
   m_engaugeFile (EMPTY_FILENAME),
   m_currentFile (EMPTY_FILENAME),
-  m_layout (0),
-  m_scene (0),
-  m_view (0),
-  m_loadImageFromUrl (0),
-  m_cmdMediator (0),
-  m_digitizeStateContext (0),
-  m_transformationStateContext (0),
-  m_backgroundStateContext (0),
-  m_networkClient (0),
+  m_layout (nullptr),
+  m_scene (nullptr),
+  m_view (nullptr),
+  m_loadImageFromUrl (nullptr),
+  m_cmdMediator (nullptr),
+  m_digitizeStateContext (nullptr),
+  m_transformationStateContext (nullptr),
+  m_backgroundStateContext (nullptr),
+  m_networkClient (nullptr),
   m_isGnuplot (isGnuplot),
   m_commandLineWithoutLoadStartupFiles (commandLineWithoutLoadStartupFiles),
-  m_ghosts (0),
-  m_timerRegressionErrorReport(0),
-  m_fileCmdScript (0),
+  m_ghosts (nullptr),
+  m_timerRegressionErrorReport(nullptr),
+  m_fileCmdScript (nullptr),
   m_isErrorReportRegressionTest (isRegressionTest),
-  m_timerRegressionFileCmdScript(0),
-  m_fittingCurve (0),
+  m_timerRegressionFileCmdScript(nullptr),
+  m_fittingCurve (nullptr),
   m_isExportOnly (isExportOnly),
   m_isExtractImageOnly (isExtractImageOnly),
   m_extractImageOnlyExtension (extractImageOnlyExtension)
@@ -216,6 +216,9 @@ MainWindow::MainWindow(const QString &errorReportFile,
   } else if (!fileCmdScriptFile.isEmpty()) {
     m_fileCmdScript = new FileCmdScript (fileCmdScriptFile);
     startRegressionTestFileCmdScript();
+  } else if (isDropRegression) {
+    m_fileCmdScript = new FileCmdScript (""); // Hack to keep dialogs from popping up
+    startRegressionDropTest (loadStartupFiles);
   } else {
 
     // Save file names for later, after gui becomes available. The file names are dropped if error report file is specified
@@ -227,6 +230,30 @@ MainWindow::MainWindow(const QString &errorReportFile,
 
 MainWindow::~MainWindow()
 {
+#if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
+  delete m_helpWindow;
+#endif
+  delete m_tutorialDlg;
+  delete m_cmdMediator;
+  delete m_cmdStackShadow;
+  delete m_digitizeStateContext;
+  delete m_transformationStateContext;
+  delete m_backgroundStateContext;
+  delete m_dlgSettingsAxesChecker;
+  delete m_dlgSettingsColorFilter;
+  delete m_dlgSettingsCoords;
+  delete m_dlgSettingsCurveList;
+  delete m_dlgSettingsCurveProperties;
+  delete m_dlgSettingsDigitizeCurve;
+  delete m_dlgSettingsExportFormat;
+  delete m_dlgSettingsGeneral;
+  delete m_dlgSettingsGridDisplay;
+  delete m_dlgSettingsGridRemoval;
+  delete m_dlgSettingsMainWindow;
+  delete m_dlgSettingsPointMatch;
+  delete m_dlgSettingsSegments;
+  delete m_fileCmdScript;
+  m_gridLines.clear ();  
 }
 
 void MainWindow::addDockWindow (QDockWidget *dockWidget,
@@ -239,8 +266,8 @@ void MainWindow::addDockWindow (QDockWidget *dockWidget,
   // can happen if it opens elsewhere). The user may not know it can be undocked, but at least can resize or
   // hide it if he/she needs more room for the main window.
   const bool DOCKED_EQUALS_NOT_FLOATING = false;
-  Qt::DockWidgetArea area = (Qt::DockWidgetArea) settings.value (settingsTokenArea,
-                                                                 Qt::NoDockWidgetArea).toInt();
+  Qt::DockWidgetArea area = static_cast<Qt::DockWidgetArea> (settings.value (settingsTokenArea,
+                                                                             Qt::NoDockWidgetArea).toInt());
 
   if (area == Qt::NoDockWidgetArea) {
 
@@ -330,7 +357,7 @@ ZoomFactor MainWindow::currentZoomFactor () const
 {
   // Find the zoom control that is checked
   for (int z = 0; z < NUMBER_ZOOM_FACTORS; z++) {
-    ZoomFactor zoomFactor = (ZoomFactor) z;
+    ZoomFactor zoomFactor = static_cast<ZoomFactor> (z);
     if (m_zoomMapToAction [zoomFactor]->isChecked ()) {
       // This zoom control is checked
       return zoomFactor;
@@ -345,7 +372,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event)
 {
   if (event->type () == QEvent::KeyPress) {
 
-    QKeyEvent *eventKeyPress = (QKeyEvent *) event;
+    QKeyEvent *eventKeyPress = static_cast<QKeyEvent *> (event);
 
     // Special shortcuts. All of these are probably only useful for debugging and/or regression testing
     if ((eventKeyPress->key() == Qt::Key_E) &&
@@ -397,11 +424,20 @@ void MainWindow::exportAllCoordinateSystemsAfterRegressionTests()
 
 QString MainWindow::exportRegressionFilenameFromInputFilename (const QString &fileName) const
 {
+  // Include file extensions used in loading, importing or drag and drop. Note html is before htm
+  // so the "l" gets replaced
+  QStringList befores;
+  befores << ".dig" << ".gif" << ".html" << ".htm" << ".jp2" << ".jpg" << ".pbm"
+          << ".pdf" << ".pgm" << ".png" << ".ppm" << ".xbm" << ".xpm" << ".xml";
+
   QString outFileName = fileName;
 
-  outFileName = outFileName.replace (".xml", ".csv_actual", Qt::CaseInsensitive); // Applies when extension is xml
-  outFileName = outFileName.replace (".dig", ".csv_actual", Qt::CaseInsensitive); // Applies when extension is dig
-  outFileName = outFileName.replace (".pdf", ".csv_actual", Qt::CaseInsensitive); // Applies when extension is pdf
+  QStringList::iterator itr;
+  for (itr = befores.begin(); itr != befores.end(); itr++) {
+    QString suffix = *itr;
+
+    outFileName = outFileName.replace (suffix, ".csv_actual", Qt::CaseInsensitive);
+  }
 
   return outFileName;
 }
@@ -437,7 +473,7 @@ void MainWindow::fileExport(const QString &fileName,
     LOG4CPP_ERROR_S ((*mainCat)) << "MainWindow::fileExport"
                                  << " file=" << fileName.toLatin1().data()
                                  << " curDir=" << QDir::currentPath().toLatin1().data();
-    QMessageBox::critical (0,
+    QMessageBox::critical (nullptr,
                            engaugeWindowTitle(),
                            tr ("Unable to export to file") + " " + fileName);
   }
@@ -471,7 +507,7 @@ void MainWindow::fileExtractImage (const QString &fileName)
     LOG4CPP_ERROR_S ((*mainCat)) << "MainWindow::fileExtractImage"
                                  << " file=" << fileName.toLatin1().data()
                                  << " curDir=" << QDir::currentPath().toLatin1().data();
-    QMessageBox::critical (0,
+    QMessageBox::critical (nullptr,
                            engaugeWindowTitle(),
                            tr ("Unable to extract image to file") + " " + fileName);
   }
@@ -747,7 +783,7 @@ void MainWindow::ghostsCreate ()
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "MainWindow::ghostsCreate";
 
-  ENGAUGE_ASSERT (m_ghosts == 0);
+  ENGAUGE_ASSERT (m_ghosts == nullptr);
   m_ghosts = new Ghosts (m_cmdMediator->document().coordSystemIndex());
 
   for (unsigned int index = 0; index < m_cmdMediator->document().coordSystemCount(); index++) {
@@ -778,7 +814,7 @@ void MainWindow::ghostsDestroy ()
   m_ghosts->destroyGhosts(*m_scene);
 
   delete m_ghosts;
-  m_ghosts = 0;
+  m_ghosts = nullptr;
 }
 
 void MainWindow::handlerFileExtractImage ()
@@ -814,7 +850,7 @@ void MainWindow::loadCoordSystemListFromCmdMediator ()
   unsigned int numberCoordSystem = m_cmdMediator->document().coordSystemCount();
 
   for (unsigned int i = 0; i < numberCoordSystem; i++) {
-    int index1Based = i + 1;
+    int index1Based = signed (i + 1);
     m_cmbCoordSystem->addItem (QString::number (index1Based),
                                QVariant (i));
   }
@@ -988,7 +1024,7 @@ bool MainWindow::loadImageNewDocument (const QString &fileName,
 
     // Show the wizard if user selected it and we are not running a script
     if (m_actionHelpChecklistGuideWizard->isChecked () &&
-        (m_fileCmdScript == 0)) {
+        (m_fileCmdScript == nullptr)) {
 
       // Show wizard
       ChecklistGuideWizard *wizard = new ChecklistGuideWizard (*this,
@@ -1050,7 +1086,7 @@ bool MainWindow::loadImageReplacingImage (const QString &fileName,
   // We do not call rebuildRecentFileListForCurrentFile for an image file, so only proper Engauge document files appear in the recent file list
   m_engaugeFile = EMPTY_FILENAME; // Forces first Save to be treated as Save As
 
-  ENGAUGE_ASSERT (m_cmdMediator != 0); // Menu option should only be available when a document is currently open
+  ENGAUGE_ASSERT (m_cmdMediator != nullptr); // Menu option should only be available when a document is currently open
 
   m_cmdMediator->document().setPixmap (image);
 
@@ -1116,7 +1152,7 @@ bool MainWindow::modeGraph () const
 {
   bool success = false;
 
-  if (m_cmdMediator != 0) {
+  if (m_cmdMediator != nullptr) {
     success = (m_cmdMediator->document().documentAxesPointsRequired() != DOCUMENT_AXES_POINTS_REQUIRED_2);
   }
 
@@ -1127,7 +1163,7 @@ bool MainWindow::modeMap () const
 {
   bool success = false;
 
-  if (m_cmdMediator != 0) {
+  if (m_cmdMediator != nullptr) {
     success = (m_cmdMediator->document().documentAxesPointsRequired() == DOCUMENT_AXES_POINTS_REQUIRED_2);
   }
 
@@ -1136,7 +1172,7 @@ bool MainWindow::modeMap () const
 
 bool MainWindow::maybeSave()
 {
-  if (m_cmdMediator != 0) {
+  if (m_cmdMediator != nullptr) {
     if (m_cmdMediator->isModified()) {
       QMessageBox::StandardButton ret = QMessageBox::warning (this,
                                                               engaugeWindowTitle(),
@@ -1198,7 +1234,7 @@ void MainWindow::rebuildRecentFileListForCurrentFile(const QString &filePath)
   QStringList recentFilePaths = settings.value (SETTINGS_RECENT_FILE_LIST).toStringList();
   recentFilePaths.removeAll (filePath); // Remove previous instance of the current filePath
   recentFilePaths.prepend (filePath); // Insert current filePath at start
-  while (recentFilePaths.count () > (int) MAX_RECENT_FILE_LIST_SIZE) {
+  while (recentFilePaths.count () > qFloor (MAX_RECENT_FILE_LIST_SIZE)) {
     recentFilePaths.removeLast (); // Remove entry since the number of entries exceeds the limit
   }
   settings.setValue (SETTINGS_RECENT_FILE_LIST, recentFilePaths);
@@ -1260,7 +1296,7 @@ void MainWindow::saveErrorReportFileAndExit (const char *context,
 {
   // Skip if currently performing a regression test - in which case the preferred behavior is to let the current test fail and
   // continue on to execute the remaining tests
-  if ((m_cmdMediator != 0) && !m_isErrorReportRegressionTest) {
+  if ((m_cmdMediator != nullptr) && !m_isErrorReportRegressionTest) {
 
     QString report = saveErrorReportFileAndExitXml (context,
                                                     file,
@@ -1418,7 +1454,7 @@ BackgroundImage MainWindow::selectOriginal(BackgroundImage backgroundImage)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::selectBackgroundOriginal";
 
-  BackgroundImage previousBackground = (BackgroundImage) m_cmbBackground->currentData().toInt();
+  BackgroundImage previousBackground = static_cast<BackgroundImage> (m_cmbBackground->currentData().toInt());
 
   int index = m_cmbBackground->findData (backgroundImage);
   ENGAUGE_ASSERT (index >= 0);
@@ -1545,8 +1581,8 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                                                true).toBool ();
   m_actionViewBackground->setChecked (viewBackgroundToolBar);
   m_toolBackground->setVisible (viewBackgroundToolBar);
-  BackgroundImage backgroundImage = (BackgroundImage) settings.value (SETTINGS_BACKGROUND_IMAGE,
-                                                                      BACKGROUND_IMAGE_FILTERED).toInt ();
+  BackgroundImage backgroundImage = static_cast<BackgroundImage> (settings.value (SETTINGS_BACKGROUND_IMAGE,
+                                                                                  BACKGROUND_IMAGE_FILTERED).toInt ());
   int indexBackground = m_cmbBackground->findData (QVariant (backgroundImage));
   m_cmbBackground->setCurrentIndex (indexBackground);
 
@@ -1575,8 +1611,8 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
   loadToolTips ();
 
   // Statusbar visibility
-  StatusBarMode statusBarMode = (StatusBarMode) settings.value (SETTINGS_VIEW_STATUS_BAR,
-                                                                false).toInt ();
+  StatusBarMode statusBarMode = static_cast<StatusBarMode> (settings.value (SETTINGS_VIEW_STATUS_BAR,
+                                                                            false).toInt ());
   m_statusBar->setStatusBarMode (statusBarMode);
   m_actionStatusNever->setChecked (statusBarMode == STATUS_BAR_MODE_NEVER);
   m_actionStatusTemporary->setChecked (statusBarMode == STATUS_BAR_MODE_TEMPORARY);
@@ -1602,25 +1638,25 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
   // settings are saved to the application AND saved to m_modelMainWindow for use in DlgSettingsMainWindow. Note that
   // TranslatorContainer has previously extracted the locale from the settings
   QLocale localeDefault;
-  QLocale::Language language = (QLocale::Language) settings.value (SETTINGS_LOCALE_LANGUAGE,
-                                                                   QVariant (localeDefault.language())).toInt();
-  QLocale::Country country = (QLocale::Country) settings.value (SETTINGS_LOCALE_COUNTRY,
-                                                                QVariant (localeDefault.country())).toInt();
+  QLocale::Language language = static_cast<QLocale::Language> (settings.value (SETTINGS_LOCALE_LANGUAGE,
+                                                                               QVariant (localeDefault.language())).toInt());
+  QLocale::Country country = static_cast<QLocale::Country> (settings.value (SETTINGS_LOCALE_COUNTRY,
+                                                                            QVariant (localeDefault.country())).toInt());
   QLocale locale (language,
                   country);
-  slotViewZoom ((ZoomFactor) settings.value (SETTINGS_ZOOM_FACTOR,
-                                             QVariant (ZOOM_1_TO_1)).toInt());
+  slotViewZoom (static_cast<ZoomFactor> (settings.value (SETTINGS_ZOOM_FACTOR,
+                                                         QVariant (ZOOM_1_TO_1)).toInt()));
   m_modelMainWindow.setLocale (locale);
-  m_modelMainWindow.setZoomFactorInitial((ZoomFactorInitial) settings.value (SETTINGS_ZOOM_FACTOR_INITIAL,
-                                                                             QVariant (DEFAULT_ZOOM_FACTOR_INITIAL)).toInt());
-  m_modelMainWindow.setZoomControl ((ZoomControl) settings.value (SETTINGS_ZOOM_CONTROL,
-                                                                  QVariant (ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)).toInt());
-  m_modelMainWindow.setMainTitleBarFormat ((MainTitleBarFormat) settings.value (SETTINGS_MAIN_TITLE_BAR_FORMAT,
-                                                                                QVariant (MAIN_TITLE_BAR_FORMAT_PATH)).toInt());
+  m_modelMainWindow.setZoomFactorInitial(static_cast<ZoomFactorInitial> (settings.value (SETTINGS_ZOOM_FACTOR_INITIAL,
+                                                                                         QVariant (DEFAULT_ZOOM_FACTOR_INITIAL)).toInt()));
+  m_modelMainWindow.setZoomControl (static_cast<ZoomControl> (settings.value (SETTINGS_ZOOM_CONTROL,
+                                                                              QVariant (ZOOM_CONTROL_MENU_WHEEL_PLUSMINUS)).toInt()));
+  m_modelMainWindow.setMainTitleBarFormat (static_cast<MainTitleBarFormat> (settings.value (SETTINGS_MAIN_TITLE_BAR_FORMAT,
+                                                                                            QVariant (MAIN_TITLE_BAR_FORMAT_PATH)).toInt()));
   m_modelMainWindow.setPdfResolution (settings.value (SETTINGS_IMPORT_PDF_RESOLUTION,
                                                       QVariant (DEFAULT_IMPORT_PDF_RESOLUTION)).toInt ());
-  m_modelMainWindow.setImportCropping ((ImportCropping) settings.value (SETTINGS_IMPORT_CROPPING,
-                                                                        QVariant (DEFAULT_IMPORT_CROPPING)).toInt ());
+  m_modelMainWindow.setImportCropping (static_cast<ImportCropping> (settings.value (SETTINGS_IMPORT_CROPPING,
+                                                                                    QVariant (DEFAULT_IMPORT_CROPPING)).toInt ()));
   m_modelMainWindow.setMaximumGridLines (settings.value (SETTINGS_MAXIMUM_GRID_LINES,
                                                          QVariant (DEFAULT_MAXIMUM_GRID_LINES)).toInt ());
   m_modelMainWindow.setHighlightOpacity (settings.value (SETTINGS_HIGHLIGHT_OPACITY,
@@ -1631,6 +1667,8 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
                                                        QVariant (DEFAULT_DRAG_DROP_EXPORT)).toBool ());
   m_modelMainWindow.setSignificantDigits (settings.value (SETTINGS_SIGNIFICANT_DIGITS,
                                                           QVariant (DEFAULT_SIGNIFICANT_DIGITS)).toInt ());
+  m_modelMainWindow.setImageReplaceRenamesDocument (settings.value (SETTINGS_IMAGE_REPLACE_RENAMES_DOCUMENT,
+                                                                    QVariant (DEFAULT_IMAGE_REPLACE_RENAMES_DOCUMENT)).toBool ());
 
   updateSettingsMainWindow();
   updateSmallDialogs();
@@ -1685,6 +1723,7 @@ void MainWindow::settingsWrite ()
   settings.setValue (SETTINGS_CHECKLIST_GUIDE_WIZARD, m_actionHelpChecklistGuideWizard->isChecked ());
   settings.setValue (SETTINGS_DRAG_DROP_EXPORT, m_modelMainWindow.dragDropExport ());
   settings.setValue (SETTINGS_HIGHLIGHT_OPACITY, m_modelMainWindow.highlightOpacity());
+  settings.setValue (SETTINGS_IMAGE_REPLACE_RENAMES_DOCUMENT, m_modelMainWindow.imageReplaceRenamesDocument());
   settings.setValue (SETTINGS_IMPORT_CROPPING, m_modelMainWindow.importCropping());
   settings.setValue (SETTINGS_IMPORT_PDF_RESOLUTION, m_modelMainWindow.pdfResolution ());
   settings.setValue (SETTINGS_LOCALE_LANGUAGE, m_modelMainWindow.locale().language());
@@ -1742,8 +1781,8 @@ bool MainWindow::setupAfterLoadNewDocument (const QString &fileName,
       return false;
     }
 
-    int numberCoordSystem = dlgImportAdvanced.numberCoordSystem();
-    m_cmdMediator->document().addCoordSystems (numberCoordSystem - 1);
+    int numberCoordSystem = signed (dlgImportAdvanced.numberCoordSystem());
+    m_cmdMediator->document().addCoordSystems (unsigned (numberCoordSystem - 1));
     m_cmdMediator->setDocumentAxesPointsRequired (dlgImportAdvanced.documentAxesPointsRequired());
   }
 
@@ -1774,7 +1813,7 @@ bool MainWindow::setupAfterLoadNewDocument (const QString &fileName,
                                               m_cmdMediator->document().modelGridRemoval(),
                                               m_cmdMediator->document().modelColorFilter(),
                                               m_cmbCurve->currentText ());
-  m_backgroundStateContext->setBackgroundImage ((BackgroundImage) m_cmbBackground->currentIndex ());
+  m_backgroundStateContext->setBackgroundImage (static_cast<BackgroundImage> (m_cmbBackground->currentIndex ()));
 
   applyZoomFactorAfterLoad(); // Zoom factor must be reapplied after background image is set, to have any effect
 
@@ -1808,11 +1847,15 @@ bool MainWindow::setupAfterLoadReplacingImage (const QString &fileName,
 
   m_isDocumentExported = false;
 
-  m_backgroundStateContext->setBackgroundImage ((BackgroundImage) m_cmbBackground->currentIndex ());
+  m_backgroundStateContext->setBackgroundImage (static_cast<BackgroundImage> (m_cmbBackground->currentIndex ()));
 
   applyZoomFactorAfterLoad(); // Zoom factor must be reapplied after background image is set, to have any effect
 
-  setCurrentFile(fileName);
+  // Some people prefer
+  if (m_modelMainWindow.imageReplaceRenamesDocument()) {
+    setCurrentFile(fileName);
+  }
+
   m_statusBar->showTemporaryMessage (temporaryMessage);
   m_statusBar->wakeUp ();
 
@@ -1930,7 +1973,7 @@ void MainWindow::slotCmbBackground(int currentIndex)
       break;
   }
 
-  m_backgroundStateContext->setBackgroundImage ((BackgroundImage) currentIndex);
+  m_backgroundStateContext->setBackgroundImage (static_cast<BackgroundImage> (currentIndex));
 }
 
 void MainWindow::slotCmbCoordSystem(int index)
@@ -1939,7 +1982,7 @@ void MainWindow::slotCmbCoordSystem(int index)
 
   CmdSelectCoordSystem *cmd = new CmdSelectCoordSystem (*this,
                                                         m_cmdMediator->document(),
-                                                        index);
+                                                        static_cast<CoordSystemIndex> (index));
 
   m_cmdMediator->push (cmd);
 }
@@ -2224,9 +2267,9 @@ void MainWindow::slotFileClose()
                                                              DIGITIZE_STATE_EMPTY);
 
     // Deallocate fitted curve
-    if (m_fittingCurve != 0) {
+    if (m_fittingCurve != nullptr) {
       m_scene->removeItem (m_fittingCurve);
-      m_fittingCurve = 0;
+      m_fittingCurve = nullptr;
     }
 
     // Remove screen objects
@@ -2248,7 +2291,7 @@ void MainWindow::slotFileClose()
     delete m_cmdMediator;
 
     // Remove file information
-    m_cmdMediator = 0;
+    m_cmdMediator = nullptr;
     m_currentFile = "";
     m_engaugeFile = "";
     setWindowTitle (engaugeWindowTitle ());
@@ -2331,9 +2374,9 @@ void MainWindow::slotFileImportDraggedImageUrl(QUrl url)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFileImportDraggedImageUrl url=" << url.toString ().toLatin1 ().data ();
 
-#ifdef NETWORKING
+  // This is required for drag and drop from GraphicsView. This had an #ifdef
+  // around it for NETWORKING but restored for drag and drop
   m_loadImageFromUrl->startLoadImage (url);
-#endif
 }
 
 void MainWindow::slotFileImportImage(QString fileName, QImage image)
@@ -2475,7 +2518,7 @@ void MainWindow::slotFittingWindowCurveFit(FittingCurveCoefficients fittingCurve
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotFittingWindowCurveFit"
                               << " order=" << fittingCurveCoef.size() - 1;
 
-  if (m_fittingCurve != 0) {
+  if (m_fittingCurve != nullptr) {
     m_scene->removeItem (m_fittingCurve);
     delete m_fittingCurve;
   }
@@ -2561,7 +2604,7 @@ void MainWindow::slotMouseMove (QPointF pos)
 //  LOG4CPP_DEBUG_S ((*mainCat)) << "MainWindow::slotMouseMove pos=" << QPointFToString (pos).toLatin1 ().data ();
 
   // Ignore mouse moves before Document is loaded
-  if (m_cmdMediator != 0) {
+  if (m_cmdMediator != nullptr) {
 
     // Get status bar coordinates
     QString coordsScreen, coordsGraph, resolutionGraph;
@@ -2672,12 +2715,12 @@ void MainWindow::slotSettingsCoords ()
   m_dlgSettingsCoords->show ();
 }
 
-void MainWindow::slotSettingsCurveAddRemove ()
+void MainWindow::slotSettingsCurveList ()
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSettingsCurveAddRemove";
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotSettingsCurveList";
 
-  m_dlgSettingsCurveAddRemove->load (*m_cmdMediator);
-  m_dlgSettingsCurveAddRemove->show ();
+  m_dlgSettingsCurveList->load (*m_cmdMediator);
+  m_dlgSettingsCurveList->show ();
 }
 
 void MainWindow::slotSettingsCurveProperties ()
@@ -2814,7 +2857,7 @@ void MainWindow::slotTimeoutRegressionFileCmdScript ()
   } else {
 
     // Script file might already have closed the Document so export only if last was not closed
-    if (m_cmdMediator != 0) {
+    if (m_cmdMediator != nullptr) {
 
 #if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
       exportAllCoordinateSystemsAfterRegressionTests ();
@@ -2949,12 +2992,12 @@ void MainWindow::slotViewToolBarFittingWindow()
 
   if (m_actionViewFittingWindow->isChecked()) {
     m_dockFittingWindow->show ();
-    if (m_fittingCurve != 0) {
+    if (m_fittingCurve != nullptr) {
       m_fittingCurve->setVisible (true);
     }
   } else {
     m_dockFittingWindow->hide ();
-    if (m_fittingCurve != 0) {
+    if (m_fittingCurve != nullptr) {
       m_fittingCurve->setVisible (false);
     }
   }
@@ -2994,9 +3037,9 @@ void MainWindow::slotViewZoom (int zoom)
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoom";
 
   // Update zoom controls and apply the zoom factor
-  ZoomFactor zoomFactor = (ZoomFactor) zoom;
+  ZoomFactor zoomFactor = static_cast<ZoomFactor> (zoom);
   m_zoomMapToAction [zoomFactor]->setChecked (true);
-  slotViewZoomFactor ((ZoomFactor) zoom);
+  slotViewZoomFactor (static_cast<ZoomFactor> (zoom));
 }
 
 void MainWindow::slotViewZoomFactor (ZoomFactor zoomFactor)
@@ -3022,7 +3065,7 @@ void MainWindow::slotViewZoomFactorInt (int zoom)
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::slotViewZoomFactorInt";
 
-  slotViewZoomFactor ((ZoomFactor) zoom);
+  slotViewZoomFactor (static_cast<ZoomFactor> (zoom));
 }
 
 void MainWindow::slotViewZoomIn ()
@@ -3083,6 +3126,50 @@ void MainWindow::slotViewZoomOutFromWheelEvent ()
 
     m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
   }
+}
+
+void MainWindow::startRegressionDropTest (const QStringList &loadStartupFiles)
+{
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::startRegressionTestErrorReport";
+
+  // Regression testing of drag and drop has some constraints:
+  // 1) Need graphics window (GraphicsView) or else its events will not work. This is why
+  //    drag and drop testing is not done as one of the cli tests, which do not show the gui
+  // 2) Drag and drop by itself does not produce the csv file, so this code will output the
+  //    x,y dimensions of the imported image instead of a normal csv file
+  connect (this, SIGNAL (signalDropRegression (QString)), m_view, SLOT (slotDropRegression (QString)));
+
+  for (int counter = 0; counter < loadStartupFiles.size (); counter++) {
+    QString filenameDrop = loadStartupFiles.at (counter);
+
+    // Trigger drop part of drag and drop operation
+    emit signalDropRegression (filenameDrop);
+
+    QSize siz = m_view->size();
+
+    QString filenameCsv;
+    if (filenameDrop.startsWith ("http")) {
+
+      // Internet url is not useful for computing local file name. Only regression tests reach this branch
+      // so filename is hardcoded
+      filenameCsv = "../test/drag_and_drop_http.csv_actual_1";
+
+    } else {
+
+      // Local file
+      filenameCsv = QString ("%1_%2")
+        .arg (exportRegressionFilenameFromInputFilename (filenameDrop))
+        .arg (counter + 1);
+    }
+
+    QFile file (filenameCsv);
+    file.open (QIODevice::WriteOnly);
+    QTextStream str (&file);
+    str << siz.width() << "x" << siz.height() << "\n";
+    file.close ();
+  }
+
+  exit (0);
 }
 
 void MainWindow::startRegressionTestErrorReport(const QString &regressionInputFile)
@@ -3228,7 +3315,7 @@ void MainWindow::updateControls ()
 
   m_cmbBackground->setEnabled (!m_currentFile.isEmpty ());
 
-  m_actionImportImageReplace->setEnabled (m_cmdMediator != 0);
+  m_actionImportImageReplace->setEnabled (m_cmdMediator != nullptr);
 #if !defined(OSX_DEBUG) && !defined(OSX_RELEASE)
   m_menuFileOpenRecent->setEnabled ((m_actionRecentFiles.count () > 0) &&
                                     (m_actionRecentFiles.at(0)->isVisible ())); // Need at least one visible recent file entry
@@ -3239,7 +3326,7 @@ void MainWindow::updateControls ()
   m_actionExport->setEnabled (!m_currentFile.isEmpty ());
   m_actionPrint->setEnabled (!m_currentFile.isEmpty ());
 
-  if (m_cmdMediator == 0) {
+  if (m_cmdMediator == nullptr) {
     m_actionEditUndo->setEnabled (false);
     m_actionEditRedo->setEnabled (false);
   } else {
@@ -3282,7 +3369,7 @@ void MainWindow::updateControls ()
   m_actionViewSettingsViews->setEnabled (!m_currentFile.isEmpty ());
 
   m_actionSettingsCoords->setEnabled (!m_currentFile.isEmpty ());
-  m_actionSettingsCurveAddRemove->setEnabled (!m_currentFile.isEmpty ());
+  m_actionSettingsCurveList->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsCurveProperties->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsDigitizeCurve->setEnabled (!m_currentFile.isEmpty ());
   m_actionSettingsExport->setEnabled (!m_currentFile.isEmpty ());
@@ -3374,8 +3461,8 @@ void MainWindow::updateFittingWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateFittingWindow";
 
-  if (m_cmdMediator != 0 &&
-      m_cmbCurve != 0) {
+  if (m_cmdMediator != nullptr &&
+      m_cmbCurve != nullptr) {
 
     // Update fitting window
     m_dockFittingWindow->update (*m_cmdMediator,
@@ -3389,8 +3476,8 @@ void MainWindow::updateGeometryWindow ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateGeometryWindow";
 
-  if (m_cmdMediator != 0 &&
-      m_cmbCurve != 0) {
+  if (m_cmdMediator != nullptr &&
+      m_cmbCurve != nullptr) {
 
     // Update geometry window
     m_dockGeometryWindow->update (*m_cmdMediator,
@@ -3429,13 +3516,14 @@ void MainWindow::updateGridLines ()
 
 void MainWindow::updateHighlightOpacity ()
 {
-  if (m_cmdMediator != 0) {
+  if (m_cmdMediator != nullptr) {
 
     // Update the QGraphicsScene with the populated Curves. This requires the points in the Document to be already updated
     // by updateAfterCommandStatusBarCoords
     m_scene->updateAfterCommand (*m_cmdMediator,
                                  m_modelMainWindow.highlightOpacity(),
-                                 m_dockGeometryWindow);
+                                 m_dockGeometryWindow,
+                                 m_transformation);
   }
 }
 
@@ -3448,14 +3536,14 @@ void MainWindow::updateRecentFileList()
   QStringList recentFilePaths = settings.value(SETTINGS_RECENT_FILE_LIST).toStringList();
 
   // Determine the desired size of the path list
-  unsigned int count = recentFilePaths.size();
+  unsigned int count = unsigned (recentFilePaths.size());
   if (count > MAX_RECENT_FILE_LIST_SIZE) {
     count = MAX_RECENT_FILE_LIST_SIZE;
   }
 
   // Add visible entries
-  unsigned int i;
-  for (i = 0; i < count; i++) {
+  int i;
+  for (i = 0; i < signed (count); i++) {
     QString strippedName = QFileInfo (recentFilePaths.at(i)).fileName();
     m_actionRecentFiles.at (i)->setText (strippedName);
     m_actionRecentFiles.at (i)->setData (recentFilePaths.at (i));
@@ -3463,7 +3551,7 @@ void MainWindow::updateRecentFileList()
   }
 
   // Hide any extra entries
-  for (i = count; i < MAX_RECENT_FILE_LIST_SIZE; i++) {
+  for (i = signed (count); i < signed (MAX_RECENT_FILE_LIST_SIZE); i++) {
     m_actionRecentFiles.at (i)->setVisible (false);
   }
 #endif
@@ -3510,9 +3598,9 @@ void MainWindow::updateSettingsCoords(const DocumentModelCoords &modelCoords)
   m_cmdMediator->document().setModelCoords(modelCoords);
 }
 
-void MainWindow::updateSettingsCurveAddRemove (const CurvesGraphs &curvesGraphs)
+void MainWindow::updateSettingsCurveList (const CurvesGraphs &curvesGraphs)
 {
-  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateSettingsCurveAddRemove";
+  LOG4CPP_INFO_S ((*mainCat)) << "MainWindow::updateSettingsCurveList";
 
   m_cmdMediator->document().setCurvesGraphs (curvesGraphs);
   loadCurveListFromCmdMediator();
@@ -3583,8 +3671,8 @@ void MainWindow::updateSettingsMainWindow()
 
   }
 
-  if ((m_scene != 0) &&
-      (m_cmdMediator != 0)) {
+  if ((m_scene != nullptr) &&
+      (m_cmdMediator != nullptr)) {
     m_scene->updateCurveStyles(m_cmdMediator->document().modelCurveStyles());
   }
 
@@ -3622,7 +3710,7 @@ void MainWindow::updateSmallDialogs ()
   m_dlgSettingsAxesChecker->setSmallDialogs (m_modelMainWindow.smallDialogs ());
   m_dlgSettingsColorFilter->setSmallDialogs (m_modelMainWindow.smallDialogs ());
   m_dlgSettingsCoords->setSmallDialogs (m_modelMainWindow.smallDialogs ());
-  m_dlgSettingsCurveAddRemove->setSmallDialogs (m_modelMainWindow.smallDialogs ());
+  m_dlgSettingsCurveList->setSmallDialogs (m_modelMainWindow.smallDialogs ());
   m_dlgSettingsCurveProperties->setSmallDialogs (m_modelMainWindow.smallDialogs ());
   m_dlgSettingsDigitizeCurve->setSmallDialogs (m_modelMainWindow.smallDialogs ());
   m_dlgSettingsExportFormat->setSmallDialogs (m_modelMainWindow.smallDialogs ());

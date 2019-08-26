@@ -7,10 +7,13 @@
 #ifndef EXPORT_FILE_FUNCTIONS_H
 #define EXPORT_FILE_FUNCTIONS_H
 
+#include "CurveLimits.h"
 #include "ExportFileAbstractBase.h"
 #include "ExportValuesXOrY.h"
+#include "Points.h"
 #include <QStringList>
 #include <QVector>
+#include "ValuesVectorXOrY.h"
 
 class Document;
 class DocumentModelCoords;
@@ -50,6 +53,8 @@ private:
                                            const Transformation &transformation,
                                            bool isLogXTheta,
                                            bool isLogYRadius,
+                                           const CurveLimits curveLimitsMin,
+                                           const CurveLimits curveLimitsMax,
                                            QTextStream &str,
                                            unsigned int &numWritesSoFar) const;
   void exportOnePerLineXThetaValuesMerged (const DocumentModelExportFormat &modelExportOverride,
@@ -61,6 +66,8 @@ private:
                                            const Transformation &transformation,
                                            bool isLogXTheta,
                                            bool isLogYRadius,
+                                           const CurveLimits curveLimitsMin,
+                                           const CurveLimits curveLimitsMax,
                                            QTextStream &str,
                                            unsigned int &numWritesSoFar) const;
 
@@ -74,7 +81,7 @@ private:
   double linearlyInterpolate (const Points &points,
                               double xThetaValue,
                               const Transformation &transformation) const;
-  void loadYRadiusValues (const DocumentModelExportFormat &modelExport,
+  void loadYRadiusValues (const DocumentModelExportFormat &modelExportOverride,
                           const Document &document,
                           const MainWindowModel &modelMainWindow,
                           const QStringList &curvesIncluded,
@@ -82,6 +89,8 @@ private:
                           bool isLogXTheta,
                           bool isLogYRadius,
                           const ExportValuesXOrY &xThetaValues,
+                          const CurveLimits &curveLimitsMin,
+                          const CurveLimits &curveLimitsMax,
                           QVector<QVector<QString*> > &yRadiusValues) const;
   void loadYRadiusValuesForCurveInterpolatedSmooth (const DocumentModelCoords &modelCoords,
                                                     const DocumentModelGeneral &modelGeneral,
@@ -91,6 +100,9 @@ private:
                                                     const Transformation &transformation,
                                                     bool isLogXTheta,
                                                     bool isLogYRadius,
+                                                    const QString &curveName,
+                                                    const CurveLimits &curveLimitsMin,
+                                                    const CurveLimits &curveLimitsMax,
                                                     QVector<QString*> &yRadiusValues) const;
   void loadYRadiusValuesForCurveInterpolatedStraight (const DocumentModelCoords &modelCoords,
                                                       const DocumentModelGeneral &modelGeneral,
@@ -98,6 +110,9 @@ private:
                                                       const Points &points,
                                                       const ExportValuesXOrY &xThetaValues,
                                                       const Transformation &transformation,
+                                                      const QString &curveName,
+                                                      const CurveLimits &curveLimitsMin,
+                                                      const CurveLimits &curveLimitsMax,
                                                       QVector<QString*> &yRadiusValues) const;
   void loadYRadiusValuesForCurveRaw (const DocumentModelCoords &modelCoords,
                                      const DocumentModelGeneral &modelGeneral,
@@ -105,6 +120,9 @@ private:
                                      const Points &points,
                                      const ExportValuesXOrY &xThetaValues,
                                      const Transformation &transformation,
+                                     const QString &curveName,
+                                     const CurveLimits &curveLimitsMin,
+                                     const CurveLimits &curveLimitsMax,
                                      QVector<QString*> &yRadiusValues) const;
 
   /// Output 2D y/radius array along with x/theta vector in first column
@@ -123,6 +141,12 @@ private:
   // since the union of all x/theta values is applied to each curve
   bool rowHasAtLeastOneYRadiusEntry (const QVector<QVector<QString*> > &yRadiusValues,
                                      int row) const;
+
+  // If there are bounds for the curve, make sure xTheta is within those bounds
+  bool xThetaIsNotOutOfBounds (double xTheta,
+                               const QString &curveName,
+                               const CurveLimits &curveLimitsMin,
+                               const CurveLimits &curveLimitsMax) const;
 };
 
 #endif // EXPORT_FILE_FUNCTIONS_H

@@ -16,6 +16,7 @@
 #include <QSettings>
 #include <QSpacerItem>
 #include <QVBoxLayout>
+#include "Settings.h"
 
 int DlgSettingsAbstractBase::MINIMUM_DIALOG_WIDTH = 380; // May be overridden by subclass
 int DlgSettingsAbstractBase::MINIMUM_PREVIEW_HEIGHT = 100;
@@ -25,7 +26,7 @@ DlgSettingsAbstractBase::DlgSettingsAbstractBase(const QString &title,
                                                  MainWindow &mainWindow) :
   QDialog (&mainWindow),
   m_mainWindow (mainWindow),
-  m_cmdMediator (0),
+  m_cmdMediator (nullptr),
   m_dialogName (dialogName),
   m_disableOkAtStartup (true)
 {
@@ -158,7 +159,7 @@ void DlgSettingsAbstractBase::populateColorComboWithTransparent (QComboBox &comb
 void DlgSettingsAbstractBase::saveGeometryToSettings()
 {
   // Store the settings for use by showEvent
-  QSettings settings;
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   settings.setValue (m_dialogName, saveGeometry ());
 }
 
@@ -172,13 +173,18 @@ void DlgSettingsAbstractBase::setDisableOkAtStartup(bool disableOkAtStartup)
   m_disableOkAtStartup = disableOkAtStartup;
 }
 
+void DlgSettingsAbstractBase::hideEvent (QHideEvent * /* event */)
+{
+  saveGeometryToSettings();
+}
+
 void DlgSettingsAbstractBase::showEvent (QShowEvent * /* event */)
 {
   if (m_disableOkAtStartup) {
     m_btnOk->setEnabled (false);
   }
 
-  QSettings settings;
+  QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
   if (settings.contains (m_dialogName)) {
 
     // Restore the settings that were stored by the last call to saveGeometryToSettings
@@ -190,15 +196,12 @@ void DlgSettingsAbstractBase::slotCancel ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsAbstractBase::slotCancel";
 
-  saveGeometryToSettings();
   hide();
 }
 
 void DlgSettingsAbstractBase::slotOk ()
 {
   LOG4CPP_INFO_S ((*mainCat)) << "DlgSettingsAbstractBase::slotOk";
-
-  saveGeometryToSettings();
 
   // Forward to leaf class
   handleOk ();

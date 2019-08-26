@@ -8,15 +8,15 @@
 #define DLG_EDIT_POINT_AXIS_H
 
 #include "DocumentAxesPointsRequired.h"
+#include "DocumentModelCoords.h"
+#include "DocumentModelGeneral.h"
+#include "MainWindowModel.h"
 #include <QDialog>
 #include <QLineEdit>
 #include <QPushButton>
 
 class DlgValidatorAbstract;
-class DocumentModelCoords;
-class DocumentModelGeneral;
 class MainWindow;
-class MainWindowModel;
 class QVBoxLayout;
 class Transformation;
 
@@ -47,7 +47,8 @@ private slots:
 
 private:
   void createCoords (QVBoxLayout *layoutOuter);
-  void createHint (QVBoxLayout *layoutOuter);
+  void createHints (QVBoxLayout *layoutOuter,
+                    DocumentAxesPointsRequired documentAxesPointsRequired);
   void createOkCancel (QVBoxLayout *layoutOuter);
   void initializeGraphCoordinates (const double *xInitialValue,
                                    const double *yInitialValue,
@@ -69,9 +70,9 @@ private:
 
   DocumentAxesPointsRequired m_documentAxesPointsRequired;
 
-  const DocumentModelCoords &m_modelCoords;
-  const DocumentModelGeneral &m_modelGeneral;
-  const MainWindowModel &m_modelMainWindow;
+  const DocumentModelCoords m_modelCoords;
+  const DocumentModelGeneral m_modelGeneral;
+  const MainWindowModel m_modelMainWindow;
 };
 
 #endif // DLG_EDIT_POINT_AXIS_H

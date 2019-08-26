@@ -18,6 +18,10 @@ CallbackDocumentHash::CallbackDocumentHash(DocumentAxesPointsRequired documentAx
 {
 }
 
+CallbackDocumentHash::~CallbackDocumentHash()
+{
+}
+
 CallbackSearchReturn CallbackDocumentHash::callback (const QString &curveName,
                                                      const Point &point)
 {
@@ -61,9 +65,6 @@ CallbackSearchReturn CallbackDocumentHash::callback (const QString &curveName,
 
       }
       break;
-
-    default:
-      ENGAUGE_ASSERT (false);
     }
   }
 

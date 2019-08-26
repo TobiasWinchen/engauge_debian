@@ -132,7 +132,7 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="108" />
         <source>Add first of three axis points.</source>
-        <translation>أضف أولاً من ثلاثة محاور.</translation>
+        <translation>أضف النقطة الأولى من النقاط الثلاث اللازمة لتحديد المحاور.</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="111" />
@@ -141,14 +141,14 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="155" />
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="164" />
         <source>Click on</source>
-        <translation>انقر فوق</translation>
+        <translation>انقر على</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="111" />
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="120" />
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="129" />
         <source>for Axis Points mode</source>
-        <translation>لوضع محور النقاط</translation>
+        <translation>لوضع نقاط المحاور</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="112" />
@@ -169,12 +169,12 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="185" />
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="213" />
         <source>Click on Ok</source>
-        <translation>انقر على طيب</translation>
+        <translation>انقر على موافق</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="117" />
         <source>Add second of three axis points.</source>
-        <translation>أضف الثاني من ثلاثة محاور</translation>
+        <translation>أضف النقطة الثانية من الثلاث اللازمة.</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="121" />
@@ -184,7 +184,7 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="126" />
         <source>Add third of three axis points.</source>
-        <translation>إضافة الثالث من ثلاثة محاور.</translation>
+        <translation>أضف النقطة الثالثة من الثلاث اللازمة.</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="130" />
@@ -199,12 +199,12 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="149" />
         <source>Add points for curve</source>
-        <translation>أضف نقاط للمنحنى</translation>
+        <translation>أضف نقاطا للمنحنى</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="155" />
         <source>for Segment Fill mode</source>
-        <translation>لوضع التعبئة الجزء</translation>
+        <translation>لوضع تعبئة الجزء</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="156" />
@@ -231,7 +231,7 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="164" />
         <source>for Point Match mode</source>
-        <translation>لوضع نقطة المباراة</translation>
+        <translation>لوضع مطابقة النقطة</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="166" />
@@ -256,7 +256,7 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="179" />
         <source>The digitized points can be exported</source>
-        <translation>النقاط الرقمية يمكن تصديرها</translation>
+        <translation>النقاط المرقمنة يمكن تصديرها</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="180" />
@@ -286,7 +286,7 @@ To run the Checklist Guide Wizard when an image file is imported, select the Hel
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="194" />
         <source>Select menu option View / Background / Show Original Image to see the original image</source>
-        <translation>حدد خيار القائمة View / Background / Show Original Image لرؤية الصورة الأصلية</translation>
+        <translation>حدد خيار القائمة عرض / خلفية / عرض الصورة الأصلية لرؤية الصورة الأصلية</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="195" />
@@ -354,56 +354,60 @@ Select points on the screen.</source>
         <location filename="../src/Create/CreateActions.cpp" line="71" />
         <source>Digitize Axis Point
 
-Digitizes an axis point for a graph by placing a new point at the cursor after a mouse click. The coordinates of the axis point are then entered. In a graph, three axis points are required to define the graph coordinates.</source>
-        <translation>رقمنة نقطة المحور
+Digitizes an axis point for a graph by placing a new point at the cursor after a mouse click. The coordinates of the axis point are then entered. After Import and Import (Advanced), three axis points with (X1,Y1) (X2,Y2) (X3,Y3) coordinates can be digitized to define the graph coordinates. Optionally, after Import (Advanced) four axis points with (X1) (X2) (Y3) (Y4) coordinates can be digitized to define the graph coordinates.
 
-يحوّل نقطة محور للرسم البياني عن طريق وضع نقطة جديدة في المؤشر بعد النقر بالماوس. يتم بعد ذلك إدخال إحداثيات نقطة المحور. في الرسم البياني ، يلزم وجود ثلاثة محاور لتحديد إحداثيات الرسم البياني.</translation>
+This tool is disabled when a complete set of axis points has been defined, or after Import (Advanced) if Scale Bar is selected.</source>
+        <translation>رقمنة محور محور - يحول نقطة محور للرسم البياني عن طريق وضع نقطة جديدة في المؤشر بعد نقرة بالماوس. ثم يتم إدخال إحداثيات نقطة المحور. بعد الاستيراد والاستيراد (متقدم) ، يمكن ترقيم ثلاث نقاط محور مع إحداثيات (X1 ، Y1) (X2 ، Y2) (X3 ، Y3) لتحديد إحداثيات الرسم البياني. اختيارياً ، بعد الاستيراد (متقدم) ، يمكن تحويل أربعة محاور ذات إحداثيات (X1) (X2) (Y3) (Y4) إلى رقم رقمي لتحديد إحداثيات الرسم البياني. يتم تعطيل هذه الأداة عند تحديد مجموعة كاملة من نقاط المحور ، أو بعد الاستيراد (متقدم) إذا تم تحديد شريط النطاق.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="78" />
+        <location filename="../src/Create/CreateActions.cpp" line="82" />
         <source>Scale Bar Tool</source>
-        <translation>مقياس شريط الأدوات</translation>
+        <translation>أداة شريط القياس</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="79" />
+        <location filename="../src/Create/CreateActions.cpp" line="83" />
         <source>Shift+F8</source>
         <translation>&gt;Shift+F8</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="81" />
-        <source>Digitize scale bar for a map.</source>
-        <translation>جدول مقياس رقمي لخريطة.</translation>
+        <location filename="../src/Create/CreateActions.cpp" line="85" />
+        <source>Digitize scale bar for a map. Requires Import (Advanced).</source>
+        <translation>رقمنة شريط النطاق لخريطة. يتطلب استيراد (متقدم).</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="82" />
+        <location filename="../src/Create/CreateActions.cpp" line="86" />
         <source>Digitize Scale Bar
 
 Digitize a scale bar for a map by clicking and dragging. The length of the scale bar is then entered. In a map, the two endpoints of the scale bar define the distances in graph coordinates.
 
-Maps must be imported using Import (Advanced).</source>
-        <translation>Digitize مقياس شريط
+This tool is enabled by selecting Scale Bar in Import (Advanced).
 
-رقمنة شريط مقياس لخريطة بالنقر والسحب. يتم بعد ذلك إدخال طول شريط القياس. في الخريطة ، تحدد نقطتا النهاية من شريط المقياس المسافات في إحداثيات الرسم البياني.
+This tool is disabled when a scale bar has been defined, or if axis points were selected during import.</source>
+        <translation>رقمنة شريط النطاق
 
-يجب استيراد الخرائط باستخدام الاستيراد (متقدم).</translation>
+رقمنة شريط مقياس للخريطة عن طريق النقر والسحب. ثم يتم إدخال طول شريط النطاق. في الخريطة ، تحدد نقطتا النهاية لشريط القياس المسافات في إحداثيات الرسم البياني.
+
+يتم تمكين هذه الأداة عن طريق تحديد Scale Bar في Import (Advanced).
+
+يتم تعطيل هذه الأداة عند تحديد شريط مقياس ، أو إذا تم تحديد نقاط المحور أثناء الاستيراد.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="89" />
+        <location filename="../src/Create/CreateActions.cpp" line="95" />
         <source>Curve Point Tool</source>
         <translation>أداة نقطة المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="90" />
+        <location filename="../src/Create/CreateActions.cpp" line="96" />
         <source>Shift+F4</source>
         <translation>Shift+F4</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="92" />
+        <location filename="../src/Create/CreateActions.cpp" line="98" />
         <source>Digitize curve points.</source>
         <translation>رقمنة نقاط المنحنى.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="93" />
+        <location filename="../src/Create/CreateActions.cpp" line="99" />
         <source>Digitize Curve Point
 
 Digitizes a curve point by placing a new point at the cursor after a mouse click. Use this mode to digitize points along curves one by one.
@@ -416,50 +420,50 @@ New points will be assigned to the currently selected curve.</source>
 سيتم تعيين نقاط جديدة للمنحنى المحدد حاليًا.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="100" />
+        <location filename="../src/Create/CreateActions.cpp" line="106" />
         <source>Point Match Tool</source>
         <translation>أداة مطابقة النقاط</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="101" />
+        <location filename="../src/Create/CreateActions.cpp" line="107" />
         <source>Shift+F5</source>
         <translation>Shift+F5</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="103" />
+        <location filename="../src/Create/CreateActions.cpp" line="109" />
         <source>Digitize curve points in a point plot by matching a point.</source>
         <translation>رقمنة نقاط المنحنى في مؤامرة نقطة عن طريق مطابقة نقطة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="104" />
+        <location filename="../src/Create/CreateActions.cpp" line="110" />
         <source>Digitize Curve Points by Point Matching
 
 Digitizes curve points in a point plot by finding points that match a sample point. The process starts by selecting a representative sample point.
 
 New points will be assigned to the currently selected curve.</source>
-        <translation>رقمنة نقاط منحنى حسب نقطة مطابقة
+        <translation>رقمنة نقاط منحنى حسب مطابقة النقاط
 
-رقم نقطة منحنى في نقطة مؤامرة من خلال إيجاد نقاط تطابق نقطة عينة. تبدأ العملية عن طريق اختيار نقطة عينة تمثيلية.
+رقمن نقاط المنحنى في نقطة من خلال إيجاد نقاط تطابق نقطة عينة. تبدأ العملية عن طريق اختيار نقطة عينة تمثيلية.
 
 سيتم تعيين نقاط جديدة للمنحنى المحدد حاليًا.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="110" />
+        <location filename="../src/Create/CreateActions.cpp" line="116" />
         <source>Color Picker Tool</source>
         <translation>لون المنتقى جدا</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="111" />
+        <location filename="../src/Create/CreateActions.cpp" line="117" />
         <source>Shift+F6</source>
         <translation>Shift+F6</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="113" />
+        <location filename="../src/Create/CreateActions.cpp" line="119" />
         <source>Select color settings for filtering in Segment Fill mode.</source>
         <translation>حدد إعدادات اللون للتصفية في وضع تعبئة الشريحة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="114" />
+        <location filename="../src/Create/CreateActions.cpp" line="120" />
         <source>Select color settings for Segment Fill filtering
 
 Select a pixel along the currently selected curve. That pixel and its neighbors will define the filter settings (color, brightness, and so on) of the currently selected curve while in Segment Fill mode.</source>
@@ -468,22 +472,22 @@ Select a pixel along the currently selected curve. That pixel and its neighbors 
 حدد بكسل على طول المنحنى المحدد حاليًا. هذه البكسل والجيران سيحدد إعدادات مرشح (كولو</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="120" />
+        <location filename="../src/Create/CreateActions.cpp" line="126" />
         <source>Segment Fill Tool</source>
         <translation>أداة تعبئة الجزء</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="121" />
+        <location filename="../src/Create/CreateActions.cpp" line="127" />
         <source>Shift+F7</source>
         <translation>Shift+F7</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="123" />
+        <location filename="../src/Create/CreateActions.cpp" line="129" />
         <source>Digitize curve points along a segment of a curve.</source>
         <translation>رقمنة نقاط المنحنى على طول جزء من منحنى.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="124" />
+        <location filename="../src/Create/CreateActions.cpp" line="130" />
         <source>Digitize Curve Points With Segment Fill
 
 Digitizes curve points by placing new points along the highlighted segment under the cursor. Use this mode to quickly digitize multiple points along a curve with a single click.
@@ -496,17 +500,17 @@ New points will be assigned to the currently selected curve.</source>
 سيتم تعيين نقاط جديدة للمنحنى المحدد حاليًا.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="145" />
+        <location filename="../src/Create/CreateActions.cpp" line="151" />
         <source>&amp;Undo</source>
         <translation>فك</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="147" />
+        <location filename="../src/Create/CreateActions.cpp" line="153" />
         <source>Undo the last operation.</source>
         <translation>التراجع عن العملية الأخيرة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="148" />
+        <location filename="../src/Create/CreateActions.cpp" line="154" />
         <source>Undo
 
 Undo the last operation.</source>
@@ -515,34 +519,34 @@ Undo the last operation.</source>
 التراجع عن العملية الأخيرة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="152" />
+        <location filename="../src/Create/CreateActions.cpp" line="158" />
         <source>&amp;Redo</source>
         <translation>فعل ثانية</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="154" />
+        <location filename="../src/Create/CreateActions.cpp" line="160" />
         <source>Redo the last operation.</source>
         <translation>إعادة العملية الأخيرة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="155" />
+        <location filename="../src/Create/CreateActions.cpp" line="161" />
         <source>Redo
 
 Redo the last operation.</source>
         <translation>إعادة العملية الأخيرة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="159" />
+        <location filename="../src/Create/CreateActions.cpp" line="165" />
         <source>Cut</source>
         <translation>يقطع</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="161" />
+        <location filename="../src/Create/CreateActions.cpp" line="167" />
         <source>Cuts the selected points and copies them to the clipboard.</source>
         <translation>قص النقاط المحددة ونسخها إلى الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="162" />
+        <location filename="../src/Create/CreateActions.cpp" line="168" />
         <source>Cut
 
 Cuts the selected points and copies them to the clipboard.</source>
@@ -551,17 +555,17 @@ Cuts the selected points and copies them to the clipboard.</source>
 قص النقاط المحددة ونسخها إلى الحافظة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="166" />
+        <location filename="../src/Create/CreateActions.cpp" line="172" />
         <source>Copy</source>
         <translation>نسخ</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="168" />
+        <location filename="../src/Create/CreateActions.cpp" line="174" />
         <source>Copies the selected points to the clipboard.</source>
         <translation>نسخ النقاط المحددة إلى الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="169" />
+        <location filename="../src/Create/CreateActions.cpp" line="175" />
         <source>Copy
 
 Copies the selected points to the clipboard.</source>
@@ -570,17 +574,17 @@ Copies the selected points to the clipboard.</source>
 نسخ النقاط المحددة إلى الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="173" />
+        <location filename="../src/Create/CreateActions.cpp" line="179" />
         <source>Paste</source>
         <translation>معجون</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="175" />
+        <location filename="../src/Create/CreateActions.cpp" line="181" />
         <source>Pastes the selected points from the clipboard.</source>
         <translation>يلصق النقاط المحددة من الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="176" />
+        <location filename="../src/Create/CreateActions.cpp" line="182" />
         <source>Paste
 
 Pastes the selected points from the clipboard. They will be assigned to the current curve.</source>
@@ -589,17 +593,17 @@ Pastes the selected points from the clipboard. They will be assigned to the curr
 يلصق النقاط المحددة من الحافظة. سيتم تعيينها إلى المنحنى الحالي.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="180" />
+        <location filename="../src/Create/CreateActions.cpp" line="186" />
         <source>Delete</source>
         <translation>حذف</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="182" />
+        <location filename="../src/Create/CreateActions.cpp" line="188" />
         <source>Deletes the selected points, after copying them to the clipboard.</source>
         <translation>يحذف النقاط المحددة ، بعد نسخها إلى الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="183" />
+        <location filename="../src/Create/CreateActions.cpp" line="189" />
         <source>Delete
 
 Deletes the selected points, after copying them to the clipboard.</source>
@@ -608,17 +612,17 @@ Deletes the selected points, after copying them to the clipboard.</source>
 يحذف النقاط المحددة ، بعد نسخها إلى الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="187" />
+        <location filename="../src/Create/CreateActions.cpp" line="193" />
         <source>Paste As New</source>
         <translation>لصق كجديد</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="188" />
+        <location filename="../src/Create/CreateActions.cpp" line="194" />
         <source>Pastes an image from the clipboard.</source>
         <translation>يلصق صورة من الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="189" />
+        <location filename="../src/Create/CreateActions.cpp" line="195" />
         <source>Paste as New
 
 Creates a new document by pasting an image from the clipboard.</source>
@@ -627,17 +631,17 @@ Creates a new document by pasting an image from the clipboard.</source>
 ينشئ مستندًا جديدًا عن طريق لصق صورة من الحافظة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="193" />
+        <location filename="../src/Create/CreateActions.cpp" line="199" />
         <source>Paste As New (Advanced)...</source>
         <translation>لصق باسم جديد (متقدم) ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="194" />
+        <location filename="../src/Create/CreateActions.cpp" line="200" />
         <source>Pastes an image from the clipboard, in advanced mode.</source>
         <translation>يلصق صورة من الحافظة ، في الوضع المتقدم.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="195" />
+        <location filename="../src/Create/CreateActions.cpp" line="201" />
         <source>Paste as New (Advanced)
 
 Creates a new document by pasting an image from the clipboard, in advanced mode.</source>
@@ -646,22 +650,22 @@ Creates a new document by pasting an image from the clipboard, in advanced mode.
 ينشئ مستندًا جديدًا عن طريق لصق صورة من الحافظة في الوضع المتقدم.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="204" />
+        <location filename="../src/Create/CreateActions.cpp" line="210" />
         <source>&amp;Import...</source>
         <translation>استيراد...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="205" />
+        <location filename="../src/Create/CreateActions.cpp" line="211" />
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="206" />
+        <location filename="../src/Create/CreateActions.cpp" line="212" />
         <source>Creates a new document by importing a simple image.</source>
         <translation>ينشئ مستندًا جديدًا عن طريق استيراد صورة بسيطة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="207" />
+        <location filename="../src/Create/CreateActions.cpp" line="213" />
         <source>Import Image
 
 Creates a new document by importing an image with a single coordinate system, and axes both coordinates known.
@@ -674,17 +678,17 @@ For more complicated images with multiple coordinate systems, and/or floating ax
 للحصول على صور أكثر تعقيدًا مع أنظمة إحداثيات متعددة و / أو محاور عائمة ، يتم استخدام استيراد (متقدم) بدلاً من ذلك.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="214" />
+        <location filename="../src/Create/CreateActions.cpp" line="220" />
         <source>Import (Advanced)...</source>
         <translation>استيراد (متقدم) ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="215" />
+        <location filename="../src/Create/CreateActions.cpp" line="221" />
         <source>Creates a new document by importing an image with support for advanced feaures.</source>
         <translation>ينشئ مستندًا جديدًا عن طريق استيراد صورة مع دعم للمحتويات المتقدمة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="216" />
+        <location filename="../src/Create/CreateActions.cpp" line="222" />
         <source>Import (Advanced)
 
 Creates a new document by importing an image with support for advanced feaures. In advanced mode, there can be multiple coordinate systems and/or floating axes.</source>
@@ -693,17 +697,17 @@ Creates a new document by importing an image with support for advanced feaures. 
 ينشئ مستندًا جديدًا عن طريق استيراد صورة مع دعم للمحتويات المتقدمة. في الوضع المتقدم ، يمكن أن يكون هناك أنظمة إحداثي متعددة و / أو محاور عائمة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="221" />
+        <location filename="../src/Create/CreateActions.cpp" line="227" />
         <source>Import (Image Replace)...</source>
         <translation>استيراد (صورة استبدال) ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="222" />
+        <location filename="../src/Create/CreateActions.cpp" line="228" />
         <source>Imports a new image into the current document, replacing the existing image.</source>
         <translation>لاستيراد صورة جديدة إلى المستند الحالي ، بدلاً من الصورة الحالية.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="223" />
+        <location filename="../src/Create/CreateActions.cpp" line="229" />
         <source>Import (Image Replace)
 
 Imports a new image into the current document. The existing image is replaced, and all curves in the document are preserved. This operation is useful for applying the axis points and other settings from an existing document to a different image.</source>
@@ -712,17 +716,17 @@ Imports a new image into the current document. The existing image is replaced, a
 يستورد صورة جديدة في المستند الحالي. يتم استبدال الصورة الحالية ، ويتم الحفاظ على جميع المنحنيات في الوثيقة. هذه العملية مفيدة لتطبيق نقاط المحور والإعدادات الأخرى من مستند موجود إلى صورة مختلفة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="229" />
+        <location filename="../src/Create/CreateActions.cpp" line="235" />
         <source>&amp;Open...</source>
         <translation>افتح...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="231" />
+        <location filename="../src/Create/CreateActions.cpp" line="237" />
         <source>Opens an existing document.</source>
         <translation>يفتح وثيقة موجودة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="232" />
+        <location filename="../src/Create/CreateActions.cpp" line="238" />
         <source>Open Document
 
 Opens an existing document.</source>
@@ -731,17 +735,17 @@ Opens an existing document.</source>
 يفتح وثيقة موجودة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="245" />
+        <location filename="../src/Create/CreateActions.cpp" line="251" />
         <source>&amp;Close</source>
         <translation>أغلق</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="247" />
+        <location filename="../src/Create/CreateActions.cpp" line="253" />
         <source>Closes the open document.</source>
         <translation>يغلق الوثيقة المفتوحة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="248" />
+        <location filename="../src/Create/CreateActions.cpp" line="254" />
         <source>Close Document
 
 Closes the open document.</source>
@@ -750,17 +754,17 @@ Closes the open document.</source>
 يغلق الوثيقة المفتوحة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="252" />
+        <location filename="../src/Create/CreateActions.cpp" line="258" />
         <source>&amp;Save</source>
         <translation>حفظ</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="254" />
+        <location filename="../src/Create/CreateActions.cpp" line="260" />
         <source>Saves the current document.</source>
         <translation>يحفظ المستند الحالي.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="255" />
+        <location filename="../src/Create/CreateActions.cpp" line="261" />
         <source>Save Document
 
 Saves the current document.</source>
@@ -769,17 +773,17 @@ Saves the current document.</source>
 يحفظ المستند الحالي.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="259" />
+        <location filename="../src/Create/CreateActions.cpp" line="265" />
         <source>Save As...</source>
         <translation>حفظ باسم ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="261" />
+        <location filename="../src/Create/CreateActions.cpp" line="267" />
         <source>Saves the current document under a new filename.</source>
         <translation>يحفظ المستند الحالي تحت اسم ملف جديد.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="262" />
+        <location filename="../src/Create/CreateActions.cpp" line="268" />
         <source>Save Document As
 
 Saves the current document under a new filename.</source>
@@ -788,22 +792,22 @@ Saves the current document under a new filename.</source>
 يحفظ المستند الحالي تحت اسم ملف جديد.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="266" />
+        <location filename="../src/Create/CreateActions.cpp" line="272" />
         <source>Export...</source>
         <translation>تصدير</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="267" />
+        <location filename="../src/Create/CreateActions.cpp" line="273" />
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="268" />
+        <location filename="../src/Create/CreateActions.cpp" line="274" />
         <source>Exports the current document into a text file.</source>
         <translation>لتصدير الوثيقة الحالية الى ملف نصي.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="269" />
+        <location filename="../src/Create/CreateActions.cpp" line="275" />
         <source>Export Document
 
 Exports the current document into a text file.</source>
@@ -812,17 +816,17 @@ Exports the current document into a text file.</source>
 لتصدير الوثيقة الحالية الى ملف نصي.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="273" />
+        <location filename="../src/Create/CreateActions.cpp" line="279" />
         <source>&amp;Print...</source>
         <translation>طباعة...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="275" />
+        <location filename="../src/Create/CreateActions.cpp" line="281" />
         <source>Print the current document.</source>
         <translation>اطبع المستند الحالي.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="276" />
+        <location filename="../src/Create/CreateActions.cpp" line="282" />
         <source>Print Document
 
 Print the current document to a printer or file.</source>
@@ -831,36 +835,36 @@ Print the current document to a printer or file.</source>
 اطبع المستند الحالي إلى طابعة أو ملف.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="280" />
+        <location filename="../src/Create/CreateActions.cpp" line="286" />
         <source>&amp;Exit</source>
-        <translation>ىخرج</translation>
+        <translation>خروج</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="282" />
+        <location filename="../src/Create/CreateActions.cpp" line="288" />
         <source>Quits the application.</source>
         <translation>إنهاء التطبيق.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="283" />
+        <location filename="../src/Create/CreateActions.cpp" line="289" />
         <source>Exit
 
 Quits the application.</source>
-        <translation>ىخرج
+        <translation>خروج
 
 إنهاء التطبيق.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="292" />
+        <location filename="../src/Create/CreateActions.cpp" line="298" />
         <source>Checklist Guide Wizard</source>
         <translation>معالج دليل الاختيار</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="294" />
+        <location filename="../src/Create/CreateActions.cpp" line="300" />
         <source>Open Checklist Guide Wizard during import to define digitizing steps</source>
         <translation>افتح "معالج دليل Checklist" أثناء الاستيراد لتحديد خطوات رقمنة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="295" />
+        <location filename="../src/Create/CreateActions.cpp" line="301" />
         <source>Checklist Guide Wizard
 
 Use Checklist Guide Wizard during import to generate a checklist of steps for the imported document</source>
@@ -869,17 +873,17 @@ Use Checklist Guide Wizard during import to generate a checklist of steps for th
 استخدم "معالج دليل قائمة التحقق" أثناء الاستيراد لإنشاء قائمة التحقق من الخطوات للمستند المستوردة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="302" />
+        <location filename="../src/Create/CreateActions.cpp" line="308" />
         <source>Tutorial</source>
         <translation>الدورة التعليمية</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="303" />
+        <location filename="../src/Create/CreateActions.cpp" line="309" />
         <source>Play tutorial showing steps for digitizing curves</source>
         <translation>تشغيل البرنامج التعليمي تظهر خطوات لرقمنة المنحنيات</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="304" />
+        <location filename="../src/Create/CreateActions.cpp" line="310" />
         <source>Tutorial
 
 Play tutorial showing steps for digitizing points from curves drawn with lines and/or point</source>
@@ -890,17 +894,17 @@ Play tutorial showing steps for digitizing points from curves drawn with lines a
 </translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="310" />
+        <location filename="../src/Create/CreateActions.cpp" line="316" />
         <source>Help</source>
         <translation>مساعدة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="312" />
+        <location filename="../src/Create/CreateActions.cpp" line="318" />
         <source>Help documentation</source>
         <translation>وثائق المساعدة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="313" />
+        <location filename="../src/Create/CreateActions.cpp" line="319" />
         <source>Help Documentation
 
 Searchable help documentation</source>
@@ -909,17 +913,17 @@ Searchable help documentation</source>
 وثائق المساعدة للبحث</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="318" />
+        <location filename="../src/Create/CreateActions.cpp" line="324" />
         <source>About Engauge</source>
         <translation>حول Engauge</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="319" />
+        <location filename="../src/Create/CreateActions.cpp" line="325" />
         <source>About the application.</source>
         <translation>حول التطبيق.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="320" />
+        <location filename="../src/Create/CreateActions.cpp" line="326" />
         <source>About Engauge
 
 About the application.</source>
@@ -928,17 +932,17 @@ About the application.</source>
 حول التطبيق.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="328" />
+        <location filename="../src/Create/CreateActions.cpp" line="334" />
         <source>Coordinates...</source>
         <translation>تنسق ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="329" />
+        <location filename="../src/Create/CreateActions.cpp" line="335" />
         <source>Edit Coordinate settings.</source>
         <translation>تحرير إعدادات الإحداثيات.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="330" />
+        <location filename="../src/Create/CreateActions.cpp" line="336" />
         <source>Coordinate Settings
 
 Coordinate settings determine how the graph coordinates are mapped to the pixels in the image</source>
@@ -947,17 +951,17 @@ Coordinate settings determine how the graph coordinates are mapped to the pixels
 تحدد إعدادات الإحداثيات كيفية تعيين إحداثيات الرسم البياني إلى وحدات البكسل في الصورة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="334" />
+        <location filename="../src/Create/CreateActions.cpp" line="340" />
         <source>Curve List...</source>
         <translation>قائمة المنحنى ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="335" />
+        <location filename="../src/Create/CreateActions.cpp" line="341" />
         <source>Edit Curve List settings.</source>
         <translation>تحرير إعدادات قائمة المنحنى.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="336" />
+        <location filename="../src/Create/CreateActions.cpp" line="342" />
         <source>Curve List
 
 Curve list settings add, rename and/or remove curves in the current document</source>
@@ -966,17 +970,17 @@ Curve list settings add, rename and/or remove curves in the current document</so
 تقوم إعدادات قائمة المنحنيات بإضافة ، وإعادة تسمية و / أو إزالة المنحنيات في المستند الحالي</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="340" />
+        <location filename="../src/Create/CreateActions.cpp" line="346" />
         <source>Curve Properties...</source>
         <translation>خصائص المنحنى ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="341" />
+        <location filename="../src/Create/CreateActions.cpp" line="347" />
         <source>Edit Curve Properties settings.</source>
         <translation>تحرير إعدادات خصائص المنحنى.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="342" />
+        <location filename="../src/Create/CreateActions.cpp" line="348" />
         <source>Curve Properties Settings
 
 Curves properties settings determine how each curve appears</source>
@@ -985,17 +989,17 @@ Curves properties settings determine how each curve appears</source>
 تحدد إعدادات خصائص المنحنيات كيف يظهر كل منحنى</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="346" />
+        <location filename="../src/Create/CreateActions.cpp" line="352" />
         <source>Digitize Curve...</source>
         <translation>رقمنة المنحنى ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="347" />
+        <location filename="../src/Create/CreateActions.cpp" line="353" />
         <source>Edit Digitize Axis and Graph Curve settings.</source>
         <translation>تحرير رقمنة المحور وضبط منحنى الرسم البياني.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="348" />
+        <location filename="../src/Create/CreateActions.cpp" line="354" />
         <source>Digitize Axis and Graph Curve Settings
 
 Digitize Curve settings determine how points are digitized in Digitize Axis Point and Digitize Graph Point modes</source>
@@ -1004,17 +1008,17 @@ Digitize Curve settings determine how points are digitized in Digitize Axis Poin
 تحدد إعدادات منحنيات الرقمنة كيف يتم ترقيم النقاط في رقمنة نقطة المحور ورقم رقمي لنقاط الرسم البياني</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="353" />
+        <location filename="../src/Create/CreateActions.cpp" line="359" />
         <source>Export Format...</source>
         <translation>تنسيق التصدير ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="354" />
+        <location filename="../src/Create/CreateActions.cpp" line="360" />
         <source>Edit Export Format settings.</source>
         <translation>تحرير إعدادات تنسيق التصدير.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="355" />
+        <location filename="../src/Create/CreateActions.cpp" line="361" />
         <source>Export Format Settings
 
 Export format settings affect how exported files are formatted</source>
@@ -1023,17 +1027,17 @@ Export format settings affect how exported files are formatted</source>
 تؤثر إعدادات تنسيق التصدير على كيفية تنسيق الملفات المصدرة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="359" />
+        <location filename="../src/Create/CreateActions.cpp" line="365" />
         <source>Color Filter...</source>
         <translation>فلتر الألوان ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="360" />
+        <location filename="../src/Create/CreateActions.cpp" line="366" />
         <source>Edit Color Filter settings.</source>
         <translation>تحرير إعدادات تصفية اللون.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="361" />
+        <location filename="../src/Create/CreateActions.cpp" line="367" />
         <source>Color Filter Settings
 
 Color filtering simplifies the graphs for easier Point Matching and Segment Filling</source>
@@ -1042,17 +1046,17 @@ Color filtering simplifies the graphs for easier Point Matching and Segment Fill
 تعمل ميزة تصفية الألوان على تبسيط الرسوم البيانية لتسهيل مطابقة النقاط وحزمة التقسيم</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="365" />
+        <location filename="../src/Create/CreateActions.cpp" line="371" />
         <source>Axes Checker...</source>
         <translation>محاور المحاور ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="366" />
+        <location filename="../src/Create/CreateActions.cpp" line="372" />
         <source>Edit Axes Checker settings.</source>
         <translation>تحرير محاور إعدادات المدقق.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="367" />
+        <location filename="../src/Create/CreateActions.cpp" line="373" />
         <source>Axes Checker Settings
 
 Axes checker can reveal any axis point mistakes, which are otherwise hard to find.</source>
@@ -1061,17 +1065,17 @@ Axes checker can reveal any axis point mistakes, which are otherwise hard to fin
 يمكن أن يكشف المدقق المحاكي عن أي أخطاء في نقطة المحور ، والتي يصعب العثور عليها.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="371" />
+        <location filename="../src/Create/CreateActions.cpp" line="377" />
         <source>Grid Line Display...</source>
         <translation>شبكة خط العرض ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="372" />
+        <location filename="../src/Create/CreateActions.cpp" line="378" />
         <source>Edit Grid Line Display settings.</source>
         <translation>تحرير إعدادات الشبكة عرض الخط.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="373" />
+        <location filename="../src/Create/CreateActions.cpp" line="379" />
         <source>Grid Line Display Settings
 
 Grid lines displayed on the graph can provide more accuracy than the Axis Checker, for distorted graphs. In a distorted graph, the grid lines can be used to adjust the axis points for more accuracy in different regions.</source>
@@ -1080,17 +1084,17 @@ Grid lines displayed on the graph can provide more accuracy than the Axis Checke
 يمكن أن توفر خطوط الشبكة المعروضة على الرسم البياني دقة أكبر من مدقق المحاور ، للرسومات البيانية المشوهة. في الرسم البياني المشوه ، يمكن استخدام خطوط الشبكة لضبط نقاط المحور لمزيد من الدقة في مناطق مختلفة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="378" />
+        <location filename="../src/Create/CreateActions.cpp" line="384" />
         <source>Grid Line Removal...</source>
         <translation>إزالة خط الشبكة ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="379" />
+        <location filename="../src/Create/CreateActions.cpp" line="385" />
         <source>Edit Grid Line Removal settings.</source>
         <translation>تحرير إعدادات إزالة خط الشبكة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="380" />
+        <location filename="../src/Create/CreateActions.cpp" line="386" />
         <source>Grid Line Removal Settings
 
 Grid line removal isolates curve lines for easier Point Matching and Segment Filling, when Color Filtering is not able to separate grid lines from curve lines.</source>
@@ -1099,36 +1103,36 @@ Grid line removal isolates curve lines for easier Point Matching and Segment Fil
 تعمل ميزة إزالة خط الشبكة على عزل خطوط منحنى لتسهيل مطابقة النقاط وحزمة القطع ، عندما لا تكون تصفية الألوان قادرة على فصل خطوط الشبكة عن خطوط المنحنى.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="385" />
+        <location filename="../src/Create/CreateActions.cpp" line="391" />
         <source>Point Match...</source>
-        <translation>نقطة المباراة ...</translation>
+        <translation>مطابقة النقطة ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="386" />
+        <location filename="../src/Create/CreateActions.cpp" line="392" />
         <source>Edit Point Match settings.</source>
-        <translation>تعديل إعدادات نقطة المباراة.</translation>
+        <translation>تعديل إعدادات مطابقة النقطة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="387" />
+        <location filename="../src/Create/CreateActions.cpp" line="393" />
         <source>Point Match Settings
 
 Point match settings determine how points are matched while in Point Match mode</source>
-        <translation>إعدادات نقطة المباراة
+        <translation>إعدادات مطابقة النقطة
 
 تحدد إعدادات مطابقة النقاط كيفية مطابقة النقاط أثناء وضع مطابقة النقاط</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="391" />
+        <location filename="../src/Create/CreateActions.cpp" line="397" />
         <source>Segment Fill...</source>
         <translation>تعبئة الشريحة ...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="392" />
+        <location filename="../src/Create/CreateActions.cpp" line="398" />
         <source>Edit Segment Fill settings.</source>
         <translation>تحرير إعدادات ملء الشريحة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="393" />
+        <location filename="../src/Create/CreateActions.cpp" line="399" />
         <source>Segment Fill Settings
 
 Segment fill settings determine how points are generated in the Segment Fill mode</source>
@@ -1137,17 +1141,17 @@ Segment fill settings determine how points are generated in the Segment Fill mod
 تحدد إعدادات تعبئة الشرائح كيفية إنشاء النقاط في وضع تعبئة الشريحة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="397" />
+        <location filename="../src/Create/CreateActions.cpp" line="403" />
         <source>General...</source>
-        <translation>جنرال لواء...</translation>
+        <translation>عام...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="398" />
+        <location filename="../src/Create/CreateActions.cpp" line="404" />
         <source>Edit General settings.</source>
         <translation>تحرير الإعدادات العامة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="399" />
+        <location filename="../src/Create/CreateActions.cpp" line="405" />
         <source>General Settings
 
 General settings are document-specific settings that affect multiple modes. For example, the cursor size setting affects both Color Picker and Point Match modes</source>
@@ -1156,17 +1160,17 @@ General settings are document-specific settings that affect multiple modes. For 
 الإعدادات العامة هي إعدادات خاصة بالمستند تؤثر في أوضاع متعددة. على سبيل المثال ، يؤثر إعداد حجم المؤشر على كل من منتقي الألوان ونمط مطابقة النقاط</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="404" />
+        <location filename="../src/Create/CreateActions.cpp" line="410" />
         <source>Main Window...</source>
         <translation>النافذة الرئيسية...</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="406" />
+        <location filename="../src/Create/CreateActions.cpp" line="412" />
         <source>Edit Main Window settings.</source>
         <translation>تحرير إعدادات النافذة الرئيسية.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="407" />
+        <location filename="../src/Create/CreateActions.cpp" line="413" />
         <source>Main Window Settings
 
 Main window settings affect the user interface and are not specific to any document</source>
@@ -1175,17 +1179,17 @@ Main window settings affect the user interface and are not specific to any docum
 تؤثر إعدادات النافذة الرئيسية على واجهة المستخدم وليست خاصة بأي مستند</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="416" />
+        <location filename="../src/Create/CreateActions.cpp" line="422" />
         <source>Background Toolbar</source>
         <translation>شريط ادوات خلفية</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="419" />
+        <location filename="../src/Create/CreateActions.cpp" line="425" />
         <source>Show or hide the background toolbar.</source>
         <translation>إظهار أو إخفاء شريط أدوات الخلفية.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="420" />
+        <location filename="../src/Create/CreateActions.cpp" line="426" />
         <source>View Background ToolBar
 
 Show or hide the background toolbar</source>
@@ -1194,17 +1198,17 @@ Show or hide the background toolbar</source>
 إظهار أو إخفاء شريط أدوات الخلفية</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="424" />
+        <location filename="../src/Create/CreateActions.cpp" line="430" />
         <source>Checklist Guide Toolbar</source>
         <translation>شريط أدوات دليل الاختيار</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="427" />
+        <location filename="../src/Create/CreateActions.cpp" line="433" />
         <source>Show or hide the checklist guide.</source>
         <translation>إظهار أو إخفاء دليل قائمة التحقق.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="428" />
+        <location filename="../src/Create/CreateActions.cpp" line="434" />
         <source>View Checklist Guide
 
 Show or hide the checklist guide</source>
@@ -1213,19 +1217,19 @@ Show or hide the checklist guide</source>
 إظهار أو إخفاء دليل قائمة التحقق</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="432" />
+        <location filename="../src/Create/CreateActions.cpp" line="438" />
         <source>Curve Fitting Window</source>
         <translation>نافذة منحنى المناسب
 
 </translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="435" />
+        <location filename="../src/Create/CreateActions.cpp" line="441" />
         <source>Show or hide the curve fitting window.</source>
         <translation>إظهار أو إخفاء نافذة تركيب المنحنى.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="436" />
+        <location filename="../src/Create/CreateActions.cpp" line="442" />
         <source>View Curve Fitting Window
 
 Show or hide the curve fitting window</source>
@@ -1234,17 +1238,17 @@ Show or hide the curve fitting window</source>
 إظهار أو إخفاء نافذة تركيب المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="440" />
+        <location filename="../src/Create/CreateActions.cpp" line="446" />
         <source>Geometry Window</source>
         <translation>نافذة الهندسة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="443" />
+        <location filename="../src/Create/CreateActions.cpp" line="449" />
         <source>Show or hide the geometry window.</source>
         <translation>إظهار أو إخفاء نافذة الهندسة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="444" />
+        <location filename="../src/Create/CreateActions.cpp" line="450" />
         <source>View Geometry Window
 
 Show or hide the geometry window</source>
@@ -1253,17 +1257,17 @@ Show or hide the geometry window</source>
 إظهار أو إخفاء نافذة الهندسة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="448" />
+        <location filename="../src/Create/CreateActions.cpp" line="454" />
         <source>Digitizing Tools Toolbar</source>
         <translation>شريط أدوات أدوات الترقيم</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="451" />
+        <location filename="../src/Create/CreateActions.cpp" line="457" />
         <source>Show or hide the digitizing tools toolbar.</source>
         <translation>إظهار أو إخفاء شريط أدوات أدوات الترقيم.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="452" />
+        <location filename="../src/Create/CreateActions.cpp" line="458" />
         <source>View Digitizing Tools ToolBar
 
 Show or hide the digitizing tools toolbar</source>
@@ -1272,17 +1276,17 @@ Show or hide the digitizing tools toolbar</source>
 إظهار أو إخفاء شريط أدوات أدوات الترقيم</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="456" />
+        <location filename="../src/Create/CreateActions.cpp" line="462" />
         <source>Settings Views Toolbar</source>
         <translation>شريط أدوات عرض الإعدادات</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="459" />
+        <location filename="../src/Create/CreateActions.cpp" line="465" />
         <source>Show or hide the settings views toolbar.</source>
         <translation>إظهار أو إخفاء شريط أدوات الإعدادات.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="460" />
+        <location filename="../src/Create/CreateActions.cpp" line="466" />
         <source>View Settings Views ToolBar
 
 Show or hide the settings views toolbar. These views graphically show the most important settings.</source>
@@ -1291,17 +1295,17 @@ Show or hide the settings views toolbar. These views graphically show the most i
 إظهار أو إخفاء شريط أدوات الإعدادات. تعرض هذه المشاهدات بيانيا أهم الإعدادات.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="465" />
+        <location filename="../src/Create/CreateActions.cpp" line="471" />
         <source>Coordinate System Toolbar</source>
         <translation>تنسيق شريط أدوات النظام</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="468" />
+        <location filename="../src/Create/CreateActions.cpp" line="474" />
         <source>Show or hide the coordinate system toolbar.</source>
         <translation>إظهار أو إخفاء شريط أدوات النظام الإحداثي.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="469" />
+        <location filename="../src/Create/CreateActions.cpp" line="475" />
         <source>View Coordinate Systems ToolBar
 
 Show or hide the coordinate system selection toolbar. This toolbar is used to select the current coordinate system when the document has multiple coordinate systems. This toolbar is also used to view and print all coordinate systems.
@@ -1314,17 +1318,17 @@ This toolbar is disabled when there is only one coordinate system.</source>
 يتم تعطيل شريط الأدوات هذا عند وجود نظام إحداثي واحد فقط.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="477" />
+        <location filename="../src/Create/CreateActions.cpp" line="483" />
         <source>Tool Tips</source>
         <translation>نصائح أداة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="480" />
+        <location filename="../src/Create/CreateActions.cpp" line="486" />
         <source>Show or hide the tool tips.</source>
         <translation>إظهار أو إخفاء تلميحات الأدوات.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="481" />
+        <location filename="../src/Create/CreateActions.cpp" line="487" />
         <source>View Tool Tips
 
 Show or hide the tool tips</source>
@@ -1333,17 +1337,17 @@ Show or hide the tool tips</source>
 إظهار أو إخفاء تلميحات الأدوات</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="485" />
+        <location filename="../src/Create/CreateActions.cpp" line="491" />
         <source>Grid Lines</source>
         <translation>خطوط الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="488" />
+        <location filename="../src/Create/CreateActions.cpp" line="494" />
         <source>Show or hide grid lines.</source>
         <translation>إظهار أو إخفاء خطوط الشبكة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="489" />
+        <location filename="../src/Create/CreateActions.cpp" line="495" />
         <source>View Grid Lines
 
 Show or hide grid lines that are added for accurate adjustments of the axes points, which can improve accuracy in distorted graphs</source>
@@ -1352,36 +1356,36 @@ Show or hide grid lines that are added for accurate adjustments of the axes poin
 إظهار أو إخفاء خطوط الشبكة التي تمت إضافتها لإجراء عمليات ضبط دقيقة لنقاط المحاور ، والتي يمكنها تحسين الدقة في الرسوم البيانية المشوهة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="494" />
+        <location filename="../src/Create/CreateActions.cpp" line="500" />
         <source>No Background</source>
-        <translation>أي خلفية</translation>
+        <translation>بدون خلفية</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="496" />
+        <location filename="../src/Create/CreateActions.cpp" line="502" />
         <source>Do not show the image underneath the points.</source>
         <translation>لا تظهر الصورة أسفل النقاط.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="497" />
+        <location filename="../src/Create/CreateActions.cpp" line="503" />
         <source>No Background
 
 No image is shown so points are easier to see</source>
-        <translation>أي خلفية
+        <translation>بدون خلفية
 
-يتم عرض أي صورة حتى تكون النقاط أسهل في رؤيتها</translation>
+لا يتم عرض أي صورة حتى تكون النقاط أسهل في رؤيتها</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="500" />
+        <location filename="../src/Create/CreateActions.cpp" line="506" />
         <source>Show Original Image</source>
         <translation>إظهار الصورة الأصلية</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="502" />
+        <location filename="../src/Create/CreateActions.cpp" line="508" />
         <source>Show the original image underneath the points.</source>
         <translation>اعرض الصورة الأصلية أسفل النقاط.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="503" />
+        <location filename="../src/Create/CreateActions.cpp" line="509" />
         <source>Show Original Image
 
 Show the original image underneath the points</source>
@@ -1390,17 +1394,17 @@ Show the original image underneath the points</source>
 اعرض الصورة الأصلية أسفل النقاط</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="506" />
+        <location filename="../src/Create/CreateActions.cpp" line="512" />
         <source>Show Filtered Image</source>
         <translation>إظهار الصورة التي تمت تصفيتها</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="509" />
+        <location filename="../src/Create/CreateActions.cpp" line="515" />
         <source>Show the filtered image underneath the points.</source>
         <translation>اعرض الصورة التي تمت تصفيتها أسفل النقاط.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="510" />
+        <location filename="../src/Create/CreateActions.cpp" line="516" />
         <source>Show Filtered Image
 
 Show the filtered image underneath the points.
@@ -1413,17 +1417,17 @@ The filtered image is created from the original image according to the Filter pr
 يتم إنشاء الصورة التي تمت تصفيتها من الصورة الأصلية وفقًا لتفضيلات الفلتر بحيث يتم إخفاء المعلومات غير المهمة وتأكيد المعلومات المهمة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="516" />
+        <location filename="../src/Create/CreateActions.cpp" line="522" />
         <source>Hide All Curves</source>
         <translation>إخفاء كل المنحنيات</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="518" />
+        <location filename="../src/Create/CreateActions.cpp" line="524" />
         <source>Hide all digitized curves.</source>
         <translation>إخفاء جميع المنحنيات الرقمية.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="519" />
+        <location filename="../src/Create/CreateActions.cpp" line="525" />
         <source>Hide All Curves
 
 No axis points or digitized graph curves are shown so the image is easier to see.</source>
@@ -1432,17 +1436,17 @@ No axis points or digitized graph curves are shown so the image is easier to see
 لا تظهر أي نقاط محور أو منحنيات بيانية رقمية حتى يسهل رؤية الصورة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="522" />
+        <location filename="../src/Create/CreateActions.cpp" line="528" />
         <source>Show Selected Curve</source>
         <translation>إظهار المنحنى المحدد</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="524" />
+        <location filename="../src/Create/CreateActions.cpp" line="530" />
         <source>Show only the currently selected curve.</source>
         <translation>إظهار المنحنى المحدد حاليًا فقط.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="525" />
+        <location filename="../src/Create/CreateActions.cpp" line="531" />
         <source>Show Selected Curve
 
 Show only the digitized points and line that belong to the currently selected curve.</source>
@@ -1451,17 +1455,17 @@ Show only the digitized points and line that belong to the currently selected cu
 اعرض فقط النقاط الرقمية والخط الذي ينتمي إلى المنحنى المحدد حاليًا.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="528" />
+        <location filename="../src/Create/CreateActions.cpp" line="534" />
         <source>Show All Curves</source>
         <translation>عرض جميع المنحنيات</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="531" />
+        <location filename="../src/Create/CreateActions.cpp" line="537" />
         <source>Show all curves.</source>
         <translation>عرض جميع المنحنيات.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="532" />
+        <location filename="../src/Create/CreateActions.cpp" line="538" />
         <source>Show All Curves
 
 Show all digitized axis points and graph curves</source>
@@ -1470,323 +1474,323 @@ Show all digitized axis points and graph curves</source>
 إظهار جميع نقاط المحور الرقمية ومنحنيات الرسم البياني</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="547" />
+        <location filename="../src/Create/CreateActions.cpp" line="553" />
         <source>Hide Always</source>
         <translation>إخفاء دائما</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="549" />
+        <location filename="../src/Create/CreateActions.cpp" line="555" />
         <source>Always hide the status bar.</source>
         <translation>دائما إخفاء شريط الحالة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="550" />
+        <location filename="../src/Create/CreateActions.cpp" line="556" />
         <source>Hide the status bar. No temporary status or feedback messages will appear.</source>
         <translation>إخفاء شريط الحالة. لن تظهر أي رسائل مؤقتة أو رسائل تعليقات مؤقتة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="552" />
+        <location filename="../src/Create/CreateActions.cpp" line="558" />
         <source>Show Temporary Messages</source>
         <translation>إظهار الرسائل المؤقتة</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="554" />
+        <location filename="../src/Create/CreateActions.cpp" line="560" />
         <source>Hide the status bar except when display temporary messages.</source>
         <translation>إخفاء شريط الحالة فيما عدا عند عرض الرسائل المؤقتة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="555" />
+        <location filename="../src/Create/CreateActions.cpp" line="561" />
         <source>Hide the status bar, except when displaying temporary status and feedback messages.</source>
         <translation>إخفاء شريط المعلومات ، ما عدا عند عرض الحالة المؤقتة ورسائل التعليقات.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="557" />
+        <location filename="../src/Create/CreateActions.cpp" line="563" />
         <source>Show Always</source>
         <translation>إظهار دائما</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="559" />
+        <location filename="../src/Create/CreateActions.cpp" line="565" />
         <source>Always show the status bar.</source>
         <translation>دائما إظهار شريط الحالة.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="560" />
+        <location filename="../src/Create/CreateActions.cpp" line="566" />
         <source>Show the status bar. Besides displaying temporary status and feedback messages, the status bar also displays information about the cursor position.</source>
         <translation>إظهار شريط الحالة. إلى جانب عرض رسائل الحالة المؤقتة والردود ، يعرض شريط الحالة أيضًا معلومات حول موضع المؤشر.</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="569" />
+        <location filename="../src/Create/CreateActions.cpp" line="575" />
         <source>Zoom Out</source>
         <translation>تصغير</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="570" />
+        <location filename="../src/Create/CreateActions.cpp" line="576" />
         <source>Zoom out</source>
         <translation>تصغير</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="574" />
+        <location filename="../src/Create/CreateActions.cpp" line="580" />
         <source>Zoom In</source>
         <translation>تكبير</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="575" />
+        <location filename="../src/Create/CreateActions.cpp" line="581" />
         <source>Zoom in</source>
         <translation>تكبير</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="582" />
+        <location filename="../src/Create/CreateActions.cpp" line="588" />
         <source>16:1 (1600%)</source>
         <translation>16: 1 (1600 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="584" />
+        <location filename="../src/Create/CreateActions.cpp" line="590" />
         <source>Zoom 16:1</source>
         <translation>تكبير 16: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="588" />
+        <location filename="../src/Create/CreateActions.cpp" line="594" />
         <source>16:1 farther (1270%)</source>
         <translation>16: 1 أبعد (1270 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="590" />
+        <location filename="../src/Create/CreateActions.cpp" line="596" />
         <source>Zoom 12.7:1</source>
         <translation>تكبير 12.7: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="594" />
+        <location filename="../src/Create/CreateActions.cpp" line="600" />
         <source>8:1 closer (1008%)</source>
         <translation>8: 1 أقرب (1008 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="596" />
+        <location filename="../src/Create/CreateActions.cpp" line="602" />
         <source>Zoom 10.08:1</source>
         <translation>التكبير 10.08: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="600" />
+        <location filename="../src/Create/CreateActions.cpp" line="606" />
         <source>8:1 (800%)</source>
         <translation>8: 1 (800 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="602" />
+        <location filename="../src/Create/CreateActions.cpp" line="608" />
         <source>Zoom 8:1</source>
         <translation>تكبير 8: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="606" />
+        <location filename="../src/Create/CreateActions.cpp" line="612" />
         <source>8:1 farther (635%)</source>
         <translation>8: 1 أبعد (635 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="608" />
+        <location filename="../src/Create/CreateActions.cpp" line="614" />
         <source>Zoom 6.35:1</source>
         <translation>تكبير 6.35: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="612" />
+        <location filename="../src/Create/CreateActions.cpp" line="618" />
         <source>4:1 closer (504%)</source>
         <translation>4: 1 أقرب (504 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="614" />
+        <location filename="../src/Create/CreateActions.cpp" line="620" />
         <source>Zoom 5.04:1</source>
         <translation>التكبير 5.04: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="618" />
+        <location filename="../src/Create/CreateActions.cpp" line="624" />
         <source>4:1 (400%)</source>
         <translation>4: 1 (400٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="620" />
+        <location filename="../src/Create/CreateActions.cpp" line="626" />
         <source>Zoom 4:1</source>
         <translation>تكبير 4: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="624" />
+        <location filename="../src/Create/CreateActions.cpp" line="630" />
         <source>4:1 farther (317%)</source>
         <translation>4: 1 أبعد (317 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="626" />
+        <location filename="../src/Create/CreateActions.cpp" line="632" />
         <source>Zoom 3.17:1</source>
         <translation>تكبير 3.17: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="630" />
+        <location filename="../src/Create/CreateActions.cpp" line="636" />
         <source>2:1 closer (252%)</source>
         <translation>2: 1 أقرب (252 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="632" />
+        <location filename="../src/Create/CreateActions.cpp" line="638" />
         <source>Zoom 2.52:1</source>
         <translation>تكبير 2.52: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="636" />
+        <location filename="../src/Create/CreateActions.cpp" line="642" />
         <source>2:1 (200%)</source>
         <translation>2: 1 (200٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="638" />
+        <location filename="../src/Create/CreateActions.cpp" line="644" />
         <source>Zoom 2:1</source>
         <translation>تكبير 2: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="642" />
+        <location filename="../src/Create/CreateActions.cpp" line="648" />
         <source>2:1 farther (159%)</source>
         <translation>2: 1 أبعد (159 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="644" />
+        <location filename="../src/Create/CreateActions.cpp" line="650" />
         <source>Zoom 1.59:1</source>
         <translation>تكبير 1.59: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="648" />
+        <location filename="../src/Create/CreateActions.cpp" line="654" />
         <source>1:1 closer (126%)</source>
         <translation>1: 1 أقرب (126٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="651" />
+        <location filename="../src/Create/CreateActions.cpp" line="657" />
         <source>Zoom 1.3:1</source>
         <translation>تكبير 1.3: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="655" />
+        <location filename="../src/Create/CreateActions.cpp" line="661" />
         <source>1:1 (100%)</source>
         <translation>1: 1 (100٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="658" />
+        <location filename="../src/Create/CreateActions.cpp" line="664" />
         <source>Zoom 1:1</source>
         <translation>تكبير 1: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="662" />
+        <location filename="../src/Create/CreateActions.cpp" line="668" />
         <source>1:1 farther (79%)</source>
         <translation>1: 1 أبعد (79 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="665" />
+        <location filename="../src/Create/CreateActions.cpp" line="671" />
         <source>Zoom 0.8:1</source>
         <translation>تكبير 0.8: 1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="669" />
+        <location filename="../src/Create/CreateActions.cpp" line="675" />
         <source>1:2 closer (63%)</source>
         <translation>1: 2 أقرب (63 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="671" />
+        <location filename="../src/Create/CreateActions.cpp" line="677" />
         <source>Zoom 1.3:2</source>
         <translation>تكبير 1.3: 2</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="675" />
+        <location filename="../src/Create/CreateActions.cpp" line="681" />
         <source>1:2 (50%)</source>
         <translation>1: 2 (50 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="677" />
+        <location filename="../src/Create/CreateActions.cpp" line="683" />
         <source>Zoom 1:2</source>
         <translation>تكبير 1: 2</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="681" />
+        <location filename="../src/Create/CreateActions.cpp" line="687" />
         <source>1:2 farther (40%)</source>
         <translation>1: 2 أبعد (40 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="683" />
+        <location filename="../src/Create/CreateActions.cpp" line="689" />
         <source>Zoom 0.8:2</source>
         <translation>تكبير 0.8: 2</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="687" />
+        <location filename="../src/Create/CreateActions.cpp" line="693" />
         <source>1:4 closer (31%)</source>
         <translation>1: 4 أقرب (31 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="689" />
+        <location filename="../src/Create/CreateActions.cpp" line="695" />
         <source>Zoom 1.3:4</source>
         <translation>تكبير 1.3: 4</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="693" />
+        <location filename="../src/Create/CreateActions.cpp" line="699" />
         <source>1:4 (25%)</source>
         <translation>1: 4 (25 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="695" />
+        <location filename="../src/Create/CreateActions.cpp" line="701" />
         <source>Zoom 1:4</source>
         <translation>تكبير 1: 4</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="699" />
+        <location filename="../src/Create/CreateActions.cpp" line="705" />
         <source>1:4 farther (20%)</source>
         <translation>1: 4 أبعد (20 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="701" />
+        <location filename="../src/Create/CreateActions.cpp" line="707" />
         <source>Zoom 0.8:4</source>
         <translation>تكبير 0.8: 4</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="705" />
+        <location filename="../src/Create/CreateActions.cpp" line="711" />
         <source>1:8 closer (12.5%)</source>
         <translation>1: 8 أقرب (12.5 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="707" />
         <location filename="../src/Create/CreateActions.cpp" line="713" />
+        <location filename="../src/Create/CreateActions.cpp" line="719" />
         <source>Zoom 1:8</source>
         <translation>تكبير 1: 8</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="711" />
+        <location filename="../src/Create/CreateActions.cpp" line="717" />
         <source>1:8 (12.5%)</source>
         <translation>1: 8 (12.5 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="717" />
+        <location filename="../src/Create/CreateActions.cpp" line="723" />
         <source>1:8 farther (10%)</source>
         <translation>1: 8 أبعد (10 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="719" />
+        <location filename="../src/Create/CreateActions.cpp" line="725" />
         <source>Zoom 0.8:8</source>
         <translation>تكبير 0.8: 8</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="723" />
+        <location filename="../src/Create/CreateActions.cpp" line="729" />
         <source>1:16 closer (8%)</source>
         <translation>16:1 أقرب (8 ٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="725" />
+        <location filename="../src/Create/CreateActions.cpp" line="731" />
         <source>Zoom 1.3:16</source>
         <translation>تكبير 1.3: 16</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="729" />
+        <location filename="../src/Create/CreateActions.cpp" line="735" />
         <source>1:16 (6.25%)</source>
         <translation>16:1 (6.25٪)</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="731" />
+        <location filename="../src/Create/CreateActions.cpp" line="737" />
         <source>Zoom 1:16</source>
         <translation>تكبير 16:1</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="735" />
+        <location filename="../src/Create/CreateActions.cpp" line="741" />
         <source>Fill</source>
         <translation>ملء</translation>
     </message>
     <message>
-        <location filename="../src/Create/CreateActions.cpp" line="737" />
+        <location filename="../src/Create/CreateActions.cpp" line="743" />
         <source>Zoom with stretching to fill window</source>
         <translation>تكبير مع امتداد لملء النافذة</translation>
     </message>
@@ -1816,7 +1820,7 @@ Show all digitized axis points and graph curves</source>
     <message>
         <location filename="../src/Create/CreateMenus.cpp" line="65" />
         <source>View</source>
-        <translation>رأي</translation>
+        <translation>عرض</translation>
     </message>
     <message>
         <location filename="../src/Create/CreateMenus.cpp" line="77" />
@@ -1874,7 +1878,7 @@ Select background image:
     <message>
         <location filename="../src/Create/CreateToolBars.cpp" line="48" />
         <source>No background</source>
-        <translation>أي خلفية</translation>
+        <translation>بدون خلفية</translation>
     </message>
     <message>
         <location filename="../src/Create/CreateToolBars.cpp" line="49" />
@@ -1945,7 +1949,7 @@ View of filter for the current curve in Segment Fill mode. The filter settings a
     <message>
         <location filename="../src/Create/CreateToolBars.cpp" line="103" />
         <source>Views</source>
-        <translation>الآراء</translation>
+        <translation>العرض</translation>
     </message>
     <message>
         <location filename="../src/Create/CreateToolBars.cpp" line="112" />
@@ -2053,73 +2057,82 @@ When pressed, this button Prints all digitized points and lines for all coordina
 <context>
     <name>DlgEditPointAxis</name>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="64" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="65" />
         <source>Edit Axis Point</source>
         <translation>تحرير نقطة المحور</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="107" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="109" />
         <source>Graph Coordinates</source>
         <translation>إحداثيات الرسم البياني</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="116" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="118" />
         <source>as</source>
         <translation>مثل</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="126" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="128" />
         <source>(</source>
         <translation>(</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="134" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="136" />
         <source>Enter the first graph coordinate of the axis point.
 
-For cartesian plots this is X. For polar plots this is the radius R.
+For cartesian plots this is X. For polar plots this is the angle Theta.
 
 The expected format of the coordinate value is determined by the locale setting. If typed values are not recognized as expected, check the locale setting in Settings / Main Window...</source>
-        <translation>أدخل إحداثيات الرسم البياني الأولى لنقطة المحور.
+        <translation>أدخل إحداثيات الرسم البياني الأولى لنقطة المحور. بالنسبة للقطعات الديكارتية ، هذا هو X. بالنسبة للقطاعات القطبية ، هذه هي الزاوية theta. يتم تحديد التنسيق المتوقع لقيمة الإحداثيات بواسطة إعداد الإعدادات المحلية. إذا لم يتم التعرف على القيم المكتوبة كما هو متوقع ، فتحقق من إعداد الإعدادات المحلية في الإعدادات / النافذة الرئيسية ...
 
-للقطعات الديكارتية هذا هو X. بالنسبة للقطعتين القطبيتين هذا هو نصف القطر R.
-
-يتم تحديد التنسيق المتوقع لقيمة الإحداثيات بواسطة إعداد الإعدادات المحلية. إذا لم يتم التعرف على القيم المكتوبة كما هو متوقع ، فتحقق من إعداد الإعدادات المحلية في الإعدادات / النافذة الرئيسية ...</translation>
+</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="141" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="143" />
         <source>, </source>
         <translation>, </translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="149" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="151" />
         <source>Enter the second graph coordinate of the axis point.
 
-For cartesian plots this is Y. For polar plots this is the angle Theta.
+For cartesian plots this is Y. For polar plots this is the radius R.
 
 The expected format of the coordinate value is determined by the locale setting. If typed values are not recognized as expected, check the locale setting in Settings / Main Window...</source>
-        <translation>أدخل إحداثيات الرسم البياني الثانية لنقطة المحور.
-
-بالنسبة للاراضي الديكارتية هذا هو Y. بالنسبة للقطعة الارضية هذه هي الزاوية Theta.
-
-يتم تحديد التنسيق المتوقع لقيمة الإحداثيات بواسطة إعداد الإعدادات المحلية. إذا لم يتم التعرف على القيم المكتوبة كما هو متوقع ، فتحقق من إعداد الإعدادات المحلية في الإعدادات / النافذة الرئيسية ...</translation>
+        <translation>قم بإدخال إحداثيات الرسم البياني الثانية لنقطة المحور. بالنسبة إلى المؤامرات الديكارتية ، هذا هو Y. بالنسبة إلى المؤامرات القطبية ، يكون هذا هو نصف القطر R. يتم تحديد التنسيق المتوقع لقيمة الإحداثيات بواسطة إعداد الإعدادات المحلية. إذا لم يتم التعرف على القيم المكتوبة كما هو متوقع ، فتحقق من إعداد الإعدادات المحلية في الإعدادات / النافذة الرئيسية ...</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="156" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="158" />
         <source>)</source>
         <translation>)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="173" />
-        <source>Number format</source>
-        <translation>تنسيق الرقم</translation>
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="180" />
+        <source>Number of coordinates per axis point:</source>
+        <translation>عدد الإحداثيات لكل نقطة محور:</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="187" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="183" />
+        <source>Three axis points with two coordinates each are normally used. If each axis point has only one known coordinate, then start over with File / Import (Advanced) / 4 Axis Points.</source>
+        <translation>يتم استخدام ثلاث محاور مع إحداثيات كل منها بشكل طبيعي. إذا كانت كل نقطة محور تحتوي على إحداثي واحد معروف فقط ، ابدأ من جديد بالملفات / الاستيراد (متقدم) / 4 نقاط المحور.</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="194" />
+        <source>Number format:</source>
+        <translation>تنسيق الرقم:</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="197" />
+        <source>Locale which determines the allowed number formats. This is set by Settings / Main Window.</source>
+        <translation>الإعدادات المحلية التي تحدد تنسيقات الأرقام المسموح بها. يتم تعيين هذا من خلال الإعدادات / النافذة الرئيسية.</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="213" />
         <source>Ok</source>
-        <translation>حسنا</translation>
+        <translation>موافق</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="191" />
+        <location filename="../src/Dlg/DlgEditPointAxis.cpp" line="217" />
         <source>Cancel</source>
         <translation>إلغاء</translation>
     </message>
@@ -2198,7 +2211,7 @@ The expected format of the coordinate value is determined by the locale setting.
     <message>
         <location filename="../src/Dlg/DlgEditPointGraph.cpp" line="170" />
         <source>Ok</source>
-        <translation>حسنا</translation>
+        <translation>موافق</translation>
     </message>
     <message>
         <location filename="../src/Dlg/DlgEditPointGraph.cpp" line="174" />
@@ -2221,7 +2234,7 @@ The expected format of the coordinate value is determined by the locale setting.
     <message>
         <location filename="../src/Dlg/DlgEditScale.cpp" line="94" />
         <source>Ok</source>
-        <translation>حسنا</translation>
+        <translation>موافق</translation>
     </message>
     <message>
         <location filename="../src/Dlg/DlgEditScale.cpp" line="98" />
@@ -2351,27 +2364,27 @@ In total, there will be two points on the x axis as (x1) and (x2), and two point
 <context>
     <name>DlgImportCroppingNonPdf</name>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="34" />
+        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="35" />
         <source>Image File Import Cropping</source>
         <translation>استيراد ملف الصورة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="71" />
+        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="74" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="78" />
+        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="81" />
         <source>Preview window that shows what part of the image will be imported. The image portion inside the rectangular frame will be imported from the currently selected page. The frame can be moved and resized by dragging the corner handles.</source>
         <translation>نافذة المعاينة التي تعرض أي جزء من الصورة سيتم استيراده. سيتم استيراد جزء الصورة داخل الإطار المستطيل من الصفحة المحددة حاليًا. يمكن تحريك الإطار وتغيير حجمه عن طريق سحب مقابض الركن.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="115" />
+        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="118" />
         <source>Ok</source>
-        <translation>حسنا</translation>
+        <translation>موافق</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="122" />
+        <location filename="../src/Dlg/DlgImportCroppingNonPdf.cpp" line="125" />
         <source>Cancel</source>
         <translation>إلغاء</translation>
     </message>
@@ -2379,37 +2392,37 @@ In total, there will be two points on the x axis as (x1) and (x2), and two point
 <context>
     <name>DlgImportCroppingPdf</name>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="43" />
+        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="44" />
         <source>PDF File Import Cropping</source>
         <translation>ملف PDF استيراد الاقتصاص</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="77" />
+        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="78" />
         <source>Page</source>
         <translation>صفحة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="82" />
+        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="83" />
         <source>Page number that will be imported</source>
         <translation>رقم الصفحة التي سيتم استيرادها</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="100" />
+        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="101" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="107" />
+        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="108" />
         <source>Preview window that shows what part of the image will be imported. The image portion inside the rectangular frame will be imported from the currently selected page. The frame can be moved and resized by dragging the corner handles.</source>
         <translation>نافذة المعاينة التي تعرض أي جزء من الصورة سيتم استيراده. سيتم استيراد جزء الصورة داخل الإطار المستطيل من الصفحة المحددة حاليًا. يمكن تحريك الإطار وتغيير حجمه عن طريق سحب مقابض الركن.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="151" />
+        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="152" />
         <source>Ok</source>
-        <translation>حسنا</translation>
+        <translation>موافق</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="158" />
+        <location filename="../src/Dlg/DlgImportCroppingPdf.cpp" line="159" />
         <source>Cancel</source>
         <translation>إلغاء</translation>
     </message>
@@ -2425,12 +2438,12 @@ In total, there will be two points on the x axis as (x1) and (x2), and two point
 <context>
     <name>DlgSettingsAbstractBase</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAbstractBase.cpp" line="99" />
+        <location filename="../src/Dlg/DlgSettingsAbstractBase.cpp" line="100" />
         <source>Ok</source>
-        <translation>حسنا</translation>
+        <translation>موافق</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAbstractBase.cpp" line="107" />
+        <location filename="../src/Dlg/DlgSettingsAbstractBase.cpp" line="108" />
         <source>Cancel</source>
         <translation>إلغاء</translation>
     </message>
@@ -2443,57 +2456,57 @@ In total, there will be two points on the x axis as (x1) and (x2), and two point
         <translation>المحاور المدقق</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="63" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="65" />
         <source>Axes Checker Lifetime</source>
         <translation>المحاور فاصل العمر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="70" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="72" />
         <source>Do not show</source>
         <translation>لا تظهر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="71" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="73" />
         <source>Never show axes checker.</source>
         <translation>لم تظهر محاور الفؤوس.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="74" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="76" />
         <source>Show for a number of seconds</source>
         <translation>إظهار لعدد من الثواني</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="75" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="77" />
         <source>Show axes checker for a number of seconds after changing axes points.</source>
         <translation>إظهار محاور المحاور لعدد من الثواني بعد تغيير نقاط المحاور.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="85" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="87" />
         <source>Show always</source>
         <translation>إظهار دائما</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="86" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="88" />
         <source>Always show axes checker.</source>
         <translation>دائما إظهار محاور الفؤوس.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="95" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="97" />
         <source>Line color</source>
         <translation>لون الخط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="99" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="101" />
         <source>Select a color for the highlight lines drawn at each axis point</source>
         <translation>حدد لونًا لخطوط التحديد المرسومة عند كل نقطة محور</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="153" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="155" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="160" />
+        <location filename="../src/Dlg/DlgSettingsAxesChecker.cpp" line="162" />
         <source>Preview window that shows how current settings affect the displayed axes checker</source>
         <translation>نافذة معاينة توضح كيف تؤثر الإعدادات الحالية على فحص المحاور المعروض</translation>
     </message>
@@ -2506,22 +2519,22 @@ In total, there will be two points on the x axis as (x1) and (x2), and two point
         <translation>مرشح اللون</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="62" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="64" />
         <source>Curve Name</source>
         <translation>اسم المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="66" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="68" />
         <source>Name of the curve that is currently selected for editing</source>
         <translation>اسم المنحنى المحدد حاليًا للتحرير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="70" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="72" />
         <source>Filter mode</source>
         <translation>وضع الفلتر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="74" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="76" />
         <source>Filter the original image into black and white pixels using the Intensity parameter, to hide unimportant information and emphasize important information.
 
 The Intensity value of a pixel is computed from the red, green and blue components as I = squareroot (R * R + G * G + B * B)</source>
@@ -2530,7 +2543,7 @@ The Intensity value of a pixel is computed from the red, green and blue componen
 يتم حساب قيمة كثافة البكسل من المكونات الحمراء والخضراء والزرقاء مثل I = squareroot (R * R + G * G + B * B)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="82" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="84" />
         <source>Filter the original image into black and white pixels by isolating the foreground from the background, to hide unimportant information and emphasize important information.
 
 The background color is shown on the left side of the scale bar.
@@ -2543,17 +2556,17 @@ The distance of any color (R, G, B) from the background color (Rb, Gb, Bb) is co
 يتم حساب المسافة بين أي لون (R، G، B) من لون الخلفية (Rb، Gb، Bb) كـ F = squareroot ((R - Rb) * (R - Rb) + (G - Gb) * (G - Gb) + (B - Bb)). على الجانب الأيسر من المقياس ، تكون قيمة مسافة المقدمة صفر ، وتزداد خطيًا إلى الحد الأقصى في أقصى اليمين</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="92" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="94" />
         <source>Filter the original image into black and white pixels using the Hue component of the Hue, Saturation and Value (HSV) color components, to hide unimportant information and emphasize important information.</source>
         <translation>قم بتصفية الصورة الأصلية إلى وحدات بكسل بالأبيض والأسود باستخدام مكون الصبغة لمكونات ألوان الصبغة والتشبع والقيمة (HSV) ، لإخفاء المعلومات غير المهمة وتأكيد المعلومات الهامة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="99" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="101" />
         <source>Filter the original image into black and white pixels using the Saturation component of the Hue, Saturation and Value (HSV) color components, to hide unimportant information and emphasize important information.</source>
         <translation>قم بتصفية الصورة الأصلية إلى وحدات بكسل بالأبيض والأسود باستخدام مكون التشبع لمكونات ألوان الصبغة والتشبع والقيمة (HSV) ، لإخفاء المعلومات غير المهمة وتأكيد المعلومات الهامة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="106" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="108" />
         <source>Filter the original image into black and white pixels using the Value component of the Hue, Saturation and Value (HSV) color components, to hide unimportant information and emphasize important information.
 
 The Value component is also called the Lightness.</source>
@@ -2562,27 +2575,27 @@ The Value component is also called the Lightness.</source>
 يسمى مكون القيمة أيضًا "الخفة".</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="122" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="124" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="129" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="131" />
         <source>Preview window that shows how current settings affect the filtering of the original image.</source>
         <translation>نافذة المعاينة التي توضح كيف تؤثر الإعدادات الحالية على تصفية الصورة الأصلية.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="144" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="146" />
         <source>Filter Parameter Histogram Profile</source>
         <translation>تصفية المعلمة المدرج الرسم البياني</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="152" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="154" />
         <source>Histogram profile of the selected filter parameter. The two Dividers can be moved back and forth to adjust the range of filter parameter values that will be included in the filtered image. The clear portion will be included, and the shaded portion will be excluded.</source>
         <translation>ملف التوصيف الرسمى لمعامل التصفية المحدد. يمكن نقل الفواصل إلى الخلف والأمام لتعديل نطاق قيم معلمات الترشيح التي سيتم تضمينها في الصورة التي تمت تصفيتها. سيتم تضمين الجزء الواضح ، وسيتم استبعاد الجزء المظلل.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="159" />
+        <location filename="../src/Dlg/DlgSettingsColorFilter.cpp" line="161" />
         <source>This read-only box displays a graphical representation of the horizontal axis in the histogram profile above.</source>
         <translation>يعرض مربع القراءة فقط هذا تمثيلًا رسوميًا للمحور الأفقي في ملف التوصيف المدرج التكراري أعلاه.</translation>
     </message>
@@ -2590,19 +2603,19 @@ The Value component is also called the Lightness.</source>
 <context>
     <name>DlgSettingsCoords</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="75" />
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="907" />
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="911" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="76" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="915" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="919" />
         <source>Coordinates</source>
         <translation>إحداثيات</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="214" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="219" />
         <source>Date/Time</source>
         <translation>تاريخ / وقت</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="224" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="229" />
         <source>Date format to be used for date values, and date portion of mixed date/time values, during input and output.
 
 Setting the format to an empty value results in just the time portion appearing in output.</source>
@@ -2611,7 +2624,7 @@ Setting the format to an empty value results in just the time portion appearing 
 يؤدي تعيين التنسيق إلى قيمة فارغة إلى ظهور جزء الوقت فقط في الإخراج</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="231" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="236" />
         <source>Time format to be used for time values, and time portion of mixed date/time values, during input and output.
 
 Setting the format to an empty value results in just the date portion appearing in output.</source>
@@ -2620,28 +2633,28 @@ Setting the format to an empty value results in just the date portion appearing 
 يؤدي تعيين التنسيق إلى قيمة فارغة إلى ظهور جزء التاريخ في المخرجات فقط.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="243" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="248" />
         <source>Coordinates Types</source>
         <translation>ينسق أنواع</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="248" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="253" />
         <source>Polar</source>
         <translation>قطبي</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="248" />
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="910" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="253" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="918" />
         <source>R</source>
         <translation>R</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="250" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="255" />
         <source>Cartesian (X, Y)</source>
         <translation>الديكارتي (X، Y)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="251" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="256" />
         <source>Select cartesian coordinates.
 
 The X and Y coordinates will be used</source>
@@ -2650,7 +2663,7 @@ The X and Y coordinates will be used</source>
 سيتم استخدام الإحداثيات X و Y</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="257" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="262" />
         <source>Select polar coordinates.
 
 The Theta and R coordinates will be used.
@@ -2663,30 +2676,30 @@ Polar coordinates are not allowed with log scale for Theta</source>
 لا يسمح بالإحداثيات القطبية بمقياس سجل لـ Theta</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="276" />
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="311" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="281" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="316" />
         <source>Scale</source>
         <translation>مقياس</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="279" />
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="314" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="284" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="319" />
         <source>Linear</source>
         <translation>خطي</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="280" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="285" />
         <source>Specifies linear scale for the X or Theta coordinate</source>
         <translation>يحدد المقياس الخطي للإحداثيات X أو Theta</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="284" />
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="322" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="289" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="327" />
         <source>Log</source>
         <translation>وغاريتمي</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="285" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="290" />
         <source>Specifies logarithmic scale for the X or Theta coordinate.
 
 Log scale is not allowed if there are negative coordinates.
@@ -2699,23 +2712,23 @@ Log scale is not allowed for the Theta coordinate.</source>
 لا يسمح مقياس لوغاريتمي لإحداثيات ثيتا.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="291" />
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="336" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="296" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="341" />
         <source>Units</source>
         <translation>وحدات</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="315" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="320" />
         <source>Specifies linear scale for the Y or R coordinate</source>
         <translation>يحدد المقياس الخطي للإحداثيات Y أو R</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="319" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="324" />
         <source>Origin radius value</source>
         <translation>قيمة نصف قطر المنشأ</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="323" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="328" />
         <source>Specifies logarithmic scale for the Y or R coordinate
 
 Log scale is not allowed if there are negative coordinates.</source>
@@ -2724,7 +2737,7 @@ Log scale is not allowed if there are negative coordinates.</source>
 مقياس الدخول غير مسموح به إذا كانت هناك إحداثيات سالبة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="330" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="335" />
         <source>Specify radius value at origin.
 
 Normally the radius at the origin is 0, but a nonzero value may be applied in other cases (like when the radial units are decibels).</source>
@@ -2733,17 +2746,17 @@ Normally the radius at the origin is 0, but a nonzero value may be applied in ot
 عادة يكون نصف القطر في الأصل هو 0 ، ولكن يمكن تطبيق قيمة غير صفرية في حالات أخرى (مثل عندما تكون الوحدات الشعاعية ديسيبل).</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="353" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="358" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="360" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="365" />
         <source>Preview window that shows how current settings affect the coordinate system.</source>
         <translation>نافذة المعاينة التي توضح كيف تؤثر الإعدادات الحالية على نظام الإحداثيات.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="665" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="673" />
         <source>Numbers have the simplest and most general format.
 
 Date and time values have date and/or time components.
@@ -2756,7 +2769,7 @@ Degrees Minutes Seconds (DDD MM SS.S) format uses two integer number for degrees
 يستخدم تنسيق Degrees Minutes Seconds (DDD MM SS.S) رقمين صحيحين للدرجات والدقائق ، بالإضافة إلى رقم حقيقي للثواني. هناك 60 ثانية في الدقيقة. أثناء الإدخال ، يجب إدخال المسافات بين الأرقام الثلاثة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="698" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="706" />
         <source>Degrees (DDD.DDDDD) format uses a single real number. One complete revolution is 360 degrees.
 
 Degrees Minutes (DDD MM.MMM) format uses one integer number for degrees, and a real number for minutes. There are 60 minutes per degree. During input, a space must be inserted between the two numbers.
@@ -2781,105 +2794,101 @@ Turns format uses a single real number. One complete revolution is one turn.</so
 يستخدم تنسيق التقليب رقمًا واحدًا حقيقيًا. ثورة واحدة كاملة هي دورة واحدة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="905" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="913" />
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="909" />
+        <location filename="../src/Dlg/DlgSettingsCoords.cpp" line="917" />
         <source>Y</source>
         <translation>Y</translation>
     </message>
 </context>
 <context>
-    <name>DlgSettingsCurveAddRemove</name>
+    <name>DlgSettingsCurveList</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="32" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="32" />
         <source>Curve List</source>
         <translation>قائمة المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="69" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="69" />
         <source>Add...</source>
         <translation>إضافة ...</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="70" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="70" />
         <source>Adds a new curve to the curve list. The curve name can be edited in the curve name list.
 
 Every curve name must be unique</source>
-        <translation>يضيف منحنى جديد إلى قائمة المنحنى. يمكن تحرير اسم المنحنى في قائمة اسم المنحنى.</translation>
+        <translation>يضيف منحنى جديد إلى قائمة المنحنى. يمكن تحرير اسم المنحنى في قائمة اسم المنحنى.
+
+يجب أن يكون كل اسم منحنى فريدًا</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="76" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="76" />
         <source>Remove</source>
         <translation>إزالة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="77" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="77" />
         <source>Removes the currently selected curve from the curve list.
 
 There must always be at least one curve</source>
-        <translation>يزيل المنحنى المحدد حاليًا من قائمة المنحنى.
-
-يجب أن يكون هناك دائمًا منحنى واحد على الأقل</translation>
+        <translation>يزيل المنحنى المحدد حاليًا من قائمة المنحنى. يجب أن يكون هناك دائمًا منحنى واحد على الأقل</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="89" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="89" />
         <source>Curve Names</source>
         <translation>أسماء المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="94" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="94" />
         <source>List of the curves belonging to this document.
 
 Click on a curve name to edit it. Each curve name must be unique.
 
 Reorder curves by dragging them around.</source>
-        <translation>قائمة المنحنيات التي تنتمي إلى هذا المستند.
-
-انقر على اسم منحنى لتحريره. يجب أن يكون كل اسم منحنى فريدًا.
-
-إعادة ترتيب المنحنيات عن طريق سحبها حولها.</translation>
+        <translation>قائمة المنحنيات التي تنتمي إلى هذا المستند. انقر فوق اسم منحنى لتحريره. يجب أن يكون كل اسم منحنى فريدًا. منحنيات إعادة التوجيه عن طريق سحبها حولها.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="121" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="121" />
         <source>Save As Default</source>
         <translation>إحفظ كافتراضي</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="122" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="122" />
         <source>Save the curve names for use as defaults for future graph curves.</source>
         <translation>احفظ أسماء المنحنى لاستخدامها كإعدادات افتراضية لمنحنيات الرسم البياني المستقبلية.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="126" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="126" />
         <source>Reset Default</source>
         <translation>اعادة التشغيل الافتراضي</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="127" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="127" />
         <source>Reset the defaults for future graph curves to the original settings.</source>
-        <translation>إعادة تعيين الإعدادات الافتراضية لمنحنيات الرسم البياني المستقبلية إلى الإعدادات الأصلية</translation>
+        <translation>إعادة تعيين الإعدادات الافتراضية لمنحنيات الرسم البياني المستقبلية إلى الإعدادات الأصلية.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="506" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="507" />
         <source>Removing this curve will also remove</source>
         <translation>ستزيل إزالة هذا المنحنى أيضًا</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="508" />
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="513" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="509" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="514" />
         <source>points. Continue?</source>
         <translation>نقاط. استمر؟</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="511" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="512" />
         <source>Removing these curves will also remove</source>
         <translation>إزالة هذه المنحنيات سيزيل أيضا</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveAddRemove.cpp" line="517" />
+        <location filename="../src/Dlg/DlgSettingsCurveList.cpp" line="518" />
         <source>Curves With Points</source>
         <translation>منحنيات بالنقاط</translation>
     </message>
@@ -2887,32 +2896,32 @@ Reorder curves by dragging them around.</source>
 <context>
     <name>DlgSettingsCurveProperties</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="61" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="62" />
         <source>Curve Properties</source>
         <translation>خصائص المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="88" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="89" />
         <source>Curve Name</source>
         <translation>اسم المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="92" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="93" />
         <source>Name of the curve that is currently selected for editing</source>
         <translation>اسم المنحنى المحدد حاليًا للتحرير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="102" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="103" />
         <source>Line</source>
         <translation>خط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="108" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="109" />
         <source>Width</source>
         <translation>عرض</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="112" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="113" />
         <source>Select a width for the lines drawn between points.
 
 This applies only to graph curves. No lines are ever drawn between axis points.</source>
@@ -2921,13 +2930,13 @@ This applies only to graph curves. No lines are ever drawn between axis points.<
 هذا ينطبق فقط على منحنيات الرسم البياني. لا يتم رسم أي خطوط بين نقاط المحور.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="118" />
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="203" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="119" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="209" />
         <source>Color</source>
         <translation>اللون</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="122" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="123" />
         <source>Select a color for the lines drawn between points.
 
 This applies only to graph curves. No lines are ever drawn between axis points.</source>
@@ -2936,12 +2945,12 @@ This applies only to graph curves. No lines are ever drawn between axis points.<
 هذا ينطبق فقط على منحنيات الرسم البياني. لا يتم رسم أي خطوط بين نقاط المحور.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="128" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="129" />
         <source>Connect as</source>
         <translation>الاتصال ك</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="136" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="137" />
         <source>Select rule for connecting points with lines.
 
 If the curve is connected as a single-valued function then the points are ordered by increasing value of the independent variable.
@@ -2950,53 +2959,43 @@ If the curve is connected as a closed contour, then the points are ordered by ag
 
 Lines are drawn between successively ordered points.
 
-Straight curves are drawn with straight lines between successive points. Smooth curves are drawn with smooth lines between successive points.
+Straight curves are drawn with straight lines between successive points. Smooth curves are drawn with smooth lines between successive points, using natural cubic splines of (x,y) pairs versus scalar ordinal (t) values.
 
 This applies only to graph curves. No lines are ever drawn between axis points.</source>
-        <translation>حدد القاعدة لتوصيل النقاط مع الخطوط.
-
-إذا كان المنحنى متصلاً كدالة ذات قيمة واحدة ، يتم ترتيب النقاط بزيادة قيمة المتغير المستقل.
-
-إذا كان المنحنى متصلاً ككفاف مغلق ، يتم ترتيب النقاط حسب العمر ، باستثناء النقاط الموضوعة على طول خط موجود. يتم إدراج أي نقطة وضعت فوق أي خط موجود بين نقطتي النهاية لهذا الخط - كما لو كان عمره بين أعمار نقطتي النهاية.
-
-يتم رسم الخطوط بين النقاط المطلوبة على التوالي.
-
-يتم رسم المنحنيات المستقيمة بخطوط مستقيمة بين النقاط المتتالية. يتم رسم المنحنيات السلسة مع خطوط ناعمة بين النقاط المتتالية.
-
-هذا ينطبق فقط على منحنيات الرسم البياني. لا يتم رسم أي خطوط بين نقاط المحور.</translation>
+        <translation>حدد القاعدة لتوصيل النقاط باستخدام خطوط. إذا كان المنحنى متصلاً كدالة ذات قيمة واحدة ، يتم ترتيب النقاط بزيادة قيمة المتغير المستقل.إذا تم توصيل المنحنى ككفاف مغلق ، فإن النقاط تكون مرتبة حسب العمر ، باستثناء النقاط الموضوعة على طول الخط الحالي. يتم إدراج أي نقطة موضوعة فوق أي خط موجود بين نقطتي النهاية في ذلك الخط - كما لو كان عمرها بين أعمار نقطتي النهاية. يتم رسم الخطوط بين النقاط المطلوبة تباعًا. يتم رسم منحنيات السحاب بشكل مستقيم خطوط بين النقاط المتتالية. يتم رسم المنحنيات الناعمة بخطوط ناعمة بين النقاط المتتالية ، باستخدام شريحة مكعب طبيعية لأزواج (x، y) مقابل قيم ترتيبية (t) قياسية. وينطبق هذا فقط على منحنيات الرسم البياني. لا يتم رسم أي خطوط بين نقاط المحور.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="156" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="158" />
         <source>Point</source>
         <translation>نقطة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="162" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="164" />
         <source>Shape</source>
         <translation>شكل</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="166" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="168" />
         <source>Select a shape for the points</source>
         <translation>حدد شكلًا للنقاط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="182" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="188" />
         <source>Radius</source>
         <translation>نصف القطر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="186" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="192" />
         <source>Select a radius, in pixels, for the points</source>
         <translation>حدد نصف قطر بالبكسل للنقاط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="191" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="197" />
         <source>Line width</source>
         <translation>عرض الخط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="195" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="201" />
         <source>Select a line width, in pixels, for the points.
 
 A larger width results in a thicker line, with the exception of a value of zero which always results in a line that is one pixel wide (which is easy to see even when zoomed far out)</source>
@@ -3005,12 +3004,12 @@ A larger width results in a thicker line, with the exception of a value of zero 
 ينتج عن العرض الأكبر خطًا أكثر سمكًا ، باستثناء قيمة صفر والتي تؤدي دائمًا إلى خط يبلغ عرضه بكسل واحد (وهو أمر يسهل رؤيته حتى عند التكبير بعيدًا)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="207" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="213" />
         <source>Select a color for the line used to draw the point shapes</source>
         <translation>حدد لونًا للخط المستخدم لرسم أشكال النقاط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="218" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="224" />
         <source>Save the visible curve settings for use as future defaults, according to the curve name selection.
 
 If the visible settings are for the axes curve, then they will be used for future axes curves, until new settings are saved as the defaults.
@@ -3023,12 +3022,12 @@ If the visible settings are for the Nth graph curve in the curve list, then they
 إذا كانت الإعدادات المرئية منحنى الرسم البياني Nth في قائمة المنحنى ، فسيتم استخدامها لمنحنيات الرسم البياني المستقبلية التي تمثل أيضًا منحنى الرسم البياني Nth في قائمة المنحنى الخاصة بهم ، حتى يتم حفظ الإعدادات الجديدة كإعدادات افتراضية.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="232" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="238" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="239" />
+        <location filename="../src/Dlg/DlgSettingsCurveProperties.cpp" line="245" />
         <source>Preview window that shows how current settings affect the points and line of the selected curve.
 
 The X coordinate is in the horizontal direction, and the Y coordinate is in the vertical direction. A function can have only one Y value, at most, for any X value, but a relation can have multiple Y values for one X value.</source>
@@ -3129,17 +3128,17 @@ Drag the cursor over this area to see the effects of the current settings on the
         <translation>تنسيق التصدير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="79" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="84" />
         <source>Included</source>
         <translation>شمل</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="82" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="87" />
         <source>Not included</source>
         <translation>غير مشمول</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="87" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="92" />
         <source>List of curves to be included in the exported file.
 
 The order of the curves here does not affect the order in the exported file. That order is determined by the Curves settings.</source>
@@ -3148,135 +3147,147 @@ The order of the curves here does not affect the order in the exported file. Tha
 لا يؤثر ترتيب المنحنيات هنا على ترتيب الملف الذي تم تصديره. يتم تحديد هذا الترتيب بواسطة إعدادات المنحنيات.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="96" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="101" />
         <source>List of curves to be excluded from the exported file</source>
         <translation>قائمة المنحنيات التي سيتم استبعادها من الملف المصدر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="101" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="106" />
         <source>Include</source>
         <translation>تتضمن</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="103" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="108" />
         <source>Move the currently selected curve(s) from the excluded list</source>
         <translation>حرك المنحنى (المنحنيات) المحددة حاليًا من القائمة المستبعدة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="107" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="112" />
         <source>Exclude</source>
         <translation>استبعد</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="109" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="114" />
         <source>Move the currently selected curve(s) from the included list</source>
         <translation>حرك المنحنى (المنحنيات) المحددة حاليًا من lis المضمن</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="120" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="125" />
         <source>Delimiters</source>
         <translation>محدد</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="127" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="132" />
         <source>Exported file will have commas between adjacent values, unless overridden by tabs in TSV files.</source>
         <translation>سيحتوي الملف الذي تم تصديره على فواصل بين القيم المجاورة ، إلا إذا تم تجاوزها بواسطة علامات التبويب في ملفات TSV.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="132" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="137" />
         <source>Exported file will have spaces between adjacent values, unless overridden by commas in CSV files, or tabs in TSV files.</source>
         <translation>سيكون للملف الذي تم تصديره فراغات بين القيم المجاورة ، إلا إذا تم تجاوزه بفواصل في ملفات CSV ، أو علامات تبويب في ملفات TSV.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="138" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="143" />
         <source>Exported file will have tabs between adjacent values, unless overridden by commas in CSV files.</source>
         <translation>سيحتوي الملف الذي تم تصديره على علامات تبويب بين القيم المجاورة ، إلا إذا تم تجاوزه بفواصل في ملفات CSV.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="143" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="148" />
         <source>Exported file will have semicolons between adjacent values, unless overridden by commas in CSV files.</source>
         <translation>سيحتوي الملف الذي تم تصديره على فواصل منقوطة بين القيم المجاورة ، إلا إذا تم تجاوزها بفواصل في ملفات CSV.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="147" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="152" />
         <source>Override in CSV/TSV files</source>
         <translation>تجاوز في ملفات CSV / TSV
 
 </translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="148" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="153" />
         <source>Comma-separated value (CSV) files and tab-separated value (TSV) files will use commas and tabs respectively, unless this setting is selected. Selecting this setting will apply the delimiter setting to every file.</source>
         <translation>ستستخدم ملفات القيمة المفصولة بفواصل (CSV) وملفات قيم مفصولة (TSV) علامات الفاصلة وعلامات التبويب على التوالي ، ما لم يتم تحديد هذا الإعداد. سيؤدي تحديد هذا الإعداد إلى تطبيق الإعداد المحدد على كل ملف.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="159" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="164" />
         <source>Layout</source>
         <translation>نسق</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="165" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="170" />
         <source>All curves on each line</source>
         <translation>جميع المنحنيات على كل سطر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="166" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="171" />
         <source>Exported file will have, on each line, an X value, the Y value for the first curve, the Y value for the second curve,...</source>
         <translation>سيكون للملف الذي تم تصديره ، على كل سطر ، قيمة X ، وقيمة Y للمنحنى الأول ، وقيمة Y للمنحنى الثاني ، ...</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="171" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="176" />
         <source>One curve on each line</source>
         <translation>منحنى واحد على كل سطر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="172" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="177" />
         <source>Exported file will have all the points for the first curve, with one X-Y pair on each line, then the points for the second curve,...</source>
         <translation>سيكون للملف الذي تم تصديره كل النقاط للمنحنى الأول ، مع زوج X-Y واحد على كل سطر ، ثم نقاط المنحنى الثاني ، ...</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="182" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="187" />
         <source>Function Points Selection</source>
         <translation>اختيار النقاط الوظيفية</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="196" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="201" />
         <source>Interpolate Ys at Xs from all curves</source>
         <translation>استيفاء YS في XS من جميع المنحنيات</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="197" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="202" />
         <source>Exported file will have values at every unique X value from every curve. Y values will be linearly interpolated if necessary</source>
         <translation>سيحتوي الملف الذي تم تصديره على قيم عند كل قيمة X فريدة من كل منحنى. سيتم تحديد قيم Y بشكل خطي إذا لزم الأمر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="202" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="208" />
+        <source>Extrapolate outside endpoints</source>
+        <translation>استقراء خارج نقاط النهاية</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="209" />
+        <source>Enable or disable extrapolation outside of endpoints of each curve. If disabled, only points between the endpoints of each curve are exported</source>
+        <translation>تمكين أو تعطيل الاستقراء خارج نقاط النهاية لكل منحنى. في حالة التعطيل ، يتم تصدير النقاط بين نقاط النهاية لكل منحنى فقط
+
+</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="214" />
         <source>Interpolate Ys at Xs from first curve</source>
         <translation>استيفاء YS في XS من المنحنى الأول</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="203" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="215" />
         <source>Exported file will have values at every unique X value from the first curve. Y values will be linearly interpolated if necessary</source>
         <translation>سيحتوي الملف الذي تم تصديره على قيم عند كل قيمة X فريدة من أول منحنى. سيتم تحديد قيم Y بشكل خطي إذا لزم الأمر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="208" />
-        <source>Interpolate Ys at evenly spaced X values.</source>
-        <translation>استيفاء Ys في قيم X متباعدة بالتساوي.</translation>
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="220" />
+        <source>Interpolate Ys at evenly spaced X values that are automatically selected</source>
+        <translation>أقحم Ys عند قيم X متباعدة بالتساوي والتي يتم تحديدها تلقائيًا</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="209" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="221" />
         <source>Exported file will have values at evenly spaced X values, separated by the interval selected below.</source>
         <translation>سيكون للملف الذي تم تصديره قيم عند قيم X متساوية التباعد ، مفصولة بفاصل زمني محدد أدناه.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="213" />
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="350" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="225" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="372" />
         <source>Interval</source>
         <translation>فترة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="221" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="233" />
         <source>Interval, in the units of X, between successive points in the X direction.
 
 If the scale is linear, then this interval is added to successive X values. If the scale is logarithmic, then this interval is multiplied to successive X values.
@@ -3289,7 +3300,7 @@ The X values will be automatically aligned along simple numbers. If the first an
 ستتم محاذاة قيم X تلقائيًا بأرقام بسيطة. إذا لم تكن النقاط الأولى و / أو الأخيرة على طول قيم X المتوافقة ، فستتم إضافة نقطة أو نقطتين إضافيتين عند الضرورة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="231" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="243" />
         <source>Units for spacing interval.
 
 Pixel units are preferred when the spacing is to be independent of the X scale. The spacing will be consistent across the graph, even if the X scale is logarithmic.
@@ -3302,56 +3313,76 @@ Graph units are preferred when the spacing is to depend on the X scale.</source>
 يتم تفضيل وحدات الرسم البياني عندما تعتمد المسافات على مقياس X.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="243" />
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="376" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="255" />
+        <source>Interpolate Ys at evenly spaced X values on grid lines</source>
+        <translation>أقحم Ys عند قيم X متباعدة بالتساوي على خطوط الشبكة</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="256" />
+        <source>Exported file will have values at evenly spaced X values at the vertical grid lines.</source>
+        <translation>سيكون للملف المصدر قيم عند قيم X متباعدة بشكل متساوٍ في خطوط الشبكة الرأسية.</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="260" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="398" />
         <source>Raw Xs and Ys</source>
         <translation>Xs الخام و Ys</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="244" />
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="377" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="261" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="399" />
         <source>Exported file will have only original X and Y values</source>
         <translation>ستحتوي Xs الخام والملفات المصدرة على قيم X و Y الأصلية فقط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="255" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="272" />
         <source>Header</source>
         <translation>رأس</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="265" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="282" />
         <source>Exported file will have no header line</source>
         <translation>لن يكون للملف الذي تم تصديره سطر رأس</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="270" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="287" />
         <source>Exported file will have simple header line</source>
         <translation>سيكون للملف الذي تم تصديره سطر رأس بسيط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="275" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="292" />
         <source>Exported file will have gnuplot header line</source>
         <translation>سيكون للملف الذي تم تصديره سطر رأس gnuplot
 
 </translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="287" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="304" />
         <source>Save As Default</source>
         <translation>إحفظ كافتراضي</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="288" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="305" />
         <source>Save the settings for use as future defaults.</source>
         <translation>احفظ الإعدادات لاستخدامها كإعدادات افتراضية في المستقبل.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="297" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="309" />
+        <source>Load Default</source>
+        <translation>حمل الإفتراضي</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="310" />
+        <source>Load the default settings.</source>
+        <translation>قم بتحميل الإعدادات الافتراضية.</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="319" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="313" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="335" />
         <source>Preview window shows how current settings affect the exported file.
 
 Functions (shown here in blue) are output first, followed by relations (shown here in green) if any exist.</source>
@@ -3360,27 +3391,27 @@ Functions (shown here in blue) are output first, followed by relations (shown he
 الوظائف (تظهر هنا باللون الأزرق) هي الإخراج أولاً ، متبوعة بالعلاقات (كما هو موضح هنا باللون الأخضر) إن وجدت.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="329" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="351" />
         <source>Relation Points Selection</source>
         <translation>اختيار نقاط العلاقة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="343" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="365" />
         <source>Interpolate Xs and Ys at evenly spaced intervals.</source>
         <translation>الاستيفاء من XS و YS على فترات متباعدة بشكل متساو.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="344" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="366" />
         <source>Exported file will have points evenly spaced along each relation, separated by the interval selected below. If the last interval does not end at the last point, then a shorter last interval is added that ends on the last point.</source>
         <translation>سيكون للملف الذي تم تصديره نقاط متباعدة بالتساوي على طول كل علاقة ، مفصولة بفاصل زمني محدد أدناه. إذا لم ينتهي الفاصل الأخير في النقطة الأخيرة ، فسيتم إضافة فاصل أخير قصير ينتهي في النقطة الأخيرة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="358" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="380" />
         <source>Interval between successive points when exporting at evenly spaced (X,Y) coordinates.</source>
         <translation>الفاصل الزمني بين النقاط المتعاقبة عند التصدير عند إحداثيات متساوية (X، Y).</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="364" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="386" />
         <source>Units for spacing interval.
 
 Pixel units are preferred when the spacing is to be independent of the X and Y scales. The spacing will be consistent across the graph, even if a scale is logarithmic or the X and Y scales are different.
@@ -3393,12 +3424,12 @@ Graph units are usually preferred when the X and Y scales are identical.</source
 عادةً ما يتم تفضيل وحدات الرسم البياني عندما تكون مقاييس X و Y متطابقة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="420" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="442" />
         <source>Functions</source>
         <translation>المهام</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="422" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="444" />
         <source>Functions Tab
 
 Controls for specifying the format of functions during export</source>
@@ -3407,12 +3438,12 @@ Controls for specifying the format of functions during export</source>
 ضوابط لتحديد تنسيق الوظائف أثناء التصدير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="428" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="450" />
         <source>Relations</source>
         <translation>علاقات</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="430" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="452" />
         <source>Relations Tab
 
 Controls for specifying the format of relations during export</source>
@@ -3421,27 +3452,17 @@ Controls for specifying the format of relations during export</source>
 ضوابط لتحديد شكل العلاقات أثناء التصدير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="451" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="471" />
         <source>X Label</source>
         <translation>علامة X</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="453" />
-        <source>Theta Label</source>
-        <translation>ثيتا ليبل</translation>
-    </message>
-    <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="459" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="475" />
         <source>Label in the header for x values</source>
         <translation>تسمية في رأس للقيم س</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="461" />
-        <source>Label in the header for theta values</source>
-        <translation>التسمية في رأس لقيم ثيتا</translation>
-    </message>
-    <message>
-        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="1113" />
+        <location filename="../src/Dlg/DlgSettingsExportFormat.cpp" line="1214" />
         <source>Preview is unavailable until axis points are defined.</source>
         <translation>المعاينة غير متوفرة حتى يتم تعريف نقاط المحور.</translation>
     </message>
@@ -3469,7 +3490,7 @@ This parameter is used in the Color Picker and Point Match modes</source>
 
 هذا هو العرض والارتفاع الفعالان للمؤشر عند النقر فوق بكسل ليس جزءًا من الخلفية.
 
-يتم استخدام هذه المعلمة في أوضاع Color Picker و Point Match</translation>
+يتم استخدام هذه المعلمة في أوضاع منتقي الألوان و مطابقة النقطة</translation>
     </message>
     <message>
         <location filename="../src/Dlg/DlgSettingsGeneral.cpp" line="59" />
@@ -3508,23 +3529,23 @@ This parameter is used on the coordinates in the Status Bar and during Export</s
         <translation>عرض الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="65" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="82" />
         <source>Color</source>
         <translation>اللون</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="69" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="86" />
         <source>Select a color for the lines</source>
         <translation>اختر لونًا للخطوط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="91" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="167" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="108" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="184" />
         <source>Disable</source>
         <translation>تعطيل</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="95" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="112" />
         <source>Disabled value.
 
 The X grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -3533,13 +3554,13 @@ The X grid lines are specified using only three values at a time. For flexibilit
 يتم تحديد خطوط الشبكة X باستخدام ثلاث قيم فقط في كل مرة. للحصول على المرونة ، يتم تقديم أربع قيم لذلك يجب عليك اختيار القيمة التي تم تعطيلها. وبمجرد تعطيل هذه القيمة ، يتم تحديثها بمجرد تغيير القيم الأخرى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="110" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="186" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="127" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="203" />
         <source>Count</source>
         <translation>عد</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="114" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="131" />
         <source>Number of X grid lines.
 
 The number of X grid lines must be entered as an integer greater than zero</source>
@@ -3550,13 +3571,13 @@ The number of X grid lines must be entered as an integer greater than zero</sour
 </translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="123" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="199" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="140" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="216" />
         <source>Start</source>
         <translation>بداية</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="127" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="144" />
         <source>Value of the first X grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -3565,13 +3586,13 @@ The start value cannot be greater than the stop value</source>
 لا يمكن أن تكون قيمة البدء أكبر من قيمة الإيقاف</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="134" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="210" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="151" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="227" />
         <source>Step</source>
         <translation>خطوة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="138" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="155" />
         <source>Difference in value between two successive X grid lines.
 
 The step value must be greater than zero</source>
@@ -3580,13 +3601,13 @@ The step value must be greater than zero</source>
 يجب أن تكون قيمة الخطوة أكبر من الصفر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="145" />
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="221" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="162" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="238" />
         <source>Stop</source>
         <translation>توقف</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="149" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="166" />
         <source>Value of the last X grid line.
 
 The stop value cannot be less than the start value</source>
@@ -3595,7 +3616,7 @@ The stop value cannot be less than the start value</source>
 لا يمكن أن تكون قيمة الإيقاف أقل من قيمة البدء</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="171" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="188" />
         <source>Disabled value.
 
 The Y grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -3604,7 +3625,7 @@ The Y grid lines are specified using only three values at a time. For flexibilit
 يتم تحديد خطوط الشبكة Y باستخدام ثلاث قيم فقط في كل مرة. للحصول على المرونة ، يتم تقديم أربع قيم لذلك يجب عليك اختيار القيمة التي تم تعطيلها. وبمجرد تعطيل هذه القيمة ، يتم تحديثها بمجرد تغيير القيم الأخرى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="190" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="207" />
         <source>Number of Y grid lines.
 
 The number of Y grid lines must be entered as an integer greater than zero</source>
@@ -3613,7 +3634,7 @@ The number of Y grid lines must be entered as an integer greater than zero</sour
 يجب إدخال عدد خطوط الشبكة ص كعدد صحيح أكبر من الصفر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="203" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="220" />
         <source>Value of the first Y grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -3622,7 +3643,7 @@ The start value cannot be greater than the stop value</source>
 لا يمكن أن تكون قيمة البدء أكبر من قيمة الإيقاف</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="214" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="231" />
         <source>Difference in value between two successive Y grid lines.
 
 The step value must be greater than zero</source>
@@ -3631,7 +3652,7 @@ The step value must be greater than zero</source>
 يجب أن تكون قيمة الخطوة أكبر من الصفر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="225" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="242" />
         <source>Value of the last Y grid line.
 
 The stop value cannot be less than the start value</source>
@@ -3640,37 +3661,37 @@ The stop value cannot be less than the start value</source>
 لا يمكن أن تكون قيمة الإيقاف أقل من قيمة البدء</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="241" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="258" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="248" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="265" />
         <source>Preview window that shows how current settings affect grid display</source>
         <translation>نافذة المعاينة التي توضح كيف تؤثر الإعدادات الحالية على عرض الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="305" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="322" />
         <source>X Grid Lines</source>
         <translation>X خطوط الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="307" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="324" />
         <source>Grid Lines</source>
         <translation>خطوط الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="311" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="328" />
         <source>Y Grid Lines</source>
         <translation>خطوط الشبكة Y</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="313" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="330" />
         <source>Radius Grid Lines</source>
         <translation>خطوط الشبكة الشعاع</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="571" />
+        <location filename="../src/Dlg/DlgSettingsGridDisplay.cpp" line="588" />
         <source>Grid line count exceeds limit set by Settings / Main Window.</source>
         <translation>عدد خطوط الشبكة يتجاوز الحد المحدد بواسطة الإعدادات / النافذة الرئيسية.</translation>
     </message>
@@ -3683,22 +3704,22 @@ The stop value cannot be less than the start value</source>
         <translation>إزالة الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="63" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="82" />
         <source>Preview</source>
         <translation>معاينة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="70" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="89" />
         <source>Preview window that shows how current settings affect grid removal</source>
         <translation>نافذة المعاينة التي توضح كيف تؤثر الإعدادات الحالية على إزالة الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="81" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="100" />
         <source>Remove pixels close to defined grid lines</source>
         <translation>قم بإزالة وحدات البكسل بالقرب من خطوط الشبكة المحددة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="82" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="101" />
         <source>Check this box to have pixels close to regularly spaced gridlines removed.
 
 This option is only available when the axis points have all been defined.</source>
@@ -3707,12 +3728,12 @@ This option is only available when the axis points have all been defined.</sourc
 يكون هذا الخيار متاحًا فقط عند تحديد نقاط المحور كلها.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="87" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="106" />
         <source>Close distance (pixels)</source>
         <translation>إغلاق المسافة (بكسل)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="91" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="110" />
         <source>Set closeness distance in pixels.
 
 Pixels that are closer to the regularly spaced gridlines, than this distance, will be removed.
@@ -3725,23 +3746,23 @@ This value cannot be negative. A zero value disables this feature. Decimal value
 لا يمكن أن تكون هذه القيمة سالبة. تقوم قيمة الصفر بتعطيل هذه الميزة. القيم العشرية مسموح بها</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="108" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="127" />
         <source>X Grid Lines</source>
         <translation>X خطوط الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="110" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="129" />
         <source>Grid Lines</source>
         <translation>خطوط الشبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="118" />
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="196" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="137" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="215" />
         <source>Disable</source>
         <translation>تعطيل</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="122" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="141" />
         <source>Disabled value.
 
 The X grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -3750,13 +3771,13 @@ The X grid lines are specified using only three values at a time. For flexibilit
 يتم تحديد خطوط الشبكة X باستخدام ثلاث قيم فقط في كل مرة. للحصول على المرونة ، يتم تقديم أربع قيم لذلك يجب عليك اختيار القيمة التي تم تعطيلها. وبمجرد تعطيل هذه القيمة ، يتم تحديثها بمجرد تغيير القيم الأخرى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="137" />
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="215" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="156" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="234" />
         <source>Count</source>
         <translation>عد</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="141" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="160" />
         <source>Number of X grid lines.
 
 The number of X grid lines must be entered as an integer greater than zero</source>
@@ -3767,13 +3788,13 @@ The number of X grid lines must be entered as an integer greater than zero</sour
 </translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="148" />
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="226" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="167" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="245" />
         <source>Start</source>
         <translation>بداية</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="152" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="171" />
         <source>Value of the first X grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -3782,13 +3803,13 @@ The start value cannot be greater than the stop value</source>
 لا يمكن أن تكون قيمة البدء أكبر من قيمة الإيقاف</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="159" />
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="237" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="178" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="256" />
         <source>Step</source>
         <translation>خطوة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="163" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="182" />
         <source>Difference in value between two successive X grid lines.
 
 The step value must be greater than zero</source>
@@ -3797,13 +3818,13 @@ The step value must be greater than zero</source>
 يجب أن تكون قيمة الخطوة أكبر من الصفر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="170" />
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="248" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="189" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="267" />
         <source>Stop</source>
         <translation>توقف</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="174" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="193" />
         <source>Value of the last X grid line.
 
 The stop value cannot be less than the start value</source>
@@ -3812,17 +3833,17 @@ The stop value cannot be less than the start value</source>
 لا يمكن أن تكون قيمة الإيقاف أقل من قيمة البدء</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="186" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="205" />
         <source>Y Grid Lines</source>
         <translation>خطوط الشبكة Y</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="188" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="207" />
         <source>R Grid Lines</source>
         <translation>خطوط الشبكة R</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="200" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="219" />
         <source>Disabled value.
 
 The Y grid lines are specified using only three values at a time. For flexibility, four values are offered so you must chose which value is disabled. Once disabled, that value is simply updated as the other values change</source>
@@ -3831,7 +3852,7 @@ The Y grid lines are specified using only three values at a time. For flexibilit
 يتم تحديد خطوط الشبكة Y باستخدام ثلاث قيم فقط في كل مرة. للحصول على المرونة ، يتم تقديم أربع قيم لذلك يجب عليك اختيار القيمة التي تم تعطيلها. وبمجرد تعطيل هذه القيمة ، يتم تحديثها بمجرد تغيير القيم الأخرى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="219" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="238" />
         <source>Number of Y grid lines.
 
 The number of Y grid lines must be entered as an integer greater than zero</source>
@@ -3840,7 +3861,7 @@ The number of Y grid lines must be entered as an integer greater than zero</sour
 يجب إدخال عدد خطوط الشبكة ص كعدد صحيح أكبر من الصفر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="230" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="249" />
         <source>Value of the first Y grid line.
 
 The start value cannot be greater than the stop value</source>
@@ -3849,7 +3870,7 @@ The start value cannot be greater than the stop value</source>
 لا يمكن أن تكون قيمة البدء أكبر من قيمة الإيقاف</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="241" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="260" />
         <source>Difference in value between two successive Y grid lines.
 
 The step value must be greater than zero</source>
@@ -3858,7 +3879,7 @@ The step value must be greater than zero</source>
 يجب أن تكون قيمة الخطوة أكبر من الصفر</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="252" />
+        <location filename="../src/Dlg/DlgSettingsGridRemoval.cpp" line="271" />
         <source>Value of the last Y grid line.
 
 The stop value cannot be less than the start value</source>
@@ -3870,17 +3891,17 @@ The stop value cannot be less than the start value</source>
 <context>
     <name>DlgSettingsMainWindow</name>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="40" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="43" />
         <source>Main Window</source>
         <translation>النافذة الرئيسية</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="65" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="68" />
         <source>Initial zoom</source>
         <translation>التكبير الأولي</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="80" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="83" />
         <source>Initial Zoom
 
 Select the initial zoom factor when a new document is loaded. Either the previous zoom can be kept, or the specified zoom can be applied.</source>
@@ -3889,32 +3910,32 @@ Select the initial zoom factor when a new document is loaded. Either the previou
 حدد عامل التكبير / التصغير الأولي عند تحميل مستند جديد. يمكن الاحتفاظ بالتكبير السابق أو يمكن تطبيق التكبير المحدد.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="86" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="89" />
         <source>Zoom control</source>
         <translation>التحكم في التكبير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="90" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="93" />
         <source>Menu only</source>
         <translation>القائمة فقط</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="91" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="94" />
         <source>Menu and mouse wheel</source>
         <translation>القائمة وعجلة الماوس</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="92" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="95" />
         <source>Menu and +/- keys</source>
         <translation>القائمة و +/- المفتاح</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="93" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="96" />
         <source>Menu, mouse wheel and +/- keys</source>
         <translation>القائمة ، عجلة الماوس و +/- keyMenu و +/- المفتاح</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="94" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="97" />
         <source>Zoom Control
 
 Select which inputs are used to zoom in and out.</source>
@@ -3923,12 +3944,16 @@ Select which inputs are used to zoom in and out.</source>
 حدد المدخلات التي يتم استخدامها للتكبير والتصغير.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="99" />
         <source>Locale</source>
-        <translation>مكان</translation>
+        <translation type="vanished">مكان</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="104" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="102" />
+        <source>Locale (requires restart)</source>
+        <translation>الإعدادات المحلية (يتطلب إعادة التشغيل)</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="107" />
         <source>Locale
 
 Select the locale that will be used in numbers (immediately), and the language in the user interface (after restart).
@@ -3941,12 +3966,12 @@ The locale determines how numbers are formatted. Specifically, either commas or 
 تحدد الإعدادات المحلية كيفية تنسيق الأرقام. على وجه التحديد ، سيتم استخدام الفواصل أو الفترات كمحددات مجموعة في كل رقم يتم إدخاله بواسطة المستخدم ، يتم عرضه في واجهة المستخدم ، أو تصديره إلى ملف.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="124" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="127" />
         <source>Import cropping</source>
         <translation>استيراد المحاصيل</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="128" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="131" />
         <source>Import Cropping
 
 Enables or disables cropping of the imported image when importing. Cropping the image is useful for removing unimportant information around a graph, but less useful when the graph already fills the entire image.
@@ -3959,12 +3984,12 @@ This setting only has an effect when Engauge has been built with support for pdf
 هذا الإعداد له تأثير فقط عندما تم تصميم Engauge بدعم ملفات pdf.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="141" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="144" />
         <source>Import PDF resolution (dots per inch)</source>
         <translation>استيراد دقة PDF (النقاط لكل بوصة)</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="145" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="148" />
         <source>Import PDF Resolution
 
 Imported Portable Document Format (PDF) files will be converted to this pixel resolution in dots per inch (DPI), where each pixel is one dot. A higher value increases the picture resolution and may also improve numeric digitizing accuracy. However, a very high value can make the image so large that Engauge will slow down.</source>
@@ -3973,12 +3998,12 @@ Imported Portable Document Format (PDF) files will be converted to this pixel re
 سيتم تحويل ملفات تنسيق المستندات المحمولة (PDF) المستوردة إلى دقة البكسل هذه بالنقاط لكل بوصة (DPI) ، حيث تكون كل بكسل نقطة واحدة. تزيد القيمة الأعلى من دقة الصورة وقد تعمل أيضًا على تحسين دقة الرقمنة الرقمية. ومع ذلك ، فإن القيمة العالية جدًا يمكن أن تجعل الصورة كبيرة جدًا بحيث تبطئ Engauge.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="160" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="163" />
         <source>Maximum grid lines</source>
         <translation>خطوط الشبكة القصوى</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="165" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="168" />
         <source>Maximum Grid Lines
 
 Maximum number of grid lines to be processed. This limit is applied when the step value is too small for the start and stop values, which would result in too many grid lines visually and possibly extremely long processing time (since each grid line would have to be processed)</source>
@@ -3987,12 +4012,12 @@ Maximum number of grid lines to be processed. This limit is applied when the ste
 الحد الأقصى لعدد خطوط الشبكة المراد معالجتها. يتم تطبيق هذا الحد عندما تكون قيمة الخطوة صغيرة جدًا بالنسبة لقيم البدء والتوقف ، مما يؤدي إلى وجود عدد كبير جدًا من خطوط الشبكة بشكل مرئي وربما طويل جدًا (نظرًا لأنه يجب معالجة كل خط شبكة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="172" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="175" />
         <source>Highlight opacity</source>
         <translation>تسليط الضوء على التعتيم</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="178" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="181" />
         <source>Highlight Opacity
 
 Opacity to be applied when the cursor is over a curve or axis point in Select mode. The change in appearance shows when the point can be selected.</source>
@@ -4003,17 +4028,17 @@ Opacity to be applied when the cursor is over a curve or axis point in Select mo
 </translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="184" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="187" />
         <source>Recent file list</source>
         <translation>قائمة الملفات الأخيرة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="187" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="190" />
         <source>Clear</source>
         <translation>واضح</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="189" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="192" />
         <source>Recent File List Clear
 
 Clear the recent file list in the File menu.</source>
@@ -4022,12 +4047,12 @@ Clear the recent file list in the File menu.</source>
 امسح قائمة الملفات الأخيرة في القائمة ملف.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="195" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="198" />
         <source>Include title bar path</source>
         <translation>قم بتضمين مسار شريط العنوان</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="200" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="203" />
         <source>Title Bar Filename
 
 Includes or excludes the path and file extension from the filename in the title bar.</source>
@@ -4036,12 +4061,12 @@ Includes or excludes the path and file extension from the filename in the title 
 يتضمن أو يستبعد المسار وامتداد الملف من اسم الملف في شريط العنوان.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="205" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="208" />
         <source>Allow small dialogs</source>
         <translation>السماح للحوار صغير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="210" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="213" />
         <source>Allow Small Dialogs
 
 Allows settings dialogs to be made very small so they fit on small computer screens.</source>
@@ -4050,12 +4075,12 @@ Allows settings dialogs to be made very small so they fit on small computer scre
 يسمح بمربعات الحوار لتكون صغيرة جدًا بحيث تناسب شاشات الكمبيوتر الصغيرة.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="215" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="218" />
         <source>Allow drag and drop export</source>
         <translation>اسمح بسحب وإفلات التصدير</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="220" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="223" />
         <source>Allow Drag and Drop Export
 
 Allows drag and drop export from the Curve Fitting Window and Geometry Window tables.
@@ -4068,12 +4093,26 @@ When drag and drop is disabled, a rectangular set of table cells can be selected
 عندما يتم تعطيل السحب والإسقاط ، يمكن تحديد مجموعة مستطيلة من خلايا الجدول باستخدام النقر والسحب. عند تمكين السحب والإسقاط ، يمكن تحديد مجموعة مستطيلة من خلايا الجدول باستخدام النقر ثم Shift + النقر ، نظرًا لأن النقر والسحب يبدأان عملية السحب.</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="228" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="231" />
+        <source>Image replace renames document</source>
+        <translation>صورة استبدال وثيقة إعادة تسمية</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="236" />
+        <source>Image Replace Renames Document
+
+When an image is imported to replace the current image, the document will be renamed if this is true, otherwise the name will stay the same.</source>
+        <translation>صورة استبدال وثيقة إعادة تسمية
+
+عند استيراد صورة لاستبدال الصورة الحالية ، سيتم إعادة تسمية المستند إذا كان هذا صحيحًا ، وإلا فسيظل الاسم كما هو.</translation>
+    </message>
+    <message>
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="242" />
         <source>Significant digits</source>
         <translation>أرقام هامة</translation>
     </message>
     <message>
-        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="233" />
+        <location filename="../src/Dlg/DlgSettingsMainWindow.cpp" line="247" />
         <source>Significant Digits
 
 Number of digits of precision in floating point numbers. This value affects calculations for curve fits, since intermediate results smaller than a threshold T indicate that a polynomial curve with a specific order cannot be fitted to the data. The threshold T is computed from the maximum matrix element M and significant digits S as T = M / 10^S.</source>
@@ -4087,7 +4126,7 @@ Number of digits of precision in floating point numbers. This value affects calc
     <message>
         <location filename="../src/Dlg/DlgSettingsPointMatch.cpp" line="30" />
         <source>Point Match</source>
-        <translation>نقطة المباراة</translation>
+        <translation>مطابقة النقطة</translation>
     </message>
     <message>
         <location filename="../src/Dlg/DlgSettingsPointMatch.cpp" line="83" />
@@ -4326,13 +4365,13 @@ If drag-and-drop is disabled, a rectangular set of cells may be selected by clic
 <context>
     <name>GeometryWindow</name>
     <message>
+        <location filename="../src/Geometry/GeometryWindow.cpp" line="27" />
         <location filename="../src/Geometry/GeometryWindow.cpp" line="28" />
-        <location filename="../src/Geometry/GeometryWindow.cpp" line="29" />
         <source>Geometry Window</source>
         <translation>نافذة الهندسة</translation>
     </message>
     <message>
-        <location filename="../src/Geometry/GeometryWindow.cpp" line="30" />
+        <location filename="../src/Geometry/GeometryWindow.cpp" line="29" />
         <source>Geometry Window
 
 This table displays the following geometry data for the currently selected curve:
@@ -4367,6 +4406,19 @@ Y = Y إحداثيات كل نقطة
 المسافة = المسافة على طول المنحنى في الاتجاه الأمامي أو الخلفي ، في أي من وحدات الرسم البياني أو كنسبة مئوية
 
 إذا تم تعطيل السحب والإفلات ، فقد يتم تحديد مجموعة مستطيلة من الخلايا عن طريق النقر والسحب. بخلاف ذلك ، إذا تم تمكين السحب والإفلات ، فيمكن تحديد مجموعة مستطيلة من الخلايا باستخدام النقر ثم Shift + النقر ، نظرًا لأن النقر والسحب يبدأ عملية السحب. يتم تعيين وضع السحب والإفلات في إعدادات النافذة الرئيسية</translation>
+    </message>
+    <message>
+        <location filename="../src/Geometry/GeometryWindow.cpp" line="274" />
+        <source>Highlighted segments may have unexpected values when exported due to overlaps. Adjust points or change Settings / Curve Properties / Connect As.</source>
+        <translation>قد تحتوي الشرائح المميزة على قيم غير متوقعة عند التصدير بسبب التداخلات. ضبط النقاط أو تغيير الإعدادات / خصائص المنحنى / الاتصال باسم.</translation>
+    </message>
+</context>
+<context>
+    <name>GraphicsScene</name>
+    <message>
+        <location filename="../src/Graphics/GraphicsScene.cpp" line="351" />
+        <source>Function currently has multiple Y values for one X value. Please adjust nearby points, or change the curve type in Curve Properties</source>
+        <translation>تحتوي الدالة حاليًا على قيم Y متعددة لقيمة X واحدة. يرجى ضبط النقاط القريبة ، أو تغيير نوع المنحنى في خصائص المنحنى</translation>
     </message>
 </context>
 <context>
@@ -4415,12 +4467,12 @@ Zooming the image in or out is performed using any of several methods:
 <context>
     <name>LoadImageFromUrl</name>
     <message>
-        <location filename="../src/Load/LoadImageFromUrl.cpp" line="59" />
+        <location filename="../src/Load/LoadImageFromUrl.cpp" line="66" />
         <source>Unable to download image from</source>
         <translation>غير قادر على تنزيل الصورة من</translation>
     </message>
     <message>
-        <location filename="../src/Load/LoadImageFromUrl.cpp" line="91" />
+        <location filename="../src/Load/LoadImageFromUrl.cpp" line="98" />
         <source>Unable to load image from</source>
         <translation>غير قادر على تحميل الصورة من</translation>
     </message>
@@ -4428,114 +4480,114 @@ Zooming the image in or out is performed using any of several methods:
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="442" />
+        <location filename="../src/main/MainWindow.cpp" line="478" />
         <source>Unable to export to file</source>
         <translation>غير قادر على التصدير إلى ملف</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="476" />
+        <location filename="../src/main/MainWindow.cpp" line="512" />
         <source>Unable to extract image to file</source>
         <translation>غير قادر على استخراج الصورة إلى ملف</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="551" />
-        <location filename="../src/main/MainWindow.cpp" line="711" />
-        <location filename="../src/main/MainWindow.cpp" line="890" />
+        <location filename="../src/main/MainWindow.cpp" line="587" />
+        <location filename="../src/main/MainWindow.cpp" line="747" />
+        <location filename="../src/main/MainWindow.cpp" line="926" />
         <source>Cannot read file</source>
         <translation>لا يمكن قراءة الملف</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="553" />
-        <location filename="../src/main/MainWindow.cpp" line="713" />
-        <location filename="../src/main/MainWindow.cpp" line="892" />
+        <location filename="../src/main/MainWindow.cpp" line="589" />
+        <location filename="../src/main/MainWindow.cpp" line="749" />
+        <location filename="../src/main/MainWindow.cpp" line="928" />
         <source>from directory</source>
         <translation>من الدليل</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="627" />
+        <location filename="../src/main/MainWindow.cpp" line="663" />
         <source>Import Image</source>
         <translation>استيراد صورة</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="867" />
+        <location filename="../src/main/MainWindow.cpp" line="903" />
         <source>File opened</source>
         <translation>تم فتح الملف</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="912" />
+        <location filename="../src/main/MainWindow.cpp" line="948" />
         <source>File not found</source>
         <translation>لم يتم العثور على الملف</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="929" />
+        <location filename="../src/main/MainWindow.cpp" line="965" />
         <source>Error report opened</source>
         <translation>افتتح تقرير الخطأ</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="984" />
-        <location filename="../src/main/MainWindow.cpp" line="1058" />
+        <location filename="../src/main/MainWindow.cpp" line="1020" />
+        <location filename="../src/main/MainWindow.cpp" line="1094" />
         <source>File imported</source>
         <translation>ملف مستورد</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="1092" />
+        <location filename="../src/main/MainWindow.cpp" line="1128" />
         <source>Background image.</source>
         <translation>الصورة الخلفية.</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="1093" />
+        <location filename="../src/main/MainWindow.cpp" line="1129" />
         <source>Currently selected curve.</source>
         <translation>المنحنى المحدد حاليًا.</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="1094" />
+        <location filename="../src/main/MainWindow.cpp" line="1130" />
         <source>Point style for currently selected curve.</source>
         <translation>نمط نقطة للمنحنى المحدد حاليًا.</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="1095" />
+        <location filename="../src/main/MainWindow.cpp" line="1131" />
         <source>Segment Fill filter for currently selected curve.</source>
         <translation>مرشح ملء الشريحة للمنحنى المحدد حاليًا.</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="1143" />
+        <location filename="../src/main/MainWindow.cpp" line="1179" />
         <source>The document has been modified.
 Do you want to save your changes?</source>
         <translation>تم تعديل الوثيقة.
 هل تريد حفظ التغييرات؟</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="1227" />
+        <location filename="../src/main/MainWindow.cpp" line="1263" />
         <source>Cannot write file</source>
         <translation>لا يمكن كتابة الملف</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="1275" />
+        <location filename="../src/main/MainWindow.cpp" line="1311" />
         <source>Save</source>
         <translation>حفظ</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="2288" />
+        <location filename="../src/main/MainWindow.cpp" line="2331" />
         <source>Export</source>
         <translation>تصدير</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="2370" />
+        <location filename="../src/main/MainWindow.cpp" line="2413" />
         <source>Open Document</source>
         <translation>افتح المستند</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="3581" />
+        <location filename="../src/main/MainWindow.cpp" line="3669" />
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="3582" />
+        <location filename="../src/main/MainWindow.cpp" line="3670" />
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="3712" />
+        <location filename="../src/main/MainWindow.cpp" line="3800" />
         <source>Engauge Digitizer</source>
         <translation>Engauge Digitizer</translation>
     </message>
@@ -4543,73 +4595,54 @@ Do you want to save your changes?</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="126" />
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="171" />
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="267" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="133" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="178" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="276" />
         <source>New axis point cannot be at the same screen position as an existing axis point</source>
         <translation>لا يمكن أن تكون نقطة المحور الجديدة في نفس موضع الشاشة كنقطة محور موجودة</translation>
     </message>
     <message>
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="179" />
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="274" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="186" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="285" />
         <source>New axis point cannot have the same graph coordinates as an existing axis point</source>
         <translation>لا يمكن أن تحتوي نقطة المحور الجديدة على نفس إحداثيات الرسم البياني كنقطة محور موجودة</translation>
     </message>
     <message>
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="185" />
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="280" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="192" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="291" />
         <source>No more than two axis points can lie along the same line on the screen</source>
         <translation>لا يمكن أن تقع أكثر من نقطتي محور على نفس الخط على الشاشة</translation>
     </message>
     <message>
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="191" />
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="286" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="198" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="297" />
         <source>No more than two axis points can lie along the same line in graph coordinates</source>
         <translation>لا يمكن أن تقع أكثر من نقطتي محور على نفس الخط في إحداثيات الرسم البياني</translation>
     </message>
     <message>
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="244" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="251" />
         <source>Too many x axis points. There should only be two</source>
         <translation>يوجد عدد كبير جدًا من نقاط المحور. يجب أن يكون هناك اثنين فقط</translation>
     </message>
     <message>
-        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="250" />
+        <location filename="../src/Callback/CallbackAxisPointsAbstract.cpp" line="257" />
         <source>Too many y axis points. There should only be two</source>
         <translation>الكثير من النقاط محور y. يجب أن يكون هناك اثنين فقط</translation>
     </message>
     <message>
-        <location filename="../src/Checker/CheckerMode.cpp" line="14" />
+        <location filename="../src/Checker/CheckerMode.cpp" line="16" />
         <source>Never</source>
         <translation>أبدا</translation>
     </message>
     <message>
-        <location filename="../src/Checker/CheckerMode.cpp" line="17" />
+        <location filename="../src/Checker/CheckerMode.cpp" line="20" />
         <source>NSeconds</source>
         <translation>ن ثواني</translation>
     </message>
     <message>
-        <location filename="../src/Checker/CheckerMode.cpp" line="20" />
+        <location filename="../src/Checker/CheckerMode.cpp" line="24" />
         <source>Forever</source>
         <translation>إلى الأبد</translation>
-    </message>
-    <message>
-        <location filename="../src/Checker/CheckerMode.cpp" line="23" />
-        <location filename="../src/Color/ColorFilterMode.cpp" line="29" />
-        <location filename="../src/Coord/CoordUnitsNonPolarTheta.cpp" line="28" />
-        <location filename="../src/Coord/CoordUnitsNonPolarTheta.cpp" line="49" />
-        <location filename="../src/Coord/CoordUnitsPolarTheta.cpp" line="36" />
-        <location filename="../src/Coord/CoordUnitsPolarTheta.cpp" line="65" />
-        <location filename="../src/Curve/CurveConnectAs.cpp" line="30" />
-        <location filename="../src/Export/ExportDelimiter.cpp" line="26" />
-        <location filename="../src/Export/ExportHeader.cpp" line="23" />
-        <location filename="../src/Export/ExportLayoutFunctions.cpp" line="20" />
-        <location filename="../src/Export/ExportPointsIntervalUnits.cpp" line="20" />
-        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="26" />
-        <location filename="../src/Export/ExportPointsSelectionRelations.cpp" line="20" />
-        <location filename="../src/Grid/GridCoordDisable.cpp" line="26" />
-        <location filename="../src/Point/PointShape.cpp" line="32" />
-        <source>Unknown</source>
-        <translation>غير معروف</translation>
     </message>
     <message>
         <location filename="../src/Checklist/ChecklistGuideWizard.cpp" line="69" />
@@ -4658,7 +4691,7 @@ Do you want to save your changes?</source>
         <location filename="../src/Cmd/CmdSettingsAxesChecker.cpp" line="50" />
         <location filename="../src/Cmd/CmdSettingsColorFilter.cpp" line="50" />
         <location filename="../src/Cmd/CmdSettingsCoords.cpp" line="51" />
-        <location filename="../src/Cmd/CmdSettingsCurveAddRemove.cpp" line="78" />
+        <location filename="../src/Cmd/CmdSettingsCurveList.cpp" line="79" />
         <location filename="../src/Cmd/CmdSettingsCurveProperties.cpp" line="51" />
         <location filename="../src/Cmd/CmdSettingsDigitizeCurve.cpp" line="50" />
         <location filename="../src/Cmd/CmdSettingsExportFormat.cpp" line="51" />
@@ -4696,7 +4729,17 @@ Do you want to save your changes?</source>
         <translation>القيمة</translation>
     </message>
     <message>
-        <location filename="../src/Color/ColorFilterSettings.cpp" line="214" />
+        <location filename="../src/Color/ColorFilterMode.cpp" line="29" />
+        <location filename="../src/Coord/CoordUnitsNonPolarTheta.cpp" line="28" />
+        <location filename="../src/Coord/CoordUnitsNonPolarTheta.cpp" line="49" />
+        <location filename="../src/Coord/CoordUnitsPolarTheta.cpp" line="36" />
+        <location filename="../src/Coord/CoordUnitsPolarTheta.cpp" line="65" />
+        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="32" />
+        <source>Unknown</source>
+        <translation>غير معروف</translation>
+    </message>
+    <message>
+        <location filename="../src/Color/ColorFilterSettings.cpp" line="221" />
         <source>Cannot read curve filter data</source>
         <translation>لا يمكن قراءة بيانات مرشح المنحنى</translation>
     </message>
@@ -4773,7 +4816,7 @@ Do you want to save your changes?</source>
         <translation>HH:MM:SS</translation>
     </message>
     <message>
-        <location filename="../src/CoordSystem/CoordSystem.cpp" line="602" />
+        <location filename="../src/CoordSystem/CoordSystem.cpp" line="611" />
         <source>Unexpected xml token</source>
         <translation>رمز مميز xml غير متوقع</translation>
     </message>
@@ -4784,27 +4827,27 @@ Do you want to save your changes?</source>
         <translation>لا يمكن قراءة بيانات المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Curve/CurveConnectAs.cpp" line="15" />
+        <location filename="../src/Curve/CurveConnectAs.cpp" line="17" />
         <source>FunctionSmooth</source>
         <translation>وظيفة على نحو سلس</translation>
     </message>
     <message>
-        <location filename="../src/Curve/CurveConnectAs.cpp" line="18" />
+        <location filename="../src/Curve/CurveConnectAs.cpp" line="21" />
         <source>FunctionStraight</source>
         <translation>وظيفة على التوالي</translation>
     </message>
     <message>
-        <location filename="../src/Curve/CurveConnectAs.cpp" line="21" />
+        <location filename="../src/Curve/CurveConnectAs.cpp" line="25" />
         <source>RelationSmooth</source>
         <translation>علاقة سلسة</translation>
     </message>
     <message>
-        <location filename="../src/Curve/CurveConnectAs.cpp" line="24" />
+        <location filename="../src/Curve/CurveConnectAs.cpp" line="29" />
         <source>RelationStraight</source>
         <translation>علاقة مستقيمة</translation>
     </message>
     <message>
-        <location filename="../src/Curve/CurveConnectAs.cpp" line="27" />
+        <location filename="../src/Curve/CurveConnectAs.cpp" line="33" />
         <source>ConnectSkipForAxisCurve</source>
         <translation>الاتصال تخطي منحنى المحور</translation>
     </message>
@@ -4827,7 +4870,7 @@ Do you want to save your changes?</source>
         <location filename="../src/DigitizeState/DigitizeStateAxis.cpp" line="135" />
         <location filename="../src/DigitizeState/DigitizeStateAxis.cpp" line="176" />
         <location filename="../src/DigitizeState/DigitizeStateScale.cpp" line="173" />
-        <location filename="../src/main/main.cpp" line="334" />
+        <location filename="../src/main/main.cpp" line="365" />
         <source>Engauge Digitizer</source>
         <translation>Engauge Digitizer</translation>
     </message>
@@ -4837,19 +4880,19 @@ Do you want to save your changes?</source>
         <translation>تم تحديد ثلاثة محاور ، ولم تعد هناك حاجة إلى أو السماح.</translation>
     </message>
     <message>
-        <location filename="../src/DigitizeState/DigitizeStateColorPicker.cpp" line="151" />
+        <location filename="../src/DigitizeState/DigitizeStateColorPicker.cpp" line="152" />
         <source>Color Picker</source>
         <translation>لون المنتقى</translation>
     </message>
     <message>
-        <location filename="../src/DigitizeState/DigitizeStateColorPicker.cpp" line="152" />
+        <location filename="../src/DigitizeState/DigitizeStateColorPicker.cpp" line="153" />
         <source>Sorry, but the color picker point must be near a non-background pixel. Please try again.</source>
         <translation>عذرًا ، ولكن يجب أن تكون نقطة منتقي الألوان بالقرب من بكسل بخلاف الخلفية. حاول مرة اخرى.</translation>
     </message>
     <message>
         <location filename="../src/DigitizeState/DigitizeStatePointMatch.cpp" line="350" />
         <source>Point Match</source>
-        <translation>نقطة المباراة</translation>
+        <translation>مطابقة النقطة</translation>
     </message>
     <message>
         <location filename="../src/DigitizeState/DigitizeStatePointMatch.cpp" line="351" />
@@ -4882,34 +4925,34 @@ Do you want to save your changes?</source>
         <translation>تحرك</translation>
     </message>
     <message>
-        <location filename="../src/Document/Document.cpp" line="93" />
-        <location filename="../src/Document/Document.cpp" line="133" />
+        <location filename="../src/Document/Document.cpp" line="95" />
+        <location filename="../src/Document/Document.cpp" line="137" />
         <source>Operating system says file is not readable</source>
         <translation>يقول نظام التشغيل الملف غير قابل للقراءة</translation>
     </message>
     <message>
-        <location filename="../src/Document/Document.cpp" line="119" />
+        <location filename="../src/Document/Document.cpp" line="123" />
         <source>cannot read newer files from version</source>
         <translation>لا يمكن قراءة ملفات أحدث من الإصدار</translation>
     </message>
     <message>
-        <location filename="../src/Document/Document.cpp" line="121" />
+        <location filename="../src/Document/Document.cpp" line="125" />
         <source>of</source>
         <translation>من</translation>
     </message>
     <message>
-        <location filename="../src/Document/Document.cpp" line="140" />
+        <location filename="../src/Document/Document.cpp" line="144" />
         <location filename="../src/util/Xml.cpp" line="40" />
         <source>File</source>
         <translation>ملف</translation>
     </message>
     <message>
-        <location filename="../src/Document/Document.cpp" line="142" />
+        <location filename="../src/Document/Document.cpp" line="146" />
         <source>was not found</source>
         <translation>لم يتم العثور على</translation>
     </message>
     <message>
-        <location filename="../src/Document/Document.cpp" line="510" />
+        <location filename="../src/Document/Document.cpp" line="517" />
         <source>Cannot read image data</source>
         <translation>لا يمكن قراءة بيانات الصورة</translation>
     </message>
@@ -4934,7 +4977,7 @@ Do you want to save your changes?</source>
         <translation>لا يمكن قراءة بيانات منحنى رقمنة</translation>
     </message>
     <message>
-        <location filename="../src/Document/DocumentModelExportFormat.cpp" line="203" />
+        <location filename="../src/Document/DocumentModelExportFormat.cpp" line="225" />
         <source>Cannot read export data</source>
         <translation>لا يمكن قراءة بيانات التصدير</translation>
     </message>
@@ -4969,37 +5012,37 @@ Do you want to save your changes?</source>
         <translation>واجه خطأ في تحديد نقطة. يرجى إبلاغ مطوري Engauge مع أي تعليقات حول البلد واللغة. كان اسم نقطة غير صالح</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportDelimiter.cpp" line="14" />
+        <location filename="../src/Export/ExportDelimiter.cpp" line="16" />
         <source>Commas</source>
         <translation>الفواصل</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportDelimiter.cpp" line="17" />
+        <location filename="../src/Export/ExportDelimiter.cpp" line="20" />
         <source>Semicolons</source>
         <translation>منقوطة</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportDelimiter.cpp" line="20" />
+        <location filename="../src/Export/ExportDelimiter.cpp" line="24" />
         <source>Spaces</source>
         <translation>الفراغات</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportDelimiter.cpp" line="23" />
+        <location filename="../src/Export/ExportDelimiter.cpp" line="28" />
         <source>Tabs</source>
         <translation>علامات التبويب</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportHeader.cpp" line="14" />
+        <location filename="../src/Export/ExportHeader.cpp" line="16" />
         <source>Gnuplot</source>
         <translation>Gnuplot</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportHeader.cpp" line="17" />
+        <location filename="../src/Export/ExportHeader.cpp" line="20" />
         <source>None</source>
         <translation>لا شيء</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportHeader.cpp" line="20" />
+        <location filename="../src/Export/ExportHeader.cpp" line="24" />
         <source>Simple</source>
         <translation>بسيط</translation>
     </message>
@@ -5014,58 +5057,58 @@ Do you want to save your changes?</source>
         <translation>لا يمكن تصدير الملف</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportLayoutFunctions.cpp" line="14" />
+        <location filename="../src/Export/ExportLayoutFunctions.cpp" line="16" />
         <source>AllPerLine</source>
         <translation>كل في الخط</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportLayoutFunctions.cpp" line="17" />
+        <location filename="../src/Export/ExportLayoutFunctions.cpp" line="20" />
         <source>OnePerLine</source>
         <translation>واحد في كل سطر</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportPointsIntervalUnits.cpp" line="14" />
+        <location filename="../src/Export/ExportPointsIntervalUnits.cpp" line="16" />
         <source>Graph Units</source>
         <translation>وحدات الرسم البياني</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportPointsIntervalUnits.cpp" line="17" />
+        <location filename="../src/Export/ExportPointsIntervalUnits.cpp" line="20" />
         <source>Pixels</source>
         <translation>بكسل</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="14" />
+        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="16" />
         <source>InterpolateAllCurves</source>
         <translation>استيفاء جميع المنحنيات</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="17" />
+        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="20" />
         <source>InterpolateFirstCurve</source>
         <translation>اقراء المنحنى الأول</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="20" />
+        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="24" />
         <source>InterpolatePeriodic</source>
         <translation>استيفاء الدوري</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="23" />
-        <location filename="../src/Export/ExportPointsSelectionRelations.cpp" line="17" />
+        <location filename="../src/Export/ExportPointsSelectionFunctions.cpp" line="28" />
+        <location filename="../src/Export/ExportPointsSelectionRelations.cpp" line="20" />
         <source>Raw</source>
         <translation>الخام</translation>
     </message>
     <message>
-        <location filename="../src/Export/ExportPointsSelectionRelations.cpp" line="14" />
+        <location filename="../src/Export/ExportPointsSelectionRelations.cpp" line="16" />
         <source>Interpolate</source>
         <translation>أقحم</translation>
     </message>
     <message>
-        <location filename="../src/FileCmd/FileCmdScript.cpp" line="31" />
+        <location filename="../src/FileCmd/FileCmdScript.cpp" line="35" />
         <source>Cannot read script file</source>
         <translation>لا يمكن قراءة ملف البرنامج النصي</translation>
     </message>
     <message>
-        <location filename="../src/FileCmd/FileCmdScript.cpp" line="33" />
+        <location filename="../src/FileCmd/FileCmdScript.cpp" line="37" />
         <source>from directory</source>
         <translation>من الدليل</translation>
     </message>
@@ -5101,7 +5144,7 @@ Do you want to save your changes?</source>
     </message>
     <message>
         <location filename="../src/Geometry/GeometryWindow.cpp" line="177" />
-        <location filename="../src/Point/PointShape.cpp" line="29" />
+        <location filename="../src/Point/PointShape.cpp" line="44" />
         <source>X</source>
         <translation>X</translation>
     </message>
@@ -5111,22 +5154,22 @@ Do you want to save your changes?</source>
         <translation>Y</translation>
     </message>
     <message>
-        <location filename="../src/Grid/GridCoordDisable.cpp" line="14" />
+        <location filename="../src/Grid/GridCoordDisable.cpp" line="16" />
         <source>Count</source>
         <translation>عد</translation>
     </message>
     <message>
-        <location filename="../src/Grid/GridCoordDisable.cpp" line="17" />
+        <location filename="../src/Grid/GridCoordDisable.cpp" line="20" />
         <source>Start</source>
         <translation>بداية</translation>
     </message>
     <message>
-        <location filename="../src/Grid/GridCoordDisable.cpp" line="20" />
+        <location filename="../src/Grid/GridCoordDisable.cpp" line="24" />
         <source>Step</source>
         <translation>خطوة</translation>
     </message>
     <message>
-        <location filename="../src/Grid/GridCoordDisable.cpp" line="23" />
+        <location filename="../src/Grid/GridCoordDisable.cpp" line="28" />
         <source>Stop</source>
         <translation>توقف</translation>
     </message>
@@ -5166,49 +5209,59 @@ Do you want to save your changes?</source>
         <translation>لا يمكن قراءة معرفات النقاط</translation>
     </message>
     <message>
-        <location filename="../src/Point/PointShape.cpp" line="14" />
+        <location filename="../src/Point/PointShape.cpp" line="16" />
         <source>Circle</source>
         <translation>دائرة</translation>
     </message>
     <message>
-        <location filename="../src/Point/PointShape.cpp" line="17" />
+        <location filename="../src/Point/PointShape.cpp" line="20" />
         <source>Cross</source>
         <translation>تعبر</translation>
     </message>
     <message>
-        <location filename="../src/Point/PointShape.cpp" line="20" />
+        <location filename="../src/Point/PointShape.cpp" line="24" />
         <source>Diamond</source>
         <translation>الماس</translation>
     </message>
     <message>
-        <location filename="../src/Point/PointShape.cpp" line="23" />
+        <location filename="../src/Point/PointShape.cpp" line="28" />
+        <source>Hourglass</source>
+        <translation>الساعة الرملية</translation>
+    </message>
+    <message>
+        <location filename="../src/Point/PointShape.cpp" line="32" />
         <source>Square</source>
         <translation>ميدان</translation>
     </message>
     <message>
-        <location filename="../src/Point/PointShape.cpp" line="26" />
+        <location filename="../src/Point/PointShape.cpp" line="36" />
         <source>Triangle</source>
         <translation>مثلث</translation>
     </message>
     <message>
-        <location filename="../src/Point/PointStyle.cpp" line="146" />
+        <location filename="../src/Point/PointShape.cpp" line="40" />
+        <source>Triangle2</source>
+        <translation>مثلث2</translation>
+    </message>
+    <message>
+        <location filename="../src/Point/PointStyle.cpp" line="151" />
         <source>Cannot read point style data</source>
         <translation>لا يمكن قراءة بيانات نمط النقطة</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="193" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="226" />
         <source>Coordinates (graph)</source>
         <translation>الرسم البياني الإحداثيات
 
 </translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="198" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="231" />
         <source>Coordinates (pixels)</source>
         <translation>بكسل الإحداثيات</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="203" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="236" />
         <source>Resolution (graph)</source>
         <translation>الرسم البياني القرار</translation>
     </message>
@@ -5223,180 +5276,202 @@ Do you want to save your changes?</source>
         <translation>بحاجة الى مزيد من النقاط محور</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="11" />
         <source>16:1 farther</source>
-        <translation>16: 1 أبعد</translation>
+        <translation type="vanished">16: 1 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="12" />
         <source>8:1 closer</source>
-        <translation>8: 1 أقرب</translation>
+        <translation type="vanished">8: 1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="14" />
         <source>8:1 farther</source>
-        <translation>8: 1 أبعد</translation>
+        <translation type="vanished">8: 1 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="15" />
         <source>4:1 closer</source>
-        <translation>4: 1 أقرب</translation>
+        <translation type="vanished">4: 1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="17" />
         <source>4:1 farther</source>
-        <translation>4: 1 أبعد</translation>
+        <translation type="vanished">4: 1 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="18" />
         <source>2:1 closer</source>
-        <translation>2: 1 أقرب</translation>
+        <translation type="vanished">2: 1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="20" />
         <source>2:1 farther</source>
-        <translation>2: 1 أبعد</translation>
+        <translation type="vanished">2: 1 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="21" />
         <source>1:1 closer</source>
-        <translation>1: 1 أقرب</translation>
+        <translation type="vanished">1: 1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="23" />
         <source>1:1 farther</source>
-        <translation>1: 1 أبعد</translation>
+        <translation type="vanished">1: 1 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="24" />
         <source>1:2 closer</source>
-        <translation>1: 2 أقرب</translation>
+        <translation type="vanished">2:1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="26" />
         <source>1:2 farther</source>
-        <translation>1: 2 أبعد</translation>
+        <translation type="vanished">1: 2 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="27" />
         <source>1:4 closer</source>
-        <translation>1: 4 أقرب</translation>
+        <translation type="vanished">4:1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="29" />
         <source>1:4 farther</source>
-        <translation>1: 4 أبعد</translation>
+        <translation type="vanished">1: 4 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="30" />
         <source>1:8 closer</source>
-        <translation>1: 8 أوثق</translation>
+        <translation type="vanished">8:1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="32" />
         <source>1:8 farther</source>
-        <translation>1: 8 أبعد</translation>
+        <translation type="vanished">8:1 أبعد</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="33" />
         <source>1:16 closer</source>
-        <translation>16:1 اقرب</translation>
+        <translation type="vanished">16:1 أقرب</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="35" />
         <source>Fill</source>
-        <translation>ملء</translation>
+        <translation type="vanished">ملء</translation>
     </message>
     <message>
-        <location filename="../src/Zoom/ZoomLabels.cpp" line="36" />
         <source>Previous</source>
-        <translation>سابق</translation>
+        <translation type="vanished">السابق</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindow.cpp" line="561" />
+        <location filename="../src/main/MainWindow.cpp" line="597" />
         <source>The file appears to have characters from multiple language alphabets, which does not work in the Windows command line</source>
         <translation>يبدو أن الملف يحتوي على أحرف من أبجديات لغات متعددة ، والتي لا تعمل في سطر أوامر Windows</translation>
     </message>
     <message>
-        <location filename="../src/main/MainWindowModel.cpp" line="109" />
+        <location filename="../src/main/MainWindowModel.cpp" line="118" />
         <source>Cannot read main window data</source>
         <translation>لا يمكن قراءة بيانات النافذة الرئيسية</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="220" />
-        <location filename="../src/main/main.cpp" line="232" />
+        <location filename="../src/main/main.cpp" line="244" />
+        <location filename="../src/main/main.cpp" line="256" />
         <source>is not a valid file name</source>
         <translation>ليس اسم ملف صالح</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="226" />
+        <location filename="../src/main/main.cpp" line="250" />
         <source>is not a valid image file extension</source>
         <translation>ليس امتداد ملف صورة صالح</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="311" />
+        <location filename="../src/main/main.cpp" line="342" />
         <source>is used only with one or more load files</source>
         <translation>يستخدم فقط مع واحد أو أكثر من ملفات التحميل</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="343" />
+        <location filename="../src/main/main.cpp" line="374" />
         <source>Available styles</source>
         <translation>الأنماط المتاحة</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="367" />
+        <location filename="../src/main/main.cpp" line="400" />
         <source>Enables extra debug information. Used for debugging</source>
         <translation>لتمكين معلومات التصحيح الإضافية. تستخدم لتصحيح الأخطاء</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="373" />
         <source>Specifies an error report file as input. Used for debugging and testing</source>
-        <translation>يحدد ملف تقرير الخطأ كمدخل. تستخدم لتصحيح الأخطاء والاختبار</translation>
+        <translation type="vanished">يحدد ملف تقرير الخطأ كمدخل. تستخدم لتصحيح الأخطاء والاختبار</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="379" />
+        <location filename="../src/main/main.cpp" line="406" />
+        <source>Indicates files opened at startup are for testing drag and drop. Used for regression testing</source>
+        <translation>يشير إلى أن الملفات المفتوحة عند بدء التشغيل هي لاختبار السحب والإفلات. تستخدم لاختبار الانحدار</translation>
+    </message>
+    <message>
+        <location filename="../src/main/main.cpp" line="412" />
+        <source>Specifies an error report file as input. Used for debugging and regression testing</source>
+        <translation>يحدد ملف تقرير الخطأ كمدخلات. يستخدم للتصحيح واختبار الانحدار</translation>
+    </message>
+    <message>
+        <location filename="../src/main/main.cpp" line="418" />
         <source>Export each loaded startup file, which must have all axis points defined, then stop</source>
         <translation>قم بتصدير كل ملف بدء تشغيل تم تحميله ، والذي يجب أن يحتوي على جميع نقاط المحور المحددة ، ثم قم بإيقافها</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="385" />
+        <location filename="../src/main/main.cpp" line="424" />
         <source>Extract image in each loaded startup file to a file with the specified extension, then stop</source>
         <translation>قم باستخراج الصورة في كل ملف بدء تشغيل تم تحميله إلى ملف بالملحق المحدد ، ثم قم بإيقافه</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="391" />
+        <location filename="../src/main/main.cpp" line="430" />
         <source>Specifies a file command script file as input. Used for debugging and testing</source>
         <translation>يحدد ملف البرنامج النصي لأمر الملف كمدخل. تستخدم لتصحيح الأخطاء والاختبار</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="397" />
+        <location filename="../src/main/main.cpp" line="436" />
         <source>Output diagnostic gnuplot input files. Used for debugging</source>
         <translation>إخراج ملفات التشخيص gnuplot الإدخال. تستخدم لتصحيح الأخطاء</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="403" />
+        <location filename="../src/main/main.cpp" line="442" />
         <source>Show this help information</source>
         <translation>عرض معلومات المساعدة هذه</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="409" />
+        <location filename="../src/main/main.cpp" line="448" />
         <source>Executes the error report file or file command script. Used for regression testing</source>
         <translation>ينفذ ملف تقرير الخطأ أو البرنامج النصي لأمر الملف. تستخدم لاختبار الانحدار</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="415" />
+        <location filename="../src/main/main.cpp" line="454" />
         <source>Removes all stored settings, including window positions. Used when windows start up offscreen</source>
         <translation>يزيل كل الإعدادات المخزنة ، بما في ذلك أوضاع النوافذ. تستخدم عند تشغيل النوافذ خارج الشاشة</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="421" />
-        <source>Show a list of available styles that can be used with the -style command</source>
-        <translation>إظهار قائمة بالأنماط المتوفرة التي يمكن استخدامها مع الأمر -style</translation>
+        <location filename="../src/main/main.cpp" line="461" />
+        <source>Set the window style to one of the styles listed by the command line option</source>
+        <translation>قم بتعيين نمط الإطار على أحد الأنماط المدرجة بواسطة خيار سطر الأوامر
+ 
+</translation>
     </message>
     <message>
-        <location filename="../src/main/main.cpp" line="427" />
+        <location filename="../src/main/main.cpp" line="469" />
+        <source>Show a list of available styles that can be used with the command line option</source>
+        <translation>عرض قائمة من الأنماط المتاحة التي يمكن استخدامها مع خيار سطر الأوامر</translation>
+    </message>
+    <message>
+        <source>Show a list of available styles that can be used with the -style command</source>
+        <translation type="vanished">إظهار قائمة بالأنماط المتوفرة التي يمكن استخدامها مع الأمر -style</translation>
+    </message>
+    <message>
+        <location filename="../src/main/main.cpp" line="476" />
+        <source>Upgrade files opened at startup to the most recent version</source>
+        <translation>ترقية الملفات المفتوحة عند بدء التشغيل إلى الإصدار الأحدث</translation>
+    </message>
+    <message>
+        <location filename="../src/main/main.cpp" line="482" />
         <source>File(s) to be imported or opened at startup</source>
         <translation>ملف (ملفات) ليتم استيراده أو فتحه عند بدء التشغيل</translation>
+    </message>
+    <message>
+        <location filename="../src/main/main.cpp" line="527" />
+        <source>Could not write to</source>
+        <translation>لا يمكن الكتابة إلى</translation>
+    </message>
+    <message>
+        <location filename="../src/main/main.cpp" line="540" />
+        <source>Upgraded</source>
+        <translation>ترقية</translation>
+    </message>
+    <message>
+        <location filename="../src/main/main.cpp" line="542" />
+        <source>to</source>
+        <translation>إلى</translation>
     </message>
     <message>
         <location filename="../src/util/Xml.cpp" line="34" />
@@ -5422,12 +5497,12 @@ Do you want to save your changes?</source>
 <context>
     <name>StatusBar</name>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="56" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="58" />
         <source>Select cursor coordinate values to display.</source>
         <translation>حدد قيم إحداثيات المؤشر لعرضها.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="57" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="59" />
         <source>Select Cursor Coordinate Values
 
 Values at cursor coordinates to display. Coordinates are in screen (pixels) or graph units. Resolution (which is the number of graph units per pixel) is in graph units. Graph units are only available after axis points have been defined.</source>
@@ -5436,12 +5511,12 @@ Values at cursor coordinates to display. Coordinates are in screen (pixels) or g
 القيم في إحداثيات المؤشر للعرض. إحداثيات الشاشة (بكسل) أو وحدات الرسم البياني. الدقة (التي هي عدد وحدات الرسم البياني لكل بكسل) موجودة في وحدات الرسم البياني. تتوفر وحدات الرسم البياني فقط بعد تعريف نقاط المحور.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="70" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="72" />
         <source>Cursor coordinate values.</source>
         <translation>المؤشر ينسق القيم.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="71" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="73" />
         <source>Cursor Coordinate Values
 
 Values at cursor coordinates. Coordinates are in screen (pixels) or graph units. Resolution (which is the number of graph units per pixel) is in graph units. Graph units are only available after axis points have been defined.</source>
@@ -5450,12 +5525,12 @@ Values at cursor coordinates. Coordinates are in screen (pixels) or graph units.
 القيم في إحداثيات المؤشر. إحداثيات الشاشة (بكسل) أو وحدات الرسم البياني. الدقة (التي هي عدد وحدات الرسم البياني لكل بكسل) موجودة في وحدات الرسم البياني. تتوفر وحدات الرسم البياني فقط بعد تعريف نقاط المحور.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="125" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="127" />
         <source>Select zoom.</source>
         <translation>حدد التكبير.</translation>
     </message>
     <message>
-        <location filename="../src/StatusBar/StatusBar.cpp" line="126" />
+        <location filename="../src/StatusBar/StatusBar.cpp" line="128" />
         <source>Select Zoom
 
 Points can be more accurately placed by zooming in.</source>
@@ -5463,16 +5538,151 @@ Points can be more accurately placed by zooming in.</source>
 
 يمكن وضع النقاط بدقة أكبر عن طريق التكبير.</translation>
     </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="138" />
+        <source>16:1</source>
+        <translation>1:16</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="139" />
+        <source>16:1 farther</source>
+        <translation>16: 1 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="140" />
+        <source>8:1 closer</source>
+        <translation>8: 1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="141" />
+        <source>8:1</source>
+        <translation>1:8</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="142" />
+        <source>8:1 farther</source>
+        <translation>8: 1 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="143" />
+        <source>4:1 closer</source>
+        <translation>4: 1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="144" />
+        <source>4:1</source>
+        <translation>1:4</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="145" />
+        <source>4:1 farther</source>
+        <translation>4: 1 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="146" />
+        <source>2:1 closer</source>
+        <translation>2: 1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="147" />
+        <source>2:1</source>
+        <translation>1:2</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="148" />
+        <source>2:1 farther</source>
+        <translation>2: 1 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="149" />
+        <source>1:1 closer</source>
+        <translation>1: 1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="150" />
+        <source>1:1</source>
+        <translation>1:1</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="151" />
+        <source>1:1 farther</source>
+        <translation>1: 1 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="152" />
+        <source>1:2 closer</source>
+        <translation>2:1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="153" />
+        <source>1:2</source>
+        <translation>2:1</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="154" />
+        <source>1:2 farther</source>
+        <translation>1: 2 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="155" />
+        <source>1:4 closer</source>
+        <translation>4:1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="156" />
+        <source>1:4</source>
+        <translation>4:1</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="157" />
+        <source>1:4 farther</source>
+        <translation>1: 4 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="158" />
+        <source>1:8 closer</source>
+        <translation>8:1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="159" />
+        <source>1:8</source>
+        <translation>8:1</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="160" />
+        <source>1:8 farther</source>
+        <translation>8:1 أبعد</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="161" />
+        <source>1:16 closer</source>
+        <translation>16:1 أقرب</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="162" />
+        <source>1:16</source>
+        <translation>16:1</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="163" />
+        <source>Fill</source>
+        <translation>ملء</translation>
+    </message>
+    <message>
+        <location filename="../src/StatusBar/StatusBar.cpp" line="164" />
+        <source>Previous</source>
+        <translation>السابق</translation>
+    </message>
 </context>
 <context>
     <name>TutorialStateAxisPoints</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="26" />
+        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="33" />
         <source>Axis Points</source>
         <translation>محور نقطة</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="36" />
         <source>Axis points are first defined to
 define the coordinates. Step 1 -
 Click on the Axis Points button</source>
@@ -5481,7 +5691,7 @@ Click on the Axis Points button</source>
 انقر على زر النقاط المحورية</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="33" />
+        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="40" />
         <source>Step 2 - Click on an axis or grid
 line with known coordinates. An axis
 point appears, with a dialog window
@@ -5494,7 +5704,7 @@ coordinates</source>
 إحداثيات</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="39" />
+        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="46" />
         <source>Step 3 - Enter the two coordinates
 of the axis point and then click Ok.
 Repeat steps 2 and 3 twice more
@@ -5505,12 +5715,12 @@ until three axis points are created</source>
 حتى يتم إنشاء ثلاثة محاور</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="47" />
+        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="54" />
         <source>Previous</source>
-        <translation>سابق</translation>
+        <translation>السابق</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="53" />
+        <location filename="../src/Tutorial/TutorialStateAxisPoints.cpp" line="60" />
         <source>Next</source>
         <translation>التالى</translation>
     </message>
@@ -5518,12 +5728,12 @@ until three axis points are created</source>
 <context>
     <name>TutorialStateChecklistWizardAbstract</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="26" />
+        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="33" />
         <source>Checklist Wizard and Checklist Guide</source>
         <translation>معالج قائمة التحقق ودليل قائمة التحقق</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="36" />
         <source>For new Engauge users, a Checklist Wizard
 is available when importing an image file.
 This wizard produces a helpful checklist of
@@ -5534,14 +5744,14 @@ steps to follow to digitize the image file.</source>
 الخطوات الواجب اتباعها لرقمنة ملف الصورة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="34" />
+        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="41" />
         <source>Step 1 - Enable the menu option Help /
 Checklist Guide Wizard.</source>
         <translation>الخطوة 1 - تمكين خيار القائمة تعليمات /
 معالج دليل الاختيار.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="37" />
+        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="44" />
         <source>Step 2 - Import the file using File /
 Import. The Checklist Wizard will appear
 and ask some simple questions to
@@ -5554,7 +5764,7 @@ digitized.</source>
 رقمية</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="43" />
+        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="50" />
         <source>Additional options are available in
 the various Settings menus.
 
@@ -5565,20 +5775,20 @@ This ends the tutorial. Good luck!</source>
 هذا ينتهي البرنامج التعليمي. حظا طيبا وفقك الله!</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="50" />
+        <location filename="../src/Tutorial/TutorialStateChecklistWizardAbstract.cpp" line="57" />
         <source>Previous</source>
-        <translation>سابق</translation>
+        <translation>السابق</translation>
     </message>
 </context>
 <context>
     <name>TutorialStateColorFilter</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="26" />
+        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="35" />
         <source>Color Filter</source>
         <translation>مرشح اللون</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="38" />
         <source>Each curve has Color Filter settings that
 are applied in Segment Fill mode. For
 black lines the defaults work well, but for
@@ -5586,21 +5796,21 @@ colored lines the settings can be improved.</source>
         <translation>يحتوي كل منحنى على إعدادات تصفية اللون التي يتم تطبيقها في وضع ملء الشاشة. بالنسبة للخطوط السوداء ، تعمل الإعدادات الافتراضية بشكل جيد ، ولكن بالنسبة للخطوط الملونة ، يمكن تحسين الإعدادات.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="34" />
+        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="43" />
         <source>Step 1 - Select the Settings / Color
 Filter menu option.</source>
         <translation>الخطوة 1 - حدد الإعدادات / اللون
 خيار تصفية القائمة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="37" />
+        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="46" />
         <source>Step 2 - Select the curve that will
 be given the new settings.</source>
         <translation>الخطوة 2 - حدد المنحنى الذي سوف
 تعطى الإعدادات الجديدة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="40" />
+        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="49" />
         <source>Step 3 - Select the mode. Intensity is
 suggested for uncolored lines, and Hue
 is suggested for colored lines.</source>
@@ -5609,7 +5819,7 @@ is suggested for colored lines.</source>
 يقترح للخطوط الملونة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="44" />
+        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="53" />
         <source>Step 4 - Adjust the included range by
 dragging the green handles, until the
 curve is clear in the preview window
@@ -5624,7 +5834,7 @@ Click Ok when finished.</source>
 انقر فوق "موافق" عند الانتهاء.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="54" />
+        <location filename="../src/Tutorial/TutorialStateColorFilter.cpp" line="63" />
         <source>Back</source>
         <translation>الى الخلف</translation>
     </message>
@@ -5632,18 +5842,18 @@ Click Ok when finished.</source>
 <context>
     <name>TutorialStateCurveSelection</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="40" />
         <source>After the axis points have been created, a
 curve is selected to receive curve points.
 Step 1 - click on Curve, Point Match, Color
 Picker or Segment Fill buttons.</source>
         <translation>بعد أن تم إنشاء نقاط المحور ،
 يتم تحديد المنحنى لتلقي نقاط المنحنى.
-الخطوة 1 - انقر على المنحنى ، نقطة المباراة ، اللون
+الخطوة 1 - انقر على المنحنى، مطابقة النقطة، اللون
 أزرار اختيار أو تعبئة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="34" />
+        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="45" />
         <source>Step 2 - Select the desired curve name. If
 that curve name has not been created yet,
 use the menu option Settings / Curve Names
@@ -5654,7 +5864,7 @@ to create it.</source>
 لإنشائه.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="39" />
+        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="50" />
         <source>Step 3 - Change the background from the
 original image to the filtered image
 produced for the current curve, using the
@@ -5671,7 +5881,7 @@ the tutorial.</source>
 البرنامج التعليمي.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="47" />
+        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="58" />
         <source>If the current curve is no longer visible
 in the filtered image, then change the
 current Color Filter settings. In the figure,
@@ -5682,17 +5892,17 @@ the orange points have disappeared.</source>
 النقاط البرتقالية قد اختفت.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="55" />
+        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="66" />
         <source>Previous</source>
-        <translation>سابق</translation>
+        <translation>السابق</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="61" />
+        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="72" />
         <source>Color Filter Settings</source>
         <translation>إعدادات تصفية اللون</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="67" />
+        <location filename="../src/Tutorial/TutorialStateCurveSelection.cpp" line="78" />
         <source>Next</source>
         <translation>التالى</translation>
     </message>
@@ -5700,18 +5910,18 @@ the orange points have disappeared.</source>
 <context>
     <name>TutorialStateCurveType</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="26" />
+        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="36" />
         <source>Curve Type</source>
         <translation>نوع المنحنى</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="39" />
         <source>The next steps depend on how the curves
 are drawn, in terms of lines and points.</source>
         <translation>تعتمد الخطوات التالية على كيفية رسم المنحنيات ، من حيث الخطوط والنقاط.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="32" />
+        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="42" />
         <source>If the curves are drawn
 with lines (with or without
 points) then click on
@@ -5722,7 +5932,7 @@ Next (Lines).</source>
 التالي (خطوط).</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="37" />
+        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="47" />
         <source>If the curves are drawn
 without lines and only
 with points, then click on
@@ -5733,17 +5943,17 @@ Next (Points).</source>
 التالي (النقاط).</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="45" />
+        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="55" />
         <source>Previous</source>
-        <translation>سابق</translation>
+        <translation>السابق</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="51" />
+        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="61" />
         <source>Next (Lines)</source>
         <translation>التالي (خطوط)</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="57" />
+        <location filename="../src/Tutorial/TutorialStateCurveType.cpp" line="67" />
         <source>Next (Points)</source>
         <translation>التالي (النقاط)</translation>
     </message>
@@ -5751,33 +5961,33 @@ Next (Points).</source>
 <context>
     <name>TutorialStateIntroduction</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="26" />
+        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="33" />
         <source>Introduction</source>
         <translation>المقدمة</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="36" />
         <source>Engauge Digitizer starts with
 images of graphs and maps.</source>
         <translation>يبدأ المحول الرقمي
 صور الرسوم البيانية والخرائط.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="32" />
+        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="39" />
         <source>You create (or digitize) points along
 the graph and map curves.</source>
         <translation>يمكنك إنشاء (أو رقمنة) نقاط على طول
 الرسم البياني والمنحنيات الخريطة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="35" />
+        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="42" />
         <source>The digitized curve points can be
 exported, as numbers, to other software tools.</source>
         <translation>يمكن أن تكون نقاط المنحنى الرقمية
 تصديرها ، كأرقام ، إلى أدوات البرامج الأخرى.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="41" />
+        <location filename="../src/Tutorial/TutorialStateIntroduction.cpp" line="48" />
         <source>Next</source>
         <translation>التالى</translation>
     </message>
@@ -5785,32 +5995,32 @@ exported, as numbers, to other software tools.</source>
 <context>
     <name>TutorialStatePointMatch</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="26" />
+        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="35" />
         <source>Point Match</source>
-        <translation>نقطة المباراة</translation>
+        <translation>مطابقة النقطة</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="38" />
         <source>In Point Match mode, you pick
 one sample point, and Engauge
 then finds all matching points.
 
 Step 1 - Click on Point Match mode.</source>
-        <translation>في وضع نقطة المباراة ، يمكنك اختيار
+        <translation>في وضع مطابقة النقطة، يمكنك اختيار
 نقطة عينة واحدة ، و Engauge
 ثم يجد كل النقاط المطابقة.
 
-الخطوة 1 - انقر على وضع نقطة المباراة.</translation>
+الخطوة 1 - انقر على وضع مطابقة النقطة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="34" />
+        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="43" />
         <source>Step 2 - Select the curve the new
 points will belong to.</source>
         <translation>الخطوة 2 - حدد المنحنى الجديد
 النقاط سوف تنتمي إليها.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="37" />
+        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="46" />
         <source>Step 3 - Click on a typical point.
 The circle turns green when it
 contains what may be a point.</source>
@@ -5819,7 +6029,7 @@ contains what may be a point.</source>
 يحتوي على ما قد يكون نقطة.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="41" />
+        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="50" />
         <source>Step 4 - Engauge will show a
 matched point with a yellow cross.
 Press the Right Arrow key to accept
@@ -5832,12 +6042,12 @@ until there are no more points.</source>
 حتى لا يكون هناك المزيد من النقاط.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="50" />
+        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="59" />
         <source>Previous</source>
-        <translation>سابق</translation>
+        <translation>السابق</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="56" />
+        <location filename="../src/Tutorial/TutorialStatePointMatch.cpp" line="65" />
         <source>Next</source>
         <translation>التالى</translation>
     </message>
@@ -5845,12 +6055,12 @@ until there are no more points.</source>
 <context>
     <name>TutorialStateSegmentFill</name>
     <message>
-        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="26" />
+        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="34" />
         <source>Segment Fill</source>
         <translation>تعبئة الجزء</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="29" />
+        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="37" />
         <source>Segment Fill mode places several
 points all along the line segments
 of a curve. Step 1 - Click on the
@@ -5861,14 +6071,14 @@ Segment Fill button.</source>
 زر تعبئة الجزء.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="34" />
+        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="42" />
         <source>Step 2 - Select the curve the new
 points will belong to.</source>
         <translation>الخطوة 2 - حدد المنحنى الجديد
 النقاط سوف تنتمي إليها.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="37" />
+        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="45" />
         <source>Step 3 - Move the cursor over a line
 segment in the desired curve. If a
 green line appears, click on it once
@@ -5879,12 +6089,12 @@ to generate many points.</source>
 لتوليد العديد من النقاط.</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="45" />
+        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="53" />
         <source>Previous</source>
-        <translation>سابق</translation>
+        <translation>السابق</translation>
     </message>
     <message>
-        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="51" />
+        <location filename="../src/Tutorial/TutorialStateSegmentFill.cpp" line="59" />
         <source>Next</source>
         <translation>التالى</translation>
     </message>

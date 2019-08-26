@@ -121,7 +121,9 @@ ExportValuesXOrY ExportXThetaValuesMergedFunctions::periodicLinearScreen (double
 {
   LOG4CPP_INFO_S ((*mainCat)) << "ExportXThetaValuesMergedFunctions::periodicLinearScreen";
 
-  const double ARBITRARY_Y = 0.0;
+  // This must be greater than zero. Otherwise, logarithmic y axis will trigger errors in the
+  // transform, which cascades into NaN values for the x coordinates below
+  const double ARBITRARY_Y = 1.0;
 
   // Screen coordinates of endpoints
   QPointF posScreenFirst, posScreenLast;
@@ -132,15 +134,13 @@ ExportValuesXOrY ExportXThetaValuesMergedFunctions::periodicLinearScreen (double
                                                       ARBITRARY_Y),
                                              posScreenLast);
   double deltaScreenX = posScreenLast.x() - posScreenFirst.x();
-  double deltaScreenY = posScreenLast.y() - posScreenFirst.y();
-  double deltaScreen = qSqrt (deltaScreenX * deltaScreenX + deltaScreenY * deltaScreenY);
 
   // Need calculations to find the scaling to be applied to successive points
   double s = 1.0;
   double interval = m_modelExport.pointsIntervalFunctions();
   if ((interval > 0) &&
-      (interval < deltaScreen)) {
-    s = interval / deltaScreen;
+      (interval < deltaScreenX)) {
+    s = interval / deltaScreenX;
   }
 
   // Example: xThetaMin=0.1 and xThetaMax=100 (points are 0.1, 1, 10, 100) with s=1/3 so scale should be 10
@@ -191,17 +191,21 @@ ExportValuesXOrY ExportXThetaValuesMergedFunctions::periodicLogGraph (double xTh
   // Convert the gathered values into a periodic sequence
   ValuesVectorXOrY values;
   double xTheta = xThetaFirstSimplestNumber;
-  while (xTheta > xThetaMin) {
-    xTheta /= m_modelExport.pointsIntervalFunctions(); // Go backwards until reaching or passing minimum
+  if (m_modelExport.pointsIntervalFunctions() > 1) { // Safe to iterate
+    while (xTheta > xThetaMin) {
+      xTheta /= m_modelExport.pointsIntervalFunctions(); // Go backwards until reaching or passing minimum
+    }
   }
   if (xTheta < xThetaMin) {
     values [xThetaMin] = true; // We passed minimum so insert point right at xThetaMin
   }
 
-  xTheta *= m_modelExport.pointsIntervalFunctions();
-  while (xTheta <= xThetaMax) {
-    values [xTheta] = true;
-    xTheta *= m_modelExport.pointsIntervalFunctions(); // Insert point at a simple number
+  if (m_modelExport.pointsIntervalFunctions() > 1) { // Safe to iterate
+    xTheta *= m_modelExport.pointsIntervalFunctions();
+    while (xTheta <= xThetaMax) {
+      values [xTheta] = true;
+      xTheta *= m_modelExport.pointsIntervalFunctions(); // Insert point at a simple number
+    }
   }
 
   if (xTheta > xThetaMax) {
@@ -263,7 +267,7 @@ ExportValuesXOrY ExportXThetaValuesMergedFunctions::xThetaValues () const
   if (m_modelExport.pointsSelectionFunctions() == EXPORT_POINTS_SELECTION_FUNCTIONS_INTERPOLATE_PERIODIC) {
 
     // Special case that occurs when there are no points
-    if (m_modelExport.pointsIntervalFunctions() == 0) {
+    if (qAbs (m_modelExport.pointsIntervalFunctions()) <= 0) {
 
       ExportValuesXOrY empty;
       return empty;
