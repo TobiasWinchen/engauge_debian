@@ -1,3 +1,12 @@
+engauge-digitizer (12.0+ds.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * Fixed copyright information for appstream metadata
+  * Updated to standards version 4.4.0
+  * Update to dh compat 12
+
+ -- Tobias Winchen <tobias@winchen.de>  Mon, 26 Aug 2019 21:09:36 +0200
+
 engauge-digitizer (10.10+ds.1-1) unstable; urgency=medium
 
   * New upstream release
