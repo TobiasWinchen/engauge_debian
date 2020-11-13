@@ -17,9 +17,9 @@ License: GPL-2+
 Files: dev/gnome/engauge-digitizer.appdata.xml
 Copyright: 2015 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
 License: CC0
-	On Debian systems, the complete text of the Creative Commons Zero 1.0
-	Universal license version 1.0 can be found in
-	`/usr/share/common-licenses/CC0-1.0'.
+  On Debian systems, the complete text of the Creative Commons Zero 1.0
+  Universal license version 1.0 can be found in
+  `/usr/share/common-licenses/CC0-1.0'.
 
 Files: src/Callback/functor.h
 Copyright: 1994 Rich Hickey
