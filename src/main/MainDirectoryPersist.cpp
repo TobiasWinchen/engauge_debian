@@ -7,7 +7,8 @@
 #include "MainDirectoryPersist.h"
 #include <QFileInfo>
 
-// QDir::current() gives "working directory" consistent with setting in qtcreator
+bool MainDirectoryPersist::m_setExportSave = false;
+bool MainDirectoryPersist::m_setImportOpen = false;
 QDir MainDirectoryPersist::m_directoryExportSave = QDir::current();
 QDir MainDirectoryPersist::m_directoryImportOpen = QDir::current();
 
@@ -27,10 +28,50 @@ QDir MainDirectoryPersist::getDirectoryImportOpen() const
 
 void MainDirectoryPersist::setDirectoryExportSaveFromFilename(const QString &fileName)
 {
-  m_directoryExportSave = QFileInfo(fileName).dir();
+  m_setExportSave = true;
+  setDirectoryExportSaveFromSavedPath (QFileInfo (fileName).dir ().absolutePath());
+}
+
+void MainDirectoryPersist::setDirectoryExportSaveFromSavedPath (const QString &path)
+{
+  m_directoryExportSave = QDir(path);
+
+  if (!m_directoryExportSave.exists ()) {
+
+    // Directory has been (re)moved so fall back on a safe alternative
+    m_directoryExportSave = QDir::current ();
+
+  }
+
+  if (!m_setImportOpen) {
+
+    // Use the export directory for import since no better alternative is available
+    m_directoryImportOpen = m_directoryExportSave;
+
+  }
 }
 
 void MainDirectoryPersist::setDirectoryImportOpenFromFilename(const QString &fileName)
 {
-  m_directoryImportOpen = QFileInfo(fileName).dir();
+  m_setImportOpen = true;
+  setDirectoryImportLoadFromSavedPath (QFileInfo (fileName).dir ().absolutePath());
+}
+
+void MainDirectoryPersist::setDirectoryImportLoadFromSavedPath (const QString &path)
+{
+  m_directoryImportOpen = QDir (path);
+
+  if (!m_directoryImportOpen.exists ()) {
+
+    // Directory has been (re)moved so fall back on a safe alternative
+    m_directoryImportOpen = QDir::current ();
+
+  }
+
+  if (!m_setExportSave) {
+
+    // Use the import directory for export since no better alternative is available
+    m_directoryExportSave = m_directoryImportOpen;
+
+  }
 }

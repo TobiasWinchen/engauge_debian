@@ -139,7 +139,7 @@ public:
              const QString &extractImageOnlyExtension,
              const QStringList &loadStartupFiles,
              const QStringList &commandLineWithoutLoadStartupFiles,
-             QWidget *parent = 0);
+             QWidget *parent = nullptr);
   ~MainWindow();
 
   /// Close file. This is called from a file script command
@@ -159,7 +159,7 @@ public:
 
   /// Catch secret keypresses
   virtual bool eventFilter(QObject *, QEvent *);
-
+  
   /// Background image that has been filtered for the current curve. This asserts if a curve-specific image is not being shown
   QImage imageFiltered () const;
 

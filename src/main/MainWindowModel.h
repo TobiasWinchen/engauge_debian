@@ -7,6 +7,7 @@
 #ifndef MAIN_WINDOW_MODEL_H
 #define MAIN_WINDOW_MODEL_H
 
+#include "ColorPalette.h"
 #include "DocumentModelAbstractBase.h"
 #include "ImportCropping.h"
 #include "MainTitleBarFormat.h"
@@ -41,8 +42,6 @@ public:
   /// Get method for drag and drop export
   bool dragDropExport () const;
 
-  virtual void loadXml(QXmlStreamReader &reader);
-
   /// Get method for highlight opacity
   double highlightOpacity() const;
 
@@ -51,6 +50,8 @@ public:
 
   /// Get method for import cropping
   ImportCropping importCropping () const;
+
+  virtual void loadXml(QXmlStreamReader &reader);
 
   /// Get method for locale
   QLocale locale() const;

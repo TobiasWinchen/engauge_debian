@@ -253,7 +253,7 @@ MainWindow::~MainWindow()
   delete m_dlgSettingsPointMatch;
   delete m_dlgSettingsSegments;
   delete m_fileCmdScript;
-  m_gridLines.clear ();  
+  m_gridLines.clear ();
 }
 
 void MainWindow::addDockWindow (QDockWidget *dockWidget,
@@ -612,7 +612,17 @@ void MainWindow::fileImport (const QString &fileName,
                         image,
                         importType);
 
-    if (!loaded) {
+    if (loaded) {
+
+      // Success
+      if ((m_cmdMediator->document().coordSystemCount() > 1) &&
+          ! m_actionViewCoordSystem->isChecked ()) {
+
+        // User is working with multiple coordinate systems so make the coordinate system toolbar visible
+        m_actionViewCoordSystem->trigger ();
+      }
+
+    } else {
 
       // Failed
       if (importType == IMPORT_TYPE_ADVANCED) {
@@ -858,7 +868,7 @@ void MainWindow::loadCoordSystemListFromCmdMediator ()
   // Always start with the first entry selected
   m_cmbCoordSystem->setCurrentIndex (0);
 
-  // Disable the controls if there is only one entry. Hopefully the user will not even notice it, thus simplifying the interface
+  // Disable the controls if there is only one entry. Hopefully the user will not even be distracted
   bool enable = (m_cmbCoordSystem->count() > 1);
   m_cmbCoordSystem->setEnabled (enable);
   m_btnShowAll->setEnabled (enable);
@@ -1057,7 +1067,7 @@ bool MainWindow::loadImageNewDocument (const QString &fileName,
     }
 
     // Start axis mode
-    m_actionDigitizeAxis->setChecked (true); // We assume user first wants to digitize axis points
+    m_actionDigitizeAxis->setChecked (true); // We assume user first wants to digitize axis points  
 
     // Trigger transition so cursor gets updated immediately
     if (modeMap ()) {
@@ -1242,13 +1252,15 @@ void MainWindow::rebuildRecentFileListForCurrentFile(const QString &filePath)
   updateRecentFileList();
 }
 
-void MainWindow::resizeEvent(QResizeEvent * /* event */)
+void MainWindow::resizeEvent(QResizeEvent *event)
 {
   LOG4CPP_DEBUG_S ((*mainCat)) << "MainWindow::resizeEvent";
 
   if (m_actionZoomFill->isChecked ()) {
     slotViewZoomFactor (ZOOM_FILL);
   }
+
+  QMainWindow::resizeEvent(event);
 }
 
 bool MainWindow::saveDocumentFile (const QString &fileName)
@@ -1552,7 +1564,7 @@ void MainWindow::settingsReadEnvironment (QSettings &settings)
 }
 
 void MainWindow::settingsReadMainWindow (QSettings &settings)
-{
+{  
   settings.beginGroup(SETTINGS_GROUP_MAIN_WINDOW);
 
   // Main window geometry
@@ -1670,6 +1682,13 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
   m_modelMainWindow.setImageReplaceRenamesDocument (settings.value (SETTINGS_IMAGE_REPLACE_RENAMES_DOCUMENT,
                                                                     QVariant (DEFAULT_IMAGE_REPLACE_RENAMES_DOCUMENT)).toBool ());
 
+  // MainDirectoryPersist starts with directories from last execution
+  MainDirectoryPersist directoryPersist;
+  directoryPersist.setDirectoryExportSaveFromSavedPath (settings.value (SETTINGS_MAIN_DIRECTORY_EXPORT_SAVE,
+                                                                        QVariant (QDir::currentPath())).toString ());
+  directoryPersist.setDirectoryImportLoadFromSavedPath (settings.value (SETTINGS_MAIN_DIRECTORY_IMPORT_LOAD,
+                                                                        QVariant (QDir::currentPath())).toString ());
+
   updateSettingsMainWindow();
   updateSmallDialogs();
 
@@ -1678,6 +1697,8 @@ void MainWindow::settingsReadMainWindow (QSettings &settings)
 
 void MainWindow::settingsWrite ()
 {
+  MainDirectoryPersist directoryPersist;
+
   QSettings settings (SETTINGS_ENGAUGE, SETTINGS_DIGITIZER);
 
   settings.beginGroup (SETTINGS_GROUP_ENVIRONMENT);
@@ -1728,6 +1749,10 @@ void MainWindow::settingsWrite ()
   settings.setValue (SETTINGS_IMPORT_PDF_RESOLUTION, m_modelMainWindow.pdfResolution ());
   settings.setValue (SETTINGS_LOCALE_LANGUAGE, m_modelMainWindow.locale().language());
   settings.setValue (SETTINGS_LOCALE_COUNTRY, m_modelMainWindow.locale().country());
+  settings.setValue (SETTINGS_MAIN_DIRECTORY_EXPORT_SAVE,
+                     directoryPersist.getDirectoryExportSave().absolutePath());
+  settings.setValue (SETTINGS_MAIN_DIRECTORY_IMPORT_LOAD,
+                     directoryPersist.getDirectoryImportOpen().absolutePath());
   settings.setValue (SETTINGS_MAIN_TITLE_BAR_FORMAT, m_modelMainWindow.mainTitleBarFormat());
   settings.setValue (SETTINGS_MAXIMUM_GRID_LINES, m_modelMainWindow.maximumGridLines());
   settings.setValue (SETTINGS_SMALL_DIALOGS, m_modelMainWindow.smallDialogs());
@@ -3135,7 +3160,7 @@ void MainWindow::startRegressionDropTest (const QStringList &loadStartupFiles)
   // Regression testing of drag and drop has some constraints:
   // 1) Need graphics window (GraphicsView) or else its events will not work. This is why
   //    drag and drop testing is not done as one of the cli tests, which do not show the gui
-  // 2) Drag and drop by itself does not produce the csv file, so this code will output the
+  // 2) Drag and drop by itself does not produce the csv file, so this code will output theupdateTransformFromMatrices
   //    x,y dimensions of the imported image instead of a normal csv file
   connect (this, SIGNAL (signalDropRegression (QString)), m_view, SLOT (slotDropRegression (QString)));
 
