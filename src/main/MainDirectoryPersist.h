@@ -29,12 +29,22 @@ public:
   /// Save the current Export/Save directory, after user has accepted the Export/Save dialog
   void setDirectoryExportSaveFromFilename (const QString &fileName);
 
+  /// Set the current Export/Save directory at startup to path from previous execution. When
+  /// called within this class the path is not saved from the previous execution
+  void setDirectoryExportSaveFromSavedPath (const QString &path);
+
   /// Save the current Import/Open directory, after user has accepted the Import/Open dialog
   void setDirectoryImportOpenFromFilename (const QString &fileName);
+
+  /// Set the current Import/Open directory at startup to path from previous execution. When
+  /// called within this class the path is not saved from the previous execution
+  void setDirectoryImportLoadFromSavedPath (const QString &path);
 
 private:
 
   // The directories are static so all instances of this class share the same values
+  static bool m_setExportSave;
+  static bool m_setImportOpen;
   static QDir m_directoryExportSave;
   static QDir m_directoryImportOpen;
 
