@@ -1,12 +1,12 @@
 engauge-digitizer (12.1+ds.1-1) unstable; urgency=medium
 
-  * New upstream release
+  * New upstream release. Closes: #974131
   * Fixed copyright information for appstream metadata
   * Updated to standards version 4.4.0
   * Update to dh compat 13
   * Use debhelper-compat virtual package over debian/compat file
 
- -- Tobias Winchen <tobias@winchen.de>  Mon, 26 Aug 2019 21:09:36 +0200
+ -- Tobias Winchen <tobias@winchen.de>  Fri, 13 Nov 2020 21:13:54 +0100
 
 engauge-digitizer (10.10+ds.1-1) unstable; urgency=medium
 
